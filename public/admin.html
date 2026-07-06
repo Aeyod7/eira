@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Admin — Eira</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Raleway:wght@300;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+  <style>
+    body { background: var(--color-surface-base); color: var(--color-text-primary); }
+    .admin-shell { max-width: 800px; margin: 0 auto; padding: var(--space-10) var(--space-6); }
+    .admin-header { display:flex; align-items:center; justify-content:space-between; margin-bottom: var(--space-10); flex-wrap:wrap; gap:var(--space-4); }
+    .admin-header h1 { margin:0; font-size: var(--font-size-2xl); font-family: var(--font-family-primary); }
+    .admin-tabs { display:flex; gap: var(--space-2); flex-wrap:wrap; margin-bottom: var(--space-10); border-bottom: 1px solid var(--color-border-subtle); padding-bottom: var(--space-4); }
+    .admin-tabs button {
+      font-family: var(--font-family-stack); font-size: var(--font-size-sm); font-weight: var(--font-weight-bold);
+      padding: var(--space-3) var(--space-5);
+      border: none; background: transparent; color: var(--color-text-muted);
+      cursor: pointer; border-radius: var(--radius-sm);
+    }
+    .admin-tabs button:hover { color: var(--color-text-primary); }
+    .admin-tabs button[aria-selected="true"] { color: var(--color-accent-strong); background: var(--color-accent-soft); }
+    [hidden] { display: none !important; }
+    .panel h2 { font-size: var(--font-size-xl); margin-bottom: var(--space-6); font-family: var(--font-family-primary); }
+
+    /* Simple cards */
+    .card { background: var(--color-surface-strong); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--space-6); margin-bottom: var(--space-6); }
+    .card h3 { margin: 0 0 var(--space-4) 0; font-size: var(--font-size-md); font-weight: var(--font-weight-bold); letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-text-muted); }
+    .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+    .stat-item { text-align: center; }
+    .stat-item .n { font-family: var(--font-family-primary); font-size: var(--font-size-2xl); display: block; }
+    .stat-item .l { font-size: var(--font-size-xs); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; font-size: var(--font-size-sm); }
+    th, td { text-align: left; padding: var(--space-4); border-bottom: 1px solid var(--color-border-subtle); vertical-align: middle; }
+    th { font-size: var(--font-size-xs); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: var(--font-weight-bold); }
+    .muted { color: var(--color-text-muted); font-size: var(--font-size-sm); }
+
+    /* Forms */
+    .simple-form .field { margin-bottom: var(--space-5); }
+    .simple-form label { display: block; margin-bottom: var(--space-2); font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .simple-form input, .simple-form select, .simple-form textarea { width: 100%; }
+    .simple-form textarea { min-height: 120px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); }
+    .actions { display: flex; gap: var(--space-4); margin-top: var(--space-8); }
+
+    /* Products */
+    .product-list { display: flex; flex-direction: column; gap: var(--space-4); }
+    .product-item { background: var(--color-surface-base); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--space-5); }
+    .product-item__head { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); }
+    .product-item__head span { font-family: var(--font-family-primary); color: var(--color-accent-strong); font-size: var(--font-size-lg); }
+    .product-item__head button { font-size: var(--font-size-xs); color: var(--color-text-muted); background: none; border: none; cursor: pointer; }
+    .product-item__head button:hover { color: var(--color-state-error); }
+    .add-btn { width: 100%; padding: var(--space-5); border: 2px dashed var(--color-border-strong); border-radius: var(--radius-md); background: transparent; color: var(--color-accent-strong); font-weight: var(--font-weight-bold); cursor: pointer; margin-top: var(--space-4); }
+    .add-btn:hover { background: var(--color-accent-soft); }
+    .product-item .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+    .product-item .full { grid-column: 1 / -1; }
+    @media (max-width: 600px) {
+      .product-item .two-col { grid-template-columns: 1fr; }
+    }
+    .content-editor { min-height: 420px; background: var(--color-surface-base); border-radius: var(--radius-lg); }
+    .content-editor-hint { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: var(--space-2); }
+    .ql-toolbar { border: 1px solid var(--color-border-subtle) !important; border-radius: var(--radius-lg) var(--radius-lg) 0 0; background: var(--color-surface-strong); }
+    .ql-container { border: 1px solid var(--color-border-subtle) !important; border-top: none !important; border-radius: 0 0 var(--radius-lg) var(--radius-lg); font-family: var(--font-family-stack) !important; font-size: var(--font-size-md) !important; }
+    .ql-editor { min-height: 420px; padding: var(--space-6) !important; line-height: 1.7; }
+    .ql-editor h2 { font-family: var(--font-family-primary); font-size: var(--font-size-xl); margin: var(--space-5) 0 var(--space-3); }
+    .ql-editor h3 { font-family: var(--font-family-primary); font-size: var(--font-size-lg); margin: var(--space-4) 0 var(--space-2); }
+    .ql-editor p { margin-bottom: var(--space-3); }
+    .ql-editor ul, .ql-editor ol { padding-left: var(--space-6); margin-bottom: var(--space-3); }
+    .ql-editor li { margin-bottom: var(--space-1); }
+
+    .login-box { max-width: 360px; margin: var(--space-20) auto; text-align: center; }
+    .login-box form { display: flex; flex-direction: column; gap: var(--space-5); margin-top: var(--space-6); }
+    .toast { position: fixed; bottom: var(--space-8); left: 50%; transform: translateX(-50%); background: var(--color-surface-dark); color: var(--color-text-secondary); padding: var(--space-4) var(--space-7); border-radius: var(--radius-pill); font-size: var(--font-size-sm); box-shadow: var(--shadow-lg); opacity: 0; transition: opacity var(--motion-duration-fast); pointer-events: none; }
+    .toast.show { opacity: 1; }
+    .link { color: var(--color-accent-strong); text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font-size: inherit; }
+    .link:hover { color: var(--color-accent-primary); }
+    .badge { display: inline-block; font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3); border-radius: var(--radius-pill); background: var(--color-accent-soft); color: var(--color-accent-strong); font-weight: var(--font-weight-bold); }
+    .og-preview { width: 100%; max-width: 200px; aspect-ratio: 2/3; object-fit: cover; border-radius: var(--radius-md); border: 1px solid var(--color-border-subtle); background: var(--color-surface-base); margin-top: var(--space-4); display: none; }
+    .og-preview[src] { display: block; }
+    .og-preview-fallback { width: 100%; max-width: 200px; aspect-ratio: 2/3; border-radius: var(--radius-md); border: 1px dashed var(--color-border-subtle); background: var(--color-surface-base); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: var(--font-size-sm); margin-top: var(--space-4); }
+    .hero-actions { white-space: nowrap; }
+    .hero-actions .btn { margin-left: var(--space-2); }
+    #hero-slides-list td { vertical-align: middle; }
+    /* Hero preview mirrors the real hero: wide, cover-cropped */
+    #h-image-preview { max-width: 100%; width: 100%; aspect-ratio: 16 / 7; object-fit: cover; object-position: center; }
+
+    @media (max-width: 600px) {
+      .two-col, .stat-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <main id="main" class="admin-shell">
+
+    <section id="login-view" class="login-box">
+      <p class="eyebrow">Admin</p>
+      <h1>Eira CMS</h1>
+      <p class="muted">Sign in to manage posts, links, and subscribers.</p>
+      <form id="login-form">
+        <input class="input" type="password" id="login-password" placeholder="Admin password" required autocomplete="current-password" />
+        <span class="field__error" id="login-err" aria-live="polite"></span>
+        <button class="btn btn--primary" type="submit">Sign in</button>
+      </form>
+    </section>
+
+    <section id="dash-view" hidden>
+      <header class="admin-header">
+        <h1>Eira CMS</h1>
+        <div style="display:flex; gap: var(--space-4); align-items:center;">
+          <a href="/" class="muted">View site →</a>
+          <button class="btn btn--secondary" id="logout-btn" type="button">Sign out</button>
+        </div>
+      </header>
+
+      <nav class="admin-tabs" role="tablist" aria-label="Admin sections">
+        <button role="tab" aria-selected="true" data-tab="stats">Stats</button>
+        <button role="tab" aria-selected="false" data-tab="posts">Posts</button>
+        <button role="tab" aria-selected="false" data-tab="products">Products</button>
+        <button role="tab" aria-selected="false" data-tab="hero">Hero</button>
+        <button role="tab" aria-selected="false" data-tab="links">Links</button>
+        <button role="tab" aria-selected="false" data-tab="subscribers">Subscribers</button>
+        <button role="tab" aria-selected="false" data-tab="newsletter">Newsletter</button>
+      </nav>
+
+      <!-- STATS -->
+      <div class="panel" id="panel-stats">
+        <div class="card">
+          <div class="stat-row">
+            <div class="stat-item"><span class="n" id="stat-subs">—</span><span class="l">Subscribers</span></div>
+            <div class="stat-item"><span class="n" id="stat-clicks">—</span><span class="l">Clicks</span></div>
+            <div class="stat-item"><span class="n" id="stat-links">—</span><span class="l">Links</span></div>
+          </div>
+        </div>
+        <h2>Top links</h2>
+        <table id="top-links-table"><thead><tr><th>Link</th><th>Post</th><th>Clicks</th></tr></thead><tbody></tbody></table>
+      </div>
+
+      <!-- POSTS -->
+      <div class="panel" id="panel-posts" hidden>
+        <div id="posts-list-view">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-6);">
+            <h2>Posts</h2>
+            <button class="btn btn--primary" id="new-post-btn" type="button">+ New post</button>
+          </div>
+          <table id="posts-table"><thead><tr><th>Title</th><th>Category</th><th>Status</th><th></th></tr></thead><tbody></tbody></table>
+        </div>
+
+        <div id="posts-editor-view" hidden>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-6); flex-wrap:wrap; gap:var(--space-4);">
+            <h2 id="editor-title">New post</h2>
+            <a id="editor-preview-link" class="muted" href="#" target="_blank">Preview post →</a>
+          </div>
+
+          <form class="simple-form" id="post-form">
+            <div class="two-col">
+              <div class="field">
+                <label for="p-title">Post title</label>
+                <input class="input" id="p-title" placeholder="10 Best Amazon UK Skincare Finds for Dark Skin" required />
+              </div>
+              <div class="field">
+                <label for="p-category">Category</label>
+                <select class="input" id="p-category" required>
+                  <option value="">Select category</option>
+                  <option value="Beauty">Beauty</option>
+                  <option value="Skincare">Skincare</option>
+                  <option value="Fashion">Fashion</option>
+                  <option value="Fitness">Fitness</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="two-col">
+              <div class="field">
+                <label for="p-slug">URL slug <span class="muted" id="p-slug-hint">auto-generated</span></label>
+                <input class="input" id="p-slug" placeholder="my-post-slug" />
+                <p class="muted" id="p-slug-edit-note" style="display:none; margin-top:var(--space-2);">Locked on edit. Changing it would break existing links.</p>
+              </div>
+              <div class="field">
+                <label for="p-published">Status</label>
+                <select class="input" id="p-published">
+                  <option value="1">Published</option>
+                  <option value="0">Draft</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="p-ogimage">Pinterest / OG image URL <span class="muted">or local image path</span></label>
+              <input class="input" id="p-ogimage" placeholder="https://pin.it/... or pins/post-pin.svg" />
+              <img class="og-preview" id="p-og-preview" alt="OG image preview" />
+              <div class="og-preview-fallback" id="p-og-fallback">No image preview</div>
+            </div>
+
+            <div class="field">
+              <label for="p-intro">Blog post content</label>
+              <div id="p-editor" class="content-editor"></div>
+              <input type="hidden" id="p-intro" />
+              <p class="content-editor-hint">Write normally. Use the toolbar for headings, bold, lists, and links.</p>
+            </div>
+
+            <div class="card" style="margin-top: var(--space-6);">
+              <h3>Products</h3>
+              <p class="muted" style="margin-bottom: var(--space-5);">Attach existing products from the Products tab. Reorder with up/down buttons.</p>
+              <div class="product-list" id="product-list"></div>
+              <div class="two-col" style="margin-top: var(--space-4);">
+                <div class="field">
+                  <select class="input" id="attach-product-select">
+                    <option value="">— Select a product to attach —</option>
+                  </select>
+                </div>
+                <div class="field" style="display:flex; align-items:flex-end;">
+                  <button class="btn btn--secondary" id="attach-product-btn" type="button">+ Attach product</button>
+                </div>
+              </div>
+              <p class="muted" style="margin-top: var(--space-3);"><a href="#" id="go-to-products-tab" class="link">Create a new product in the Products tab →</a></p>
+            </div>
+
+            <div class="actions">
+              <button class="btn btn--primary" id="save-post-btn" type="submit">Save post</button>
+              <button class="btn btn--secondary" id="cancel-post-btn" type="button">Cancel</button>
+              <button class="btn btn--error" id="delete-post-btn" type="button" hidden>Delete</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- PRODUCTS -->
+      <div class="panel" id="panel-products" hidden>
+        <div id="products-list-view">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-6);">
+            <h2>Products</h2>
+            <button class="btn btn--primary" id="new-product-btn" type="button">+ New product</button>
+          </div>
+          <table id="products-table"><thead><tr><th></th><th>Name</th><th>Category</th><th>Link</th><th>Status</th><th></th></tr></thead><tbody></tbody></table>
+        </div>
+
+        <div id="products-editor-view" hidden>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-6); flex-wrap:wrap; gap:var(--space-4);">
+            <h2 id="product-editor-title">New product</h2>
+          </div>
+
+          <form class="simple-form" id="product-form">
+            <div class="two-col">
+              <div class="field">
+                <label for="pr-name">Product name</label>
+                <input class="input" id="pr-name" placeholder="e.g. Blush cropped cardigan" required />
+              </div>
+              <div class="field">
+                <label for="pr-category">Product category</label>
+                <select class="input" id="pr-category">
+                  <option value="">Select category</option>
+                  <option value="Beauty">Beauty</option>
+                  <option value="Skincare">Skincare</option>
+                  <option value="Fashion">Fashion</option>
+                  <option value="Fitness">Fitness</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="pr-image">Product image URL</label>
+              <input class="input" id="pr-image" placeholder="https://m.media-amazon.com/images/... or Pinterest image" />
+              <img class="og-preview" id="pr-image-preview" alt="Product image preview" />
+              <div class="og-preview-fallback" id="pr-image-fallback">No image preview</div>
+            </div>
+
+            <div class="two-col">
+              <div class="field">
+                <label for="pr-linkurl">Affiliate URL</label>
+                <input class="input" id="pr-linkurl" placeholder="https://www.amazon.co.uk/dp/...?tag=eira-21" />
+                <p class="content-editor-hint">Paste the affiliate URL. A cloaked /go/:slug link will be created automatically.</p>
+                <p class="content-editor-hint" id="pr-created-link" hidden style="color:var(--color-accent-strong);"></p>
+              </div>
+              <div class="field">
+                <label for="pr-linklabel">Link label</label>
+                <input class="input" id="pr-linklabel" placeholder="Shop now" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="pr-published">Status</label>
+              <select class="input" id="pr-published">
+                <option value="1">Published</option>
+                <option value="0">Draft</option>
+              </select>
+            </div>
+
+            <div class="actions">
+              <button class="btn btn--primary" id="save-product-btn" type="submit">Save product</button>
+              <button class="btn btn--secondary" id="cancel-product-btn" type="button">Cancel</button>
+              <button class="btn btn--error" id="delete-product-btn" type="button" hidden>Delete</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- HERO -->
+      <div class="panel" id="panel-hero" hidden>
+        <div id="hero-list-view">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-6); flex-wrap:wrap; gap:var(--space-4);">
+            <h2>Hero slideshow</h2>
+            <button class="btn btn--primary" id="new-hero-btn" type="button">+ Add slide</button>
+          </div>
+          <p class="muted" id="hero-loading">Loading slides…</p>
+          <div id="hero-slides-list"></div>
+          <p class="muted" id="hero-empty" hidden>No slides. Add images to show a rotating background on the homepage.</p>
+        </div>
+
+        <div id="hero-editor-view" hidden>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-6); flex-wrap:wrap; gap:var(--space-4);">
+            <h2 id="hero-editor-title">Add hero slide</h2>
+          </div>
+          <form class="simple-form" id="hero-form">
+            <div class="field">
+              <label for="h-image-url">Image URL</label>
+              <input class="input" id="h-image-url" placeholder="https://images.unsplash.com/photo-..." required />
+              <img class="og-preview" id="h-image-preview" alt="Hero image preview" />
+              <div class="og-preview-fallback" id="h-image-fallback">No image preview</div>
+            </div>
+            <div class="two-col">
+              <div class="field">
+                <label for="h-focal">Focus point</label>
+                <select class="input" id="h-focal">
+                  <option value="center">Center</option>
+                  <option value="top">Top</option>
+                  <option value="bottom">Bottom</option>
+                  <option value="left">Left</option>
+                  <option value="right">Right</option>
+                  <option value="top left">Top left</option>
+                  <option value="top right">Top right</option>
+                  <option value="bottom left">Bottom left</option>
+                  <option value="bottom right">Bottom right</option>
+                </select>
+                <p class="content-editor-hint">Which part of the image stays visible when cropped. Use "Top" for faces, "Center" for products.</p>
+              </div>
+              <div class="field">
+                <label for="h-active">Status</label>
+                <select class="input" id="h-active">
+                  <option value="1">Active</option>
+                  <option value="0">Hidden</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="h-position">Position</label>
+              <input class="input" id="h-position" type="number" min="0" placeholder="0" />
+              <p class="content-editor-hint">Lower numbers appear first. Leave blank for next position.</p>
+            </div>
+            <div class="actions">
+              <button class="btn btn--primary" id="save-hero-btn" type="submit">Save slide</button>
+              <button class="btn btn--secondary" id="cancel-hero-btn" type="button">Cancel</button>
+              <button class="btn btn--error" id="delete-hero-btn" type="button" hidden>Delete</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- LINKS -->
+      <div class="panel" id="panel-links" hidden>
+        <h2>Affiliate links</h2>
+        <div class="card">
+          <h3>Add link</h3>
+          <div class="two-col">
+            <div class="field">
+              <label for="l-slug">Short slug</label>
+              <input class="input" id="l-slug" placeholder="vitamin-c-serum" />
+            </div>
+            <div class="field">
+              <label for="l-network">Network</label>
+              <select class="input" id="l-network">
+                <option value="amazon">Amazon</option>
+                <option value="awin">AWIN</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="l-dest">Destination URL</label>
+            <input class="input" id="l-dest" placeholder="https://www.amazon.co.uk/dp/...?tag=eira-21" />
+          </div>
+          <div class="field">
+            <label for="l-post">Post slug (optional)</label>
+            <input class="input" id="l-post" placeholder="post-slug" />
+          </div>
+          <button class="btn btn--primary" id="add-link-btn" type="button">Add link</button>
+        </div>
+
+        <table id="links-table"><thead><tr><th>Slug</th><th>Destination</th><th>Network</th><th>Clicks</th><th></th></tr></thead><tbody></tbody></table>
+      </div>
+
+      <!-- SUBSCRIBERS -->
+      <div class="panel" id="panel-subscribers" hidden>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-6);">
+          <h2>Subscribers</h2>
+          <button class="btn btn--secondary" id="export-subs-btn" type="button">Export CSV</button>
+        </div>
+        <table id="subs-table"><thead><tr><th>Email</th><th>Source</th><th>Date</th></tr></thead><tbody></tbody></table>
+      </div>
+
+      <!-- NEWSLETTER -->
+      <div class="panel" id="panel-newsletter" hidden>
+        <h2>Send a newsletter</h2>
+        <p class="muted" id="nl-status" style="margin-bottom: var(--space-6);">Checking email status…</p>
+        <div class="field">
+          <label for="nl-subject">Subject line</label>
+          <input class="input" id="nl-subject" placeholder="This week's Amazon UK beauty finds" />
+        </div>
+        <div class="field">
+          <label for="nl-body">Body (HTML allowed — paragraphs, links, headings)</label>
+          <textarea class="input" id="nl-body" rows="12" placeholder="&lt;p&gt;Here's what we're loving this week…&lt;/p&gt;&#10;&#10;&lt;p&gt;&lt;a href=&quot;https://yourdomain.com/post/...&quot;&gt;Read the full roundup →&lt;/a&gt;&lt;/p&gt;"></textarea>
+        </div>
+        <p class="muted" style="margin-bottom: var(--space-5);">Your content is wrapped in the branded Eira email layout (logo header + footer) automatically.</p>
+        <div class="two-col">
+          <div class="field">
+            <label for="nl-test">Send a test to yourself first</label>
+            <input class="input" id="nl-test" type="email" placeholder="you@example.com" />
+          </div>
+          <div class="field" style="align-self:end;">
+            <button class="btn btn--secondary" id="nl-test-btn" type="button">Send test</button>
+          </div>
+        </div>
+        <button class="btn btn--primary" id="nl-send-btn" type="button">Send to all subscribers</button>
+      </div>
+    </section>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </main>
+
+  <script>
+  (function () {
+    var $ = function (s) { return document.querySelector(s); };
+    var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+    var toastEl = $("#toast");
+    function toast(msg) { toastEl.textContent = msg; toastEl.classList.add("show"); setTimeout(function(){ toastEl.classList.remove("show"); }, 2400); }
+    function api(path, opts) {
+      opts = opts || {};
+      opts.headers = Object.assign({ "Content-Type": "application/json" }, opts.headers || {});
+      if (opts.body && typeof opts.body !== "string") opts.body = JSON.stringify(opts.body);
+      return fetch(path, opts).then(function (r) {
+        if (r.status === 401) { showLogin(); throw new Error("Unauthorized"); }
+        return r.json().catch(function () { return {}; });
+      });
+    }
+    function esc(s) { return String(s||"").replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+    // ---- Auth ----
+    function showLogin() { $("#login-view").hidden = false; $("#dash-view").hidden = true; }
+    function showDash() {
+      $("#login-view").hidden = true;
+      $("#dash-view").hidden = false;
+      $$(".admin-tabs button").forEach(function (b) { b.setAttribute("aria-selected", "false"); });
+      $$(".admin-tabs button[data-tab=stats]")[0].setAttribute("aria-selected", "true");
+      $$(".panel").forEach(function (p) { p.hidden = true; });
+      $("#panel-stats").hidden = false;
+      loadStats(); loadPosts(); loadLinks(); loadProducts(); loadHeroSlides(); loadSubs(); loadNewsletter();
+    }
+    $("#login-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      api("/api/admin/login", { method: "POST", body: { password: $("#login-password").value } })
+        .then(function (r) { if (r.ok) { toast("Signed in"); showDash(); } else { $("#login-err").textContent = r.error || "Wrong password"; } })
+        .catch(function () { $("#login-err").textContent = "Sign in failed"; });
+    });
+    $("#logout-btn").addEventListener("click", function () { api("/api/admin/logout", { method: "POST" }).then(function () { toast("Signed out"); showLogin(); }); });
+    api("/api/admin/me").then(function (r) { if (r.authenticated) showDash(); else showLogin(); });
+
+    // ---- Tabs ----
+    $$(".admin-tabs button").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        $$(".admin-tabs button").forEach(function (b) { b.setAttribute("aria-selected", "false"); });
+        btn.setAttribute("aria-selected", "true");
+        $$(".panel").forEach(function (p) { p.hidden = true; });
+        $("#panel-" + btn.dataset.tab).hidden = false;
+      });
+    });
+
+    // ---- Stats ----
+    function loadStats() {
+      api("/api/stats").then(function (s) {
+        $("#stat-subs").textContent = s.subscribers;
+        $("#stat-clicks").textContent = s.total_clicks;
+        $("#stat-links").textContent = s.top_links ? s.top_links.length : 0;
+        var tb = $("#top-links-table tbody"); tb.innerHTML = "";
+        (s.top_links || []).forEach(function (l) {
+          var tr = document.createElement("tr");
+          tr.innerHTML = "<td><code>/go/" + esc(l.slug) + "</code></td><td>" + esc(l.post_slug || "—") + "</td><td>" + l.clicks + "</td>";
+          tb.appendChild(tr);
+        });
+      }).catch(function () {});
+    }
+
+    // ---- Links ----
+    var linksCache = [];
+    function loadLinks() {
+      return api("/api/links").then(function (r) {
+        linksCache = r.links || [];
+        var tb = $("#links-table tbody"); tb.innerHTML = "";
+        linksCache.forEach(function (l) {
+          var tr = document.createElement("tr");
+          var dest = l.destination || "";
+          var destShort = dest.length > 45 ? dest.slice(0, 45) + "…" : dest;
+          tr.innerHTML = "<td><code>/go/" + esc(l.slug) + "</code></td>"
+            + "<td><a href='" + esc(dest) + "' target='_blank' rel='noopener'>" + esc(destShort) + "</a></td>"
+            + "<td>" + esc(l.network || "—") + "</td>"
+            + "<td>" + (l.clicks || 0) + "</td>"
+            + "<td><button class='link' data-del-link='" + esc(l.slug) + "'>Delete</button></td>";
+          tb.appendChild(tr);
+        });
+        $$("[data-del-link]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            if (!confirm("Delete /go/" + b.dataset.delLink + "?")) return;
+            api("/api/links/" + encodeURIComponent(b.dataset.delLink), { method: "DELETE" }).then(function () {
+              toast("Link deleted"); loadLinks(); loadStats();
+            });
+          });
+        });
+      });
+    }
+    $("#add-link-btn").addEventListener("click", function () {
+      var slug = $("#l-slug").value.trim();
+      var dest = $("#l-dest").value.trim();
+      if (!slug || !dest) { toast("Slug and destination required"); return; }
+      api("/api/links", { method: "POST", body: { slug: slug, destination: dest, network: $("#l-network").value, post_slug: $("#l-post").value } })
+        .then(function (r) {
+          if (r.ok) {
+            toast("Link saved");
+            $("#l-slug").value = ""; $("#l-dest").value = ""; $("#l-post").value = "";
+            loadLinks(); loadStats();
+          } else { toast(r.error || "Failed"); }
+        });
+    });
+
+    // ---- Posts ----
+    var editingSlug = null;
+    var attachedProducts = [];   // array of { id, name, image_url, why_html, link_slug, link_label, section_heading, image_text }
+    var slugManuallyEdited = false;
+
+    function loadPosts() {
+      api("/api/posts").then(function (r) {
+        var tb = $("#posts-table tbody"); tb.innerHTML = "";
+        (r.posts || []).forEach(function (p) {
+          var tr = document.createElement("tr");
+          tr.innerHTML = "<td><a href='/post/" + esc(p.slug) + "/' target='_blank'>" + esc(p.title) + "</a></td><td>" + esc(p.category) + "</td><td>" + (p.published ? "<span class='badge'>Published</span>" : "Draft") + "</td><td><button class='btn btn--secondary' data-edit='" + esc(p.slug) + "'>Edit</button> <button class='btn btn--error' data-delete-post='" + esc(p.slug) + "'>Delete</button></td>";
+          tb.appendChild(tr);
+        });
+        $$("[data-edit]").forEach(function (b) { b.addEventListener("click", function () { openEditor(b.dataset.edit); }); });
+        $$("[data-delete-post]").forEach(function (b) { b.addEventListener("click", function () {
+          if (!confirm("Delete this post?")) return;
+          api("/api/posts/" + encodeURIComponent(b.dataset.deletePost), { method: "DELETE" }).then(function (r) {
+            if (r.ok) { toast("Post deleted"); loadPosts(); } else { toast(r.error || "Delete failed"); }
+          });
+        }); });
+      });
+    }
+
+    $("#new-post-btn").addEventListener("click", function () { openEditor(null); });
+    $("#cancel-post-btn").addEventListener("click", function () {
+      $("#posts-list-view").hidden = false; $("#posts-editor-view").hidden = true;
+    });
+
+    function slugify(s) {
+      return s.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").substring(0, 80);
+    }
+
+    // Convert plain text with blank lines into HTML paragraphs.
+    function plainTextToHtml(text) {
+      if (!text) return "";
+      var blocks = text.split(/\n\s*\n/);
+      var html = "";
+      for (var i = 0; i < blocks.length; i++) {
+        var block = blocks[i].trim();
+        if (!block) continue;
+        // Preserve single line breaks within a paragraph as <br>
+        block = block.replace(/\n/g, "<br>");
+        html += "<p>" + block + "</p>\n";
+      }
+      return html;
+    }
+
+    function openEditor(slug) {
+      editingSlug = slug;
+      $("#post-form").reset();
+      $("#p-category").value = "";
+      $("#p-published").value = "1";
+      loadQuillContent("");
+      $("#p-slug").disabled = false;
+      $("#p-slug-hint").textContent = "auto-generated";
+      $("#p-slug-edit-note").style.display = "none";
+      $("#p-og-preview").src = ""; $("#p-og-preview").style.display = "none"; $("#p-og-fallback").style.display = "flex";
+      $("#delete-post-btn").hidden = true;
+      $("#editor-preview-link").hidden = true;
+      slugManuallyEdited = false;
+      attachedProducts = [];
+      renderAttachedProducts();
+      refreshAttachSelect();
+
+      loadLinks().then(function () {
+        if (slug) {
+          api("/api/posts/" + encodeURIComponent(slug)).then(function (r) {
+            var p = r.post; if (!p) return;
+            $("#p-slug").value = p.slug; $("#p-title").value = p.title; $("#p-category").value = p.category;
+            $("#p-ogimage").value = p.og_image || "";
+            if (p.og_image) { $("#p-ogimage").dispatchEvent(new Event("input")); }
+            $("#p-intro").value = p.intro_html || "";
+            loadQuillContent(p.intro_html || "");
+            $("#p-published").value = p.published ? "1" : "0";
+            $("#p-slug").disabled = true;
+            $("#p-slug-hint").textContent = "locked on edit";
+            $("#p-slug-edit-note").style.display = "block";
+            $("#editor-title").textContent = "Edit post";
+            $("#delete-post-btn").hidden = false;
+            $("#editor-preview-link").href = "/post/" + esc(p.slug) + "/";
+            $("#editor-preview-link").hidden = false;
+            // Load attached standalone products
+            attachedProducts = (p.attached_products || []).map(function (ap) {
+              return {
+                id: ap.id, name: ap.name, image_url: ap.image_url, why_html: ap.why_html,
+                link_slug: ap.link_slug, link_label: ap.link_label,
+                section_heading: ap.section_heading || "", image_text: ap.image_text || ""
+              };
+            });
+            renderAttachedProducts();
+          });
+        } else {
+          $("#editor-title").textContent = "New post";
+        }
+      });
+      $("#posts-list-view").hidden = true; $("#posts-editor-view").hidden = false;
+    }
+
+    $("#p-title").addEventListener("input", function () {
+      if (!slugManuallyEdited && !editingSlug) {
+        $("#p-slug").value = slugify(this.value);
+      }
+    });
+    $("#p-slug").addEventListener("input", function () { slugManuallyEdited = true; });
+
+    // OG / Pinterest image preview
+    $("#p-ogimage").addEventListener("input", function () {
+      var src = this.value.trim();
+      var img = $("#p-og-preview");
+      var fallback = $("#p-og-fallback");
+      if (!src) { img.src = ""; img.style.display = "none"; fallback.style.display = "flex"; return; }
+      img.src = src.startsWith("http") || src.startsWith("/") ? src : "/" + src;
+      img.style.display = "block";
+      fallback.style.display = "none";
+      img.onerror = function () { img.style.display = "none"; fallback.style.display = "flex"; };
+    });
+
+    // Refresh the attach-product dropdown from productsCache
+    function refreshAttachSelect() {
+      var sel = $("#attach-product-select");
+      sel.innerHTML = '<option value="">— Select a product to attach —</option>';
+      productsCache.forEach(function (p) {
+        // Skip already-attached
+        if (attachedProducts.some(function (a) { return String(a.id) === String(p.id); })) return;
+        var opt = document.createElement("option");
+        opt.value = p.id; opt.textContent = p.name;
+        sel.appendChild(opt);
+      });
+    }
+
+    function renderAttachedProducts() {
+      var container = $("#product-list");
+      container.innerHTML = "";
+      if (attachedProducts.length === 0) {
+        container.innerHTML = '<p class="muted" style="text-align:center;">No products attached. Select one below to add.</p>';
+        refreshAttachSelect();
+        return;
+      }
+      attachedProducts.forEach(function (prod, idx) {
+        var div = document.createElement("div");
+        div.className = "product-item";
+        var thumb = prod.image_url
+          ? '<img src="' + esc(prod.image_url) + '" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:var(--radius-sm);flex-shrink:0;" />'
+          : '<div style="width:56px;height:56px;border-radius:var(--radius-sm);background:var(--color-accent-soft);flex-shrink:0;"></div>';
+        div.innerHTML = ''
+          + '<div class="product-item__head"><span>' + esc(prod.name || "Product") + '</span>'
+          +   '<div style="display:flex;gap:var(--space-3);">'
+          +     '<button type="button" data-up="' + idx + '" ' + (idx === 0 ? 'disabled' : '') + '>↑</button>'
+          +     '<button type="button" data-down="' + idx + '" ' + (idx === attachedProducts.length - 1 ? 'disabled' : '') + '>↓</button>'
+          +     '<button type="button" data-detach="' + idx + '">Remove</button>'
+          +   '</div>'
+          + '</div>'
+          + '<div style="display:flex;gap:var(--space-4);align-items:flex-start;margin-top:var(--space-3);">'
+          +   thumb
+          +   '<div style="flex:1;">'
+          +     '<p class="muted" style="margin-bottom:var(--space-2);">Link: <code>/go/' + esc(prod.link_slug || "—") + '</code></p>'
+          +     '<div class="two-col">'
+          +       '<div class="field"><label>Section heading</label><input class="input" data-ovr="section_heading" data-idx="' + idx + '" value="' + esc(prod.section_heading || "") + '" placeholder="The shortlist" /></div>'
+          +       '<div class="field"><label>Image text (override)</label><input class="input" data-ovr="image_text" data-idx="' + idx + '" value="' + esc(prod.image_text || "") + '" placeholder="01" /></div>'
+          +     '</div>'
+          +   '</div>'
+          + '</div>';
+        div.querySelectorAll("[data-ovr]").forEach(function (el) {
+          el.addEventListener("input", function () {
+            attachedProducts[parseInt(el.dataset.idx, 10)][el.dataset.ovr] = el.value;
+          });
+        });
+        div.querySelector("[data-detach]").addEventListener("click", function () {
+          attachedProducts.splice(idx, 1);
+          renderAttachedProducts();
+        });
+        div.querySelector("[data-up]").addEventListener("click", function () {
+          if (idx === 0) return;
+          var tmp = attachedProducts[idx - 1];
+          attachedProducts[idx - 1] = attachedProducts[idx];
+          attachedProducts[idx] = tmp;
+          renderAttachedProducts();
+        });
+        div.querySelector("[data-down]").addEventListener("click", function () {
+          if (idx === attachedProducts.length - 1) return;
+          var tmp = attachedProducts[idx + 1];
+          attachedProducts[idx + 1] = attachedProducts[idx];
+          attachedProducts[idx] = tmp;
+          renderAttachedProducts();
+        });
+        container.appendChild(div);
+      });
+      refreshAttachSelect();
+    }
+
+    $("#attach-product-btn").addEventListener("click", function () {
+      var sel = $("#attach-product-select");
+      var pid = sel.value;
+      if (!pid) { toast("Select a product first"); return; }
+      var prod = productsCache.find(function (p) { return String(p.id) === String(pid); });
+      if (!prod) return;
+      attachedProducts.push({
+        id: prod.id, name: prod.name, image_url: prod.image_url, why_html: prod.why_html,
+        link_slug: prod.link_slug, link_label: prod.link_label,
+        section_heading: "", image_text: ""
+      });
+      renderAttachedProducts();
+    });
+
+    $("#go-to-products-tab").addEventListener("click", function (e) {
+      e.preventDefault();
+      $$(".admin-tabs button").forEach(function (b) { b.setAttribute("aria-selected", "false"); });
+      $$(".admin-tabs button[data-tab=products]")[0].setAttribute("aria-selected", "true");
+      $$(".panel").forEach(function (p) { p.hidden = true; });
+      $("#panel-products").hidden = false;
+    });
+
+    $("#post-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var slug = $("#p-slug").value.trim();
+      if (!slug) { toast("Slug is required"); return; }
+      syncQuillToInput();
+      var htmlContent = $("#p-intro").value;
+      var attachedIds = attachedProducts.map(function (a) {
+        return { product_id: a.id, section_heading: a.section_heading || null, image_text: a.image_text || null };
+      });
+      var payload = {
+        slug: slug,
+        title: $("#p-title").value,
+        category: $("#p-category").value,
+        intro_html: htmlContent,
+        og_image: $("#p-ogimage").value || null,
+        body_html: "",
+        products_json: "[]",
+        attached_product_ids: attachedIds,
+        published: $("#p-published").value === "1"
+      };
+      var path = editingSlug ? "/api/posts/" + encodeURIComponent(editingSlug) : "/api/posts";
+      api(path, { method: editingSlug ? "PUT" : "POST", body: payload }).then(function (r) {
+        if (r.ok || r.slug) {
+          toast(editingSlug ? "Post updated" : "Post created");
+          loadPosts();
+          $("#posts-list-view").hidden = false;
+          $("#posts-editor-view").hidden = true;
+        } else { toast(r.error || "Save failed"); }
+      });
+    });
+
+    $("#delete-post-btn").addEventListener("click", function () {
+      if (!editingSlug || !confirm("Delete this post?")) return;
+      api("/api/posts/" + encodeURIComponent(editingSlug), { method: "DELETE" }).then(function () {
+        toast("Post deleted");
+        loadPosts();
+        $("#posts-list-view").hidden = false;
+        $("#posts-editor-view").hidden = true;
+      });
+    });
+
+    // ---- Products ----
+    var editingProductId = null;
+    var productsCache = [];
+
+    function loadProducts() {
+      return api("/api/products").then(function (r) {
+        productsCache = r.products || [];
+        var tb = $("#products-table tbody"); tb.innerHTML = "";
+        productsCache.forEach(function (p) {
+          var tr = document.createElement("tr");
+          var thumb = p.image_url
+            ? '<img src="' + esc(p.image_url) + '" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:var(--radius-sm);" />'
+            : '<div style="width:48px;height:48px;border-radius:var(--radius-sm);background:var(--color-accent-soft);"></div>';
+          tr.innerHTML = "<td>" + thumb + "</td>"
+            + "<td>" + esc(p.name) + "</td>"
+            + "<td>" + esc(p.category || "—") + "</td>"
+            + "<td><code>/go/" + esc(p.link_slug || "—") + "</code></td>"
+            + "<td>" + (p.published ? "<span class='badge'>Published</span>" : "Draft") + "</td>"
+            + "<td><button class='btn btn--secondary' data-edit-product='" + p.id + "'>Edit</button> <button class='btn btn--error' data-delete-product='" + p.id + "'>Delete</button></td>";
+          tb.appendChild(tr);
+        });
+        $$("[data-edit-product]").forEach(function (b) {
+          b.addEventListener("click", function () { openProductEditor(b.dataset.editProduct); });
+        });
+        $$("[data-delete-product]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            if (!confirm("Delete this product?")) return;
+            api("/api/products/" + encodeURIComponent(b.dataset.deleteProduct), { method: "DELETE" }).then(function (r) {
+              if (r.ok) { toast("Product deleted"); loadProducts(); } else { toast(r.error || "Delete failed"); }
+            });
+          });
+        });
+      });
+    }
+
+    $("#new-product-btn").addEventListener("click", function () { openProductEditor(null); });
+    $("#cancel-product-btn").addEventListener("click", function () {
+      $("#products-list-view").hidden = false; $("#products-editor-view").hidden = true;
+    });
+
+    function openProductEditor(id) {
+      editingProductId = id;
+      $("#product-form").reset();
+      $("#pr-image-preview").src = ""; $("#pr-image-preview").style.display = "none"; $("#pr-image-fallback").style.display = "flex";
+      $("#pr-created-link").hidden = true;
+      $("#delete-product-btn").hidden = true;
+
+      if (id) {
+        api("/api/products/" + encodeURIComponent(id)).then(function (r) {
+          var p = r.product; if (!p) return;
+          $("#pr-name").value = p.name || "";
+          $("#pr-category").value = p.category || "";
+          $("#pr-image").value = p.image_url || "";
+          if (p.image_url) { $("#pr-image").dispatchEvent(new Event("input")); }
+
+          $("#pr-linkurl").value = "";
+          $("#pr-linklabel").value = p.link_label || "";
+          $("#pr-published").value = p.published ? "1" : "0";
+          $("#product-editor-title").textContent = "Edit product";
+          $("#delete-product-btn").hidden = false;
+          $("#pr-created-link").textContent = "Cloaked link: /go/" + (p.link_slug || "—");
+          $("#pr-created-link").hidden = !p.link_slug;
+        });
+      } else {
+        $("#product-editor-title").textContent = "New product";
+      }
+      $("#products-list-view").hidden = true; $("#products-editor-view").hidden = false;
+    }
+
+    // Product image preview
+    $("#pr-image").addEventListener("input", function () {
+      var src = this.value.trim();
+      var img = $("#pr-image-preview");
+      var fallback = $("#pr-image-fallback");
+      if (!src) { img.src = ""; img.style.display = "none"; fallback.style.display = "flex"; return; }
+      img.src = src; img.style.display = "block"; fallback.style.display = "none";
+      img.onerror = function () { img.style.display = "none"; fallback.style.display = "flex"; };
+    });
+
+    $("#product-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var name = $("#pr-name").value.trim();
+      if (!name) { toast("Product name is required"); return; }
+      var payload = {
+        name: name,
+        image_url: $("#pr-image").value || null,
+        category: $("#pr-category").value || null,
+        link_url: $("#pr-linkurl").value || null,
+        link_label: $("#pr-linklabel").value || null,
+        published: $("#pr-published").value === "1"
+      };
+      var path = editingProductId ? "/api/products/" + encodeURIComponent(editingProductId) : "/api/products";
+      api(path, { method: editingProductId ? "PUT" : "POST", body: payload }).then(function (r) {
+        if (r.ok || r.id) {
+          toast(editingProductId ? "Product updated" : "Product created");
+          loadProducts();
+          $("#products-list-view").hidden = false;
+          $("#products-editor-view").hidden = true;
+        } else { toast(r.error || "Save failed"); }
+      });
+    });
+
+    $("#delete-product-btn").addEventListener("click", function () {
+      if (!editingProductId || !confirm("Delete this product?")) return;
+      api("/api/products/" + encodeURIComponent(editingProductId), { method: "DELETE" }).then(function (r) {
+        if (r.ok) {
+          toast("Product deleted");
+          loadProducts();
+          $("#products-list-view").hidden = false;
+          $("#products-editor-view").hidden = true;
+        } else { toast(r.error || "Delete failed"); }
+      });
+    });
+
+    // ---- Hero slides ----
+    var editingHeroId = null;
+
+    // Hero image preview
+    $("#h-image-url").addEventListener("input", function () {
+      var src = this.value.trim();
+      var img = $("#h-image-preview");
+      var fallback = $("#h-image-fallback");
+      if (!src) { img.src = ""; img.style.display = "none"; fallback.style.display = "flex"; return; }
+      img.src = src; img.style.display = "block"; fallback.style.display = "none";
+      img.style.objectPosition = $("#h-focal").value || "center";
+      img.onerror = function () { img.style.display = "none"; fallback.style.display = "flex"; };
+    });
+    // Update preview crop when focus point changes
+    document.addEventListener("change", function (e) {
+      if (e.target && e.target.id === "h-focal") {
+        $("#h-image-preview").style.objectPosition = e.target.value || "center";
+      }
+    });
+
+    function loadHeroSlides() {
+      api("/api/hero-slides").then(function (r) {
+        var slides = r.slides || [];
+        $("#hero-loading").hidden = true;
+        $("#hero-empty").hidden = slides.length > 0;
+        var container = $("#hero-slides-list"); container.innerHTML = "";
+        if (slides.length === 0) return;
+        var table = document.createElement("table");
+        table.innerHTML = "<thead><tr><th>Preview</th><th>Image URL</th><th>Position</th><th>Status</th><th></th></tr></thead><tbody></tbody>";
+        var tb = table.querySelector("tbody");
+        slides.forEach(function (s, index) {
+          var tr = document.createElement("tr");
+          tr.innerHTML = "<td><img src='" + esc(s.image_url) + "' alt='' style='width:80px; height:50px; object-fit:cover; border-radius:var(--radius-sm); border:1px solid var(--color-border-subtle);' /></td>"
+            + "<td style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'>" + esc(s.image_url) + "</td>"
+            + "<td>" + esc(s.position) + "</td>"
+            + "<td>" + (s.is_active ? "<span class='badge'>Active</span>" : "Hidden") + "</td>"
+            + "<td class='hero-actions'>"
+            + (index > 0 ? "<button class='btn btn--secondary' data-move-hero='" + s.id + "' data-dir='up'>↑</button> " : "")
+            + (index < slides.length - 1 ? "<button class='btn btn--secondary' data-move-hero='" + s.id + "' data-dir='down'>↓</button> " : "")
+            + "<button class='btn btn--secondary' data-edit-hero='" + s.id + "'>Edit</button> "
+            + "<button class='btn btn--error' data-delete-hero='" + s.id + "'>Delete</button>"
+            + "</td>";
+          tb.appendChild(tr);
+        });
+        container.appendChild(table);
+
+        $$("[data-edit-hero]").forEach(function (b) { b.addEventListener("click", function () { openHeroEditor(b.dataset.editHero); }); });
+        $$("[data-delete-hero]").forEach(function (b) { b.addEventListener("click", function () {
+          if (!confirm("Delete this hero slide?")) return;
+          api("/api/hero-slides/" + encodeURIComponent(b.dataset.deleteHero), { method: "DELETE" }).then(function (r) {
+            if (r.ok) { toast("Slide deleted"); loadHeroSlides(); } else { toast(r.error || "Delete failed"); }
+          });
+        }); });
+        $$("[data-move-hero]").forEach(function (b) { b.addEventListener("click", function () {
+          var id = b.dataset.moveHero;
+          var dir = b.dataset.dir;
+          var idx = slides.findIndex(function (s) { return String(s.id) === id; });
+          if (idx < 0) return;
+          var swapIdx = dir === "up" ? idx - 1 : idx + 1;
+          if (swapIdx < 0 || swapIdx >= slides.length) return;
+          var newPos = slides[swapIdx].position;
+          api("/api/hero-slides/" + encodeURIComponent(id), { method: "PUT", body: { image_url: slides[idx].image_url, position: newPos, is_active: slides[idx].is_active } })
+            .then(function () { toast("Moved"); loadHeroSlides(); });
+        }); });
+      });
+    }
+
+    $("#new-hero-btn").addEventListener("click", function () { openHeroEditor(null); });
+    $("#cancel-hero-btn").addEventListener("click", function () {
+      $("#hero-list-view").hidden = false; $("#hero-editor-view").hidden = true;
+    });
+
+    function openHeroEditor(id) {
+      editingHeroId = id;
+      $("#hero-form").reset();
+      $("#h-image-url").value = "";
+      $("#h-image-preview").src = ""; $("#h-image-preview").style.display = "none"; $("#h-image-fallback").style.display = "flex";
+      $("#h-position").value = "";
+      $("#h-active").value = "1";
+      $("#h-focal").value = "center";
+      $("#delete-hero-btn").hidden = true;
+      $("#hero-editor-title").textContent = id ? "Edit hero slide" : "Add hero slide";
+      $("#hero-list-view").hidden = true; $("#hero-editor-view").hidden = false;
+      if (id) {
+        api("/api/hero-slides/" + encodeURIComponent(id)).then(function (r) {
+          var s = r.slide; if (!s) return;
+          $("#h-image-url").value = s.image_url || "";
+          $("#h-image-url").dispatchEvent(new Event("input"));
+          $("#h-position").value = s.position;
+          $("#h-active").value = s.is_active ? "1" : "0";
+          $("#h-focal").value = s.focal_position || "center";
+          $("#delete-hero-btn").hidden = false;
+        });
+      }
+    }
+
+    $("#hero-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var url = $("#h-image-url").value.trim();
+      if (!url) { toast("Image URL is required"); return; }
+      var payload = {
+        image_url: url,
+        position: parseInt($("#h-position").value, 10) || 0,
+        is_active: $("#h-active").value === "1",
+        focal_position: $("#h-focal").value || "center"
+      };
+      var method = editingHeroId ? "PUT" : "POST";
+      var endpoint = editingHeroId ? "/api/hero-slides/" + encodeURIComponent(editingHeroId) : "/api/hero-slides";
+      api(endpoint, { method: method, body: payload }).then(function (r) {
+        if (r.ok || r.slide) {
+          toast(editingHeroId ? "Slide updated" : "Slide added");
+          loadHeroSlides();
+          $("#hero-list-view").hidden = false;
+          $("#hero-editor-view").hidden = true;
+        } else { toast(r.error || "Failed"); }
+      });
+    });
+
+    $("#delete-hero-btn").addEventListener("click", function () {
+      if (!editingHeroId || !confirm("Delete this hero slide?")) return;
+      api("/api/hero-slides/" + encodeURIComponent(editingHeroId), { method: "DELETE" }).then(function (r) {
+        if (r.ok) {
+          toast("Slide deleted");
+          loadHeroSlides();
+          $("#hero-list-view").hidden = false;
+          $("#hero-editor-view").hidden = true;
+        } else { toast(r.error || "Delete failed"); }
+      });
+    });
+
+    // ---- Subscribers ----
+    function loadSubs() {
+      api("/api/stats").then(function (s) {
+        var tb = $("#subs-table tbody"); tb.innerHTML = "";
+        (s.recent_subscribers || []).forEach(function (sub) {
+          var tr = document.createElement("tr");
+          tr.innerHTML = "<td>" + esc(sub.email) + "</td><td>" + esc(sub.source || "—") + "</td><td class='muted'>" + esc(sub.subscribed_at || "") + "</td>";
+          tb.appendChild(tr);
+        });
+      });
+    }
+    $("#export-subs-btn").addEventListener("click", function () {
+      api("/api/stats").then(function (s) {
+        var rows = (s.recent_subscribers || []).map(function (r) { return [r.email, r.source || "", r.subscribed_at || ""]; });
+        var csv = "email,source,subscribed_at\n" + rows.map(function (r) { return r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(","); }).join("\n");
+        var blob = new Blob([csv], { type: "text/csv" });
+        var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "eira-subscribers.csv"; a.click();
+      });
+    });
+
+    // ---- Newsletter ----
+    function loadNewsletter() {
+      api("/api/newsletter").then(function (r) {
+        var el = $("#nl-status");
+        if (!r || r.configured === undefined) { el.textContent = "Couldn't check email status."; return; }
+        if (r.configured) {
+          el.innerHTML = "Email is <strong style='color:var(--color-accent-strong)'>connected</strong> · " + r.subscribers + " subscriber" + (r.subscribers === 1 ? "" : "s") + " will receive your newsletter.";
+          $("#nl-send-btn").disabled = false; $("#nl-test-btn").disabled = false;
+        } else {
+          el.innerHTML = "Email is <strong style='color:#b4462f'>not configured</strong>. Set <code>RESEND_API_KEY</code> and <code>FROM_EMAIL</code> in your environment, then redeploy.";
+          $("#nl-send-btn").disabled = true; $("#nl-test-btn").disabled = true;
+        }
+      });
+    }
+    $("#nl-test-btn").addEventListener("click", function () {
+      var subject = $("#nl-subject").value.trim();
+      var body_html = $("#nl-body").value.trim();
+      var test_email = $("#nl-test").value.trim();
+      if (!subject || !body_html) { toast("Add a subject and body first"); return; }
+      if (!test_email) { toast("Enter a test email address"); return; }
+      var btn = $("#nl-test-btn"); btn.disabled = true; btn.textContent = "Sending…";
+      api("/api/newsletter", { method: "POST", body: { subject: subject, body_html: body_html, test_email: test_email } })
+        .then(function (r) { toast(r.ok ? "Test sent to " + test_email : (r.error || "Test failed")); })
+        .finally(function () { btn.disabled = false; btn.textContent = "Send test"; });
+    });
+    $("#nl-send-btn").addEventListener("click", function () {
+      var subject = $("#nl-subject").value.trim();
+      var body_html = $("#nl-body").value.trim();
+      if (!subject || !body_html) { toast("Add a subject and body first"); return; }
+      if (!confirm("Send this newsletter to ALL subscribers? This can't be undone.")) return;
+      var btn = $("#nl-send-btn"); btn.disabled = true; btn.textContent = "Sending…";
+      api("/api/newsletter", { method: "POST", body: { subject: subject, body_html: body_html } })
+        .then(function (r) {
+          if (r.sent !== undefined) {
+            toast("Sent to " + r.sent + (r.failed ? " · " + r.failed + " failed" : ""));
+            if (r.ok) { $("#nl-subject").value = ""; $("#nl-body").value = ""; }
+          } else { toast(r.error || "Send failed"); }
+        })
+        .finally(function () { btn.disabled = false; btn.textContent = "Send to all subscribers"; });
+    });
+  })();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+  <script>
+    // Initialize Quill rich text editor
+    var quill = new Quill('#p-editor', {
+      theme: 'snow',
+      placeholder: 'Write your blog post here. Just type or paste your content — no coding needed.',
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, 3, false] }],
+          ['bold', 'italic', 'underline'],
+          [{ list: 'ordered' }, { list: 'bullet' }],
+          ['link', 'blockquote'],
+          ['clean']
+        ]
+      }
+    });
+
+    // Sync Quill content to hidden input before form submit
+    function syncQuillToInput() {
+      var html = quill.root.innerHTML;
+      // Quill returns <p><br></p> for empty — treat as empty
+      if (html === '<p><br></p>' || html === '<p></p>') html = '';
+      document.getElementById('p-intro').value = html;
+    }
+
+    // Load content into Quill when editing existing post
+    function loadQuillContent(html) {
+      if (html) {
+        quill.root.innerHTML = html;
+      } else {
+        quill.setText('');
+      }
+    }
+  </script>
+</body>
+</html>
+</html>
+</body>
+</html>
+</body>
+</html>
+</html>

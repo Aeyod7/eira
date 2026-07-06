@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Categories — Eira</title>
+  <meta name="description" content="Browse Eira posts by category — beauty, skincare, fashion, fitness, and more." />
+
+  <!-- Open Graph / Pinterest Rich Pins -->
+  <meta property="og:site_name" content="Eira" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Categories — Eira" />
+  <meta property="og:description" content="Browse Eira posts by category — beauty, skincare, fashion, fitness, and more." />
+  <meta property="og:url" content="https://eira.example/category/" />
+  <meta property="og:image" content="https://eira.example/pins/home-pin.svg" />
+  <meta property="og:image:width" content="1000" />
+  <meta property="og:image:height" content="1500" />
+  <meta property="og:image:alt" content="Eira — category hub" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Categories — Eira" />
+  <meta name="twitter:description" content="Browse Eira posts by category — beauty, skincare, fashion, fitness, and more." />
+  <meta name="twitter:image" content="https://eira.example/pins/home-pin.svg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Raleway:wght@300;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="index.html" aria-label="Eira — home">Eira</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+      <nav id="primary-nav" class="nav" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="category.html?category=Beauty">Beauty</a>
+        <a href="category.html?category=Skincare">Skincare</a>
+        <a href="category.html?category=Fashion">Fashion</a>
+        <a href="category.html?category=Fitness">Fitness</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="container container--narrow">
+        <p class="eyebrow" id="category-eyebrow">Category hub</p>
+        <h1 id="category-heading">Categories</h1>
+        <p id="category-intro">Browse every post by category hub. New posts appear here as soon as you publish them.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div id="category-posts"><p class="muted" id="category-posts-loading">Loading posts…</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <p class="footer-brand">Eira</p>
+          <p style="color: var(--color-accent-soft); max-width: 38ch;">A faceless beauty, fashion and self-care affiliate hub. Curated picks, with the context Pinterest can&rsquo;t hold.</p>
+          <p style="font-size: var(--font-size-xs); color: var(--color-accent-soft); margin-top: var(--space-6);">
+            As an Amazon Associate I earn from qualifying purchases. This site contains affiliate links &mdash; see full disclosure on each post.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h4>Categories</h4>
+          <ul>
+            <li><a href="category.html?category=Beauty">Beauty</a></li>
+            <li><a href="category.html?category=Skincare">Skincare</a></li>
+            <li><a href="category.html?category=Fashion">Fashion</a></li>
+            <li><a href="category.html?category=Fitness">Fitness</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Site</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="about.html">About</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Eira. All rights reserved.</span>
+        <span>Made for readers, not algorithms.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var toggle = document.querySelector('.nav-toggle');
+      var nav = document.getElementById('primary-nav');
+      if (!toggle || !nav) return;
+      toggle.addEventListener('click', function () {
+        var open = nav.getAttribute('data-open') === 'true';
+        nav.setAttribute('data-open', String(!open));
+        toggle.setAttribute('aria-expanded', String(!open));
+      });
+    })();
+
+    // Load posts grouped by category, or filtered to a single category from URL.
+    (function () {
+      var container = document.getElementById('category-posts');
+      var loading = document.getElementById('category-posts-loading');
+      var eyebrow = document.getElementById('category-eyebrow');
+      var heading = document.getElementById('category-heading');
+      var intro = document.getElementById('category-intro');
+      var params = new URLSearchParams(window.location.search);
+      var filterCategory = params.get('category');
+      function esc(s) { return String(s||'').replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+      function renderPostCard(p) {
+        var meta = esc(p.read_time || '');
+        var imgSrc = p.og_image ? esc(p.og_image) : '';
+        var media = imgSrc
+          ? '<a href="/post/' + esc(p.slug) + '/" style="text-decoration:none" class="card__media"><img src="' + imgSrc + '" alt="' + esc(p.title) + '" loading="lazy" /></a>'
+          : '<a href="/post/' + esc(p.slug) + '/" style="text-decoration:none" class="card__media">' + esc(p.category || 'Post') + '</a>';
+        return '<article class="card">' + media +
+          '<div class="card__body">' +
+            (meta ? '<p class="card__meta">' + meta + '</p>' : '') +
+            '<h3 class="card__title"><a href="/post/' + esc(p.slug) + '/">' + esc(p.title) + '</a></h3>' +
+          '</div>' +
+        '</article>';
+      }
+      function renderProductCard(p) {
+        var imgSrc = p.image_url ? esc(p.image_url) : '';
+        var media = imgSrc
+          ? '<a href="/go/' + esc(p.link_slug) + '" rel="sponsored nofollow noopener" target="_blank" class="card__media"><img src="' + imgSrc + '" alt="' + esc(p.name) + '" loading="lazy" /></a>'
+          : '<a href="/go/' + esc(p.link_slug) + '" rel="sponsored nofollow noopener" target="_blank" class="card__media">' + esc(p.name) + '</a>';
+        var linkLabel = esc(p.link_label || 'Shop now');
+        return '<article class="card">' + media +
+          '<div class="card__body">' +
+            '<p class="card__meta">Product</p>' +
+            '<h3 class="card__title">' + esc(p.name) + '</h3>' +
+            '<a class="affiliate-link" href="/go/' + esc(p.link_slug) + '" rel="sponsored nofollow noopener" target="_blank">' + linkLabel + '</a>' +
+          '</div>' +
+        '</article>';
+      }
+      function renderCategoryPosts(posts, products) {
+        if (filterCategory) {
+          // Single category view
+          var filteredPosts = posts.filter(function (p) { return p.category === filterCategory; });
+          var filteredProducts = products.filter(function (p) { return p.category === filterCategory; });
+          if (eyebrow) eyebrow.textContent = 'Category';
+          if (heading) heading.textContent = esc(filterCategory);
+          if (intro) intro.textContent = 'All posts and products in ' + esc(filterCategory) + '.';
+          var html = '';
+          if (filteredPosts.length === 0 && filteredProducts.length === 0) {
+            container.innerHTML = '<p class="muted">No posts or products in ' + esc(filterCategory) + ' yet.</p>';
+            return;
+          }
+          if (filteredPosts.length > 0) {
+            html += '<div class="grid grid--posts">' + filteredPosts.map(renderPostCard).join('') + '</div>';
+          }
+          if (filteredProducts.length > 0) {
+            html += '<h2 style="margin-top: var(--space-12); margin-bottom: var(--space-6);">Products</h2>' +
+              '<div class="grid grid--posts">' + filteredProducts.map(renderProductCard).join('') + '</div>';
+          }
+          container.innerHTML = html;
+          return;
+        }
+        // All categories view
+        var groupedPosts = {};
+        var postOrder = [];
+        posts.forEach(function (p) {
+          var cat = p.category || 'Uncategorized';
+          if (!groupedPosts[cat]) { groupedPosts[cat] = []; postOrder.push(cat); }
+          groupedPosts[cat].push(p);
+        });
+        var groupedProducts = {};
+        products.forEach(function (p) {
+          var cat = p.category || 'Uncategorized';
+          if (!groupedProducts[cat]) groupedProducts[cat] = [];
+          groupedProducts[cat].push(p);
+        });
+        container.innerHTML = postOrder.map(function (cat) {
+          var html = '<h2 style="margin-top: var(--space-12);">' + esc(cat) + '</h2>' +
+            '<div class="grid grid--posts">' + groupedPosts[cat].map(renderPostCard).join('') + '</div>';
+          if (groupedProducts[cat] && groupedProducts[cat].length > 0) {
+            html += '<h3 style="margin-top: var(--space-10); margin-bottom: var(--space-4);">Products</h3>' +
+              '<div class="grid grid--posts">' + groupedProducts[cat].map(renderProductCard).join('') + '</div>';
+          }
+          return html;
+        }).join('');
+      }
+      Promise.all([fetch('/api/posts?published=1').then(function (r) { return r.json(); }), fetch('/api/products?public=1').then(function (r) { return r.json(); })])
+        .then(function (results) {
+          var posts = results[0].posts || [];
+          var products = results[1].products || [];
+          if (loading) loading.remove();
+          if (posts.length === 0 && products.length === 0) {
+            container.innerHTML = '<p class="muted">No posts or products yet.</p>';
+            return;
+          }
+          renderCategoryPosts(posts, products);
+        })
+        .catch(function () {
+          if (loading) loading.remove();
+          container.innerHTML = '<p class="muted">Unable to load posts or products.</p>';
+        });
+    })();
+  </script>
+</body>
+</html>
+</html>
+</body>
+</html>

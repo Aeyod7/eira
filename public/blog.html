@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog — Eira</title>
+  <meta name="description" content="The Eira blog archive — curated beauty, skincare, fashion, and fitness posts with affiliate product picks." />
+
+  <!-- Open Graph / Pinterest Rich Pins -->
+  <meta property="og:site_name" content="Eira" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Blog — Eira" />
+  <meta property="og:description" content="The Eira blog archive — curated beauty, skincare, fashion, and fitness posts with affiliate product picks." />
+  <meta property="og:url" content="https://eira.example/blog/" />
+  <meta property="og:image" content="https://eira.example/pins/home-pin.svg" />
+  <meta property="og:image:width" content="1000" />
+  <meta property="og:image:height" content="1500" />
+  <meta property="og:image:alt" content="Eira — blog archive" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Blog — Eira" />
+  <meta name="twitter:description" content="The Eira blog archive — curated beauty, skincare, fashion, and fitness posts." />
+  <meta name="twitter:image" content="https://eira.example/pins/home-pin.svg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Raleway:wght@300;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="index.html" aria-label="Eira — home">Eira</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+      <nav id="primary-nav" class="nav" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="category.html?category=Beauty">Beauty</a>
+        <a href="category.html?category=Skincare">Skincare</a>
+        <a href="category.html?category=Fashion">Fashion</a>
+        <a href="category.html?category=Fitness">Fitness</a>
+        <a href="blog.html" aria-current="page">Blog</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="container container--narrow">
+        <p class="eyebrow">Archive</p>
+        <h1>The blog</h1>
+        <p>Every post, newest first. Filter by category hub below.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <p class="eyebrow">Filter</p>
+        <div class="filter-bar" id="filter-bar">
+          <button class="chip chip--active" data-filter="all">All</button>
+          <button class="chip" data-filter="Beauty">Beauty</button>
+          <button class="chip" data-filter="Skincare">Skincare</button>
+          <button class="chip" data-filter="Fashion">Fashion</button>
+          <button class="chip" data-filter="Fitness">Fitness</button>
+        </div>
+
+        <div class="blog-title-grid" id="blog-posts">
+          <p class="muted" id="blog-posts-loading">Loading posts…</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <p class="footer-brand">Eira</p>
+          <p style="color: var(--color-accent-soft); max-width: 38ch;">A beauty, skincare, fashion and fitness affiliate hub. Curated product picks and blog posts, with direct links to the retailers we trust.</p>
+          <p style="font-size: var(--font-size-xs); color: var(--color-accent-soft); margin-top: var(--space-6);">
+            As an Amazon Associate I earn from qualifying purchases. This site contains affiliate links &mdash; see full disclosure on each post.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h4>Categories</h4>
+          <ul>
+            <li><a href="category.html?category=Beauty">Beauty</a></li>
+            <li><a href="category.html?category=Skincare">Skincare</a></li>
+            <li><a href="category.html?category=Fashion">Fashion</a></li>
+            <li><a href="category.html?category=Fitness">Fitness</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Site</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="about.html">About</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Eira. All rights reserved.</span>
+        <span>Made for readers, not algorithms.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var toggle = document.querySelector('.nav-toggle');
+      var nav = document.getElementById('primary-nav');
+      if (!toggle || !nav) return;
+      toggle.addEventListener('click', function () {
+        var open = nav.getAttribute('data-open') === 'true';
+        nav.setAttribute('data-open', String(!open));
+        toggle.setAttribute('aria-expanded', String(!open));
+      });
+    })();
+
+    // Load all published posts with category filtering
+    (function () {
+      var container = document.getElementById('blog-posts');
+      var loading = document.getElementById('blog-posts-loading');
+      var filterBar = document.getElementById('filter-bar');
+      var allPosts = [];
+      var currentFilter = 'all';
+
+      function esc(s) { return String(s||'').replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+      function renderPosts() {
+        var posts = currentFilter === 'all' ? allPosts : allPosts.filter(function (p) { return p.category === currentFilter; });
+        if (posts.length === 0) {
+          container.innerHTML = '<p class="muted" style="grid-column: 1 / -1;">No posts in this category yet.</p>';
+          return;
+        }
+        container.innerHTML = posts.map(function (p) {
+          return '<a href="/post/' + esc(p.slug) + '/" class="blog-title-link">' + esc(p.title) + '</a>';
+        }).join('');
+      }
+
+      fetch('/api/posts?published=1')
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          allPosts = data.posts || [];
+          if (loading) loading.remove();
+          renderPosts();
+        })
+        .catch(function () {
+          if (loading) loading.remove();
+          container.innerHTML = '<p class="muted" style="grid-column: 1 / -1;">Unable to load posts.</p>';
+        });
+
+      filterBar.querySelectorAll('[data-filter]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          filterBar.querySelectorAll('[data-filter]').forEach(function (b) { b.classList.remove('chip--active'); });
+          btn.classList.add('chip--active');
+          currentFilter = btn.dataset.filter;
+          renderPosts();
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

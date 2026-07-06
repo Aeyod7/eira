@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eira — Beauty, Skincare, Fashion & Fitness Finds</title>
+  <meta name="description" content="Eira is a beauty, skincare, fashion and fitness affiliate hub. Curated product picks and blog posts with direct affiliate links." />
+  <link rel="canonical" href="https://eira.example/" />
+
+  <!-- Open Graph / Pinterest Rich Pins -->
+  <meta property="og:site_name" content="Eira" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Eira — Beauty, Skincare, Fashion & Fitness Finds" />
+  <meta property="og:description" content="Curated product picks and blog posts — beauty, skincare, fashion, and fitness finds with direct affiliate links." />
+  <meta property="og:url" content="https://eira.example/" />
+  <meta property="og:image" content="https://eira.example/pins/home-pin.svg" />
+  <meta property="og:image:width" content="1000" />
+  <meta property="og:image:height" content="1500" />
+  <meta property="og:image:alt" content="Eira — curated beauty, skincare, fashion and fitness finds" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Eira — Beauty, Skincare, Fashion & Fitness Finds" />
+  <meta name="twitter:description" content="Curated product picks and blog posts — beauty, skincare, fashion, and fitness finds with direct affiliate links." />
+  <meta name="twitter:image" content="https://eira.example/pins/home-pin.svg" />
+
+  <!-- Fonts: Playfair Display (headings) + Raleway (body/UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Raleway:wght@300;500;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Header / Nav -->
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="index.html" aria-label="Eira — home">Eira</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+      <nav id="primary-nav" class="nav" aria-label="Primary">
+        <a href="index.html" aria-current="page">Home</a>
+        <a href="category.html?category=Beauty">Beauty</a>
+        <a href="category.html?category=Skincare">Skincare</a>
+        <a href="category.html?category=Fashion">Fashion</a>
+        <a href="category.html?category=Fitness">Fitness</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero hero--slideshow">
+      <div class="hero__slides" id="hero-slides" aria-hidden="true">
+        <!-- Slides are loaded from the admin (Hero tab). Until you add one, the hero shows a clean dark background. -->
+      </div>
+      <div class="hero__overlay"></div>
+      <div class="container container--narrow hero__content">
+        <h1>EIRA</h1>
+        <p style="font-size: var(--font-size-xl); max-width: 60ch; margin-inline: auto; margin-bottom: var(--space-7);">Curated feminine lifestyle, you are the standard</p>
+        <div style="display:flex; gap:var(--space-4); justify-content:center; flex-wrap:wrap;">
+          <a class="btn btn--primary" href="blog.html">Browse the blog</a>
+          <a class="btn btn--secondary btn--on-dark" href="#latest-posts">See latest posts</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured products -->
+    <section class="section" id="featured-products" style="background: var(--color-surface-strong);">
+      <div class="container">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--space-4); margin-bottom: var(--space-8);">
+          <div>
+            <p class="eyebrow">Featured picks</p>
+            <h2 style="margin:0;">Products worth clicking</h2>
+          </div>
+          <a class="btn btn--secondary" href="category.html">Browse all categories &rarr;</a>
+        </div>
+        <div class="grid grid--posts" id="featured-products-grid">
+          <p class="muted" id="featured-products-loading">Loading products…</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Latest posts -->
+    <section class="section" id="latest-posts">
+      <div class="container">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--space-4); margin-bottom: var(--space-8);">
+          <div>
+            <p class="eyebrow">Latest posts</p>
+            <h2 style="margin:0;">Fresh from the blog</h2>
+          </div>
+          <a class="btn btn--secondary" href="blog.html">View all posts &rarr;</a>
+        </div>
+        <div class="grid grid--posts" id="latest-posts-grid">
+          <p class="muted" id="latest-posts-loading">Loading posts…</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Newsletter signup -->
+    <section class="section section--tight">
+      <div class="container container--narrow">
+        <div class="newsletter-strip">
+          <div class="newsletter-strip__text">
+            <p class="eyebrow" style="color: var(--color-accent-strong); margin-bottom: var(--space-2);">The weekly shortlist</p>
+            <p class="newsletter-strip__title">Weekly finds, straight to your inbox.</p>
+          </div>
+          <form class="newsletter-strip__form" novalidate>
+            <div class="newsletter-strip__inputwrap">
+              <label for="email-home" class="sr-only">Email address</label>
+              <input class="input" id="email-home" name="email" type="email" placeholder="you@example.com" required autocomplete="email" />
+              <button class="btn btn--primary" type="submit">Subscribe</button>
+            </div>
+            <span class="field__error" id="email-home-err" aria-live="polite"></span>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <p class="footer-brand">Eira</p>
+          <p style="color: var(--color-accent-soft); max-width: 38ch;">A beauty, skincare, fashion and fitness affiliate hub. Curated product picks and blog posts, with direct links to the retailers we trust.</p>
+          <p style="font-size: var(--font-size-xs); color: var(--color-accent-soft); margin-top: var(--space-6);">
+            As an Amazon Associate I earn from qualifying purchases. This site contains affiliate links &mdash; see full disclosure on each post.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h4>Categories</h4>
+          <ul>
+            <li><a href="category.html?category=Beauty">Beauty</a></li>
+            <li><a href="category.html?category=Skincare">Skincare</a></li>
+            <li><a href="category.html?category=Fashion">Fashion</a></li>
+            <li><a href="category.html?category=Fitness">Fitness</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Site</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="about.html">About</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Eira. All rights reserved.</span>
+        <span>Made for readers, not algorithms.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Shared utilities
+    function esc(s) { return String(s||'').replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+    // Mobile nav toggle (keyboard accessible)
+    (function () {
+      var toggle = document.querySelector('.nav-toggle');
+      var nav = document.getElementById('primary-nav');
+      if (!toggle || !nav) return;
+      toggle.addEventListener('click', function () {
+        var open = nav.getAttribute('data-open') === 'true';
+        nav.setAttribute('data-open', String(!open));
+        toggle.setAttribute('aria-expanded', String(!open));
+      });
+    })();
+
+    // Hero background slideshow — fetch from admin, rotate every 5s
+    (function () {
+      var container = document.getElementById('hero-slides');
+      if (!container) return;
+
+      function startSlideshow() {
+        var slides = container.querySelectorAll('.hero__slide');
+        if (slides.length < 2) return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var current = 0;
+        setInterval(function () {
+          slides[current].classList.remove('is-active');
+          current = (current + 1) % slides.length;
+          slides[current].classList.add('is-active');
+        }, 5000);
+      }
+
+      fetch('/api/hero-slides?public=1')
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          var slides = data.slides || [];
+          if (slides.length === 0) return; // keep the default fallback slide
+          container.innerHTML = slides.map(function (s, i) {
+            var focal = esc(s.focal_position || 'center');
+            return '<div class="hero__slide ' + (i === 0 ? 'is-active' : '') + '" style="background-image:url(\'' + esc(s.image_url) + '\'); background-position:' + focal + '"></div>';
+          }).join('');
+          startSlideshow();
+        })
+        .catch(function () { startSlideshow(); });
+    })();
+
+    // Email form → POST /api/subscribe
+    document.querySelectorAll('.email-form').forEach(function (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var input = form.querySelector('input[type="email"]');
+        var err = form.querySelector('.field__error');
+        var btn = form.querySelector('button[type="submit"]');
+        if (!input) return;
+        var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value);
+        if (!valid) {
+          input.setAttribute('aria-invalid', 'true');
+          if (err) err.textContent = 'Please enter a valid email address.';
+          return;
+        }
+        input.setAttribute('aria-invalid', 'false');
+        if (err) err.textContent = '';
+        if (btn) { btn.setAttribute('aria-busy', 'true'); btn.textContent = 'Subscribing…'; btn.disabled = true; }
+        fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: input.value, source: 'home' })
+        }).then(function (r) { return r.json(); }).then(function (data) {
+          if (data.ok) { if (btn) { btn.textContent = 'Subscribed ✓'; } }
+          else { if (btn) { btn.textContent = 'Subscribe'; btn.disabled = false; } if (err) err.textContent = data.error || 'Something went wrong.'; }
+        }).catch(function () { if (btn) { btn.textContent = 'Try again'; btn.disabled = false; } });
+      });
+    });
+
+    // Single API call — powers featured products and latest posts
+    (function () {
+      var postsGrid = document.getElementById('latest-posts-grid');
+      var postsLoading = document.getElementById('latest-posts-loading');
+      var featuredGrid = document.getElementById('featured-products-grid');
+      var featuredLoading = document.getElementById('featured-products-loading');
+
+      function renderProductCard(p) {
+        var imgSrc = p.image_url ? esc(p.image_url) : '';
+        var media = imgSrc
+          ? '<a href="/go/' + esc(p.link_slug) + '" rel="sponsored nofollow noopener" target="_blank" class="card__media"><img src="' + imgSrc + '" alt="' + esc(p.name) + '" loading="lazy" /></a>'
+          : '<a href="/go/' + esc(p.link_slug) + '" rel="sponsored nofollow noopener" target="_blank" class="card__media">' + esc(p.name) + '</a>';
+        var linkLabel = esc(p.link_label || 'Shop now');
+        return '<article class="card">' + media +
+          '<div class="card__body">' +
+            '<p class="card__meta">' + esc(p.category || 'Product') + '</p>' +
+            '<h3 class="card__title">' + esc(p.name) + '</h3>' +
+            '<a class="affiliate-link" href="/go/' + esc(p.link_slug) + '" rel="sponsored nofollow noopener" target="_blank">' + linkLabel + '</a>' +
+          '</div>' +
+        '</article>';
+      }
+
+      Promise.all([
+        fetch('/api/posts?published=1').then(function (r) { return r.json(); }),
+        fetch('/api/products?public=1').then(function (r) { return r.json(); })
+      ])
+        .then(function (results) {
+          var posts = results[0].posts || [];
+          var products = results[1].products || [];
+
+          // --- Featured products (max 6, latest first) ---
+          var featured = products.slice(0, 6);
+          if (featuredLoading) featuredLoading.remove();
+          if (featuredGrid) {
+            if (featured.length === 0) {
+              featuredGrid.innerHTML = '<p class="muted" style="grid-column: 1 / -1;">No products yet. Add products in the admin dashboard.</p>';
+            } else {
+              featuredGrid.innerHTML = featured.map(renderProductCard).join('');
+            }
+          }
+
+          // --- Latest posts (max 6) ---
+          var latest = posts.slice(0, 6);
+          if (postsLoading) postsLoading.remove();
+          if (latest.length === 0) {
+            postsGrid.innerHTML = '<p class="muted" style="grid-column: 1 / -1;">No posts yet. Add your first post in the admin dashboard.</p>';
+            return;
+          }
+          postsGrid.innerHTML = latest.map(function (p) {
+            var meta = esc(p.category || 'Eira') + (p.read_time ? ' · ' + esc(p.read_time) : '');
+            var imgSrc = p.og_image ? esc(p.og_image) : '';
+            var media = imgSrc
+              ? '<a href="/post/' + esc(p.slug) + '/" style="text-decoration:none" class="card__media"><img src="' + imgSrc + '" alt="' + esc(p.title) + '" loading="lazy" /></a>'
+              : '<a href="/post/' + esc(p.slug) + '/" style="text-decoration:none" class="card__media">' + esc(p.category || 'Post') + '</a>';
+            return '<article class="card">' + media +
+              '<div class="card__body">' +
+                '<p class="card__meta">' + meta + '</p>' +
+                '<h3 class="card__title"><a href="/post/' + esc(p.slug) + '/">' + esc(p.title) + '</a></h3>' +
+              '</div>' +
+            '</article>';
+          }).join('');
+        })
+        .catch(function () {
+          if (postsLoading) postsLoading.remove();
+          if (featuredLoading) featuredLoading.remove();
+          postsGrid.innerHTML = '<p class="muted" style="grid-column: 1 / -1;">Unable to load posts.</p>';
+          if (featuredGrid) featuredGrid.innerHTML = '<p class="muted" style="grid-column: 1 / -1;">Unable to load products.</p>';
+        });
+    })();
+  </script>
+</body>
+</html>
