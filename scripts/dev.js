@@ -53,6 +53,10 @@ function resolveApiFile(reqPath) {
     }
     if (fs.existsSync(indexFile)) { dir = path.join(dir, seg); file = indexFile; if (isLast) break; continue; }
     if (fs.existsSync(dynamicFile)) { query.slug = decodeURIComponent(seg); file = dynamicFile; break; }
+    // Fallback: if no [slug].js, try index.js in current dir with slug query param.
+    // This supports the consolidated route pattern (index.js handles both collection and individual).
+    const currentIndex = path.join(dir, "index.js");
+    if (fs.existsSync(currentIndex)) { query.slug = decodeURIComponent(seg); file = currentIndex; break; }
     return null;
   }
   // If we ended on a directory with index.js
@@ -79,12 +83,15 @@ const server = http.createServer(async (req, res) => {
   const apiMatch = resolveApiFile(req.url);
   if (apiMatch) {
     try {
+      // Read the body BEFORE importing the module — the request stream
+      // emits data events immediately and they'd be lost during the async import.
+      const body = await readBody(req);
       const mod = await import(pathToFileURL(apiMatch.file).href + "?t=" + Date.now());
       const handler = mod.default;
       if (!handler) { res.statusCode = 500; return res.end("No default export in " + apiMatch.file); }
       // Build a Vercel-like req/res
       req.query = { ...parsed.query, ...apiMatch.query };
-      req.body = await readBody(req);
+      req.body = body;
       return handler(req, res);
     } catch (e) {
       console.error("API error:", e);

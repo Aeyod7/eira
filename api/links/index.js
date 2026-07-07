@@ -1,10 +1,23 @@
 import { db, ensureSchema } from "../../lib/db.js";
 import { requireAuth } from "../../lib/auth.js";
 
-// GET  /api/links        — list all cloaked links + their click counts (admin)
-// POST /api/links        — create/update a cloaked link (admin)
+// GET    /api/links           — list all cloaked links + click counts (admin)
+// POST   /api/links           — create/update a cloaked link (admin)
+// DELETE /api/links/:slug     — delete a cloaked link (admin)
+// (Vercel rewrite: /api/links/:slug → /api/links?slug=:slug)
 export default async function handler(req, res) {
   await ensureSchema();
+  const slug = req.query?.slug;
+
+  // Individual link: DELETE only
+  if (slug && req.method === "DELETE") {
+    return requireAuth(async (req, res) => {
+      await db.execute({ sql: `DELETE FROM links WHERE slug = ?`, args: [slug] });
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.end(JSON.stringify({ ok: true }));
+    })(req, res);
+  }
 
   if (req.method === "GET") {
     return requireAuth(async (req, res) => {
@@ -46,6 +59,6 @@ export default async function handler(req, res) {
   }
 
   res.statusCode = 405;
-  res.setHeader("Allow", "GET, POST");
+  res.setHeader("Allow", "GET, POST, DELETE");
   res.end(JSON.stringify({ error: "Method not allowed" }));
 }

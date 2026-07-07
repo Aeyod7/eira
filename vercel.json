@@ -2,7 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     { "source": "/go/:slug", "destination": "/api/go/:slug" },
-    { "source": "/post/:slug", "destination": "/api/post/:slug" }
+    { "source": "/post/:slug", "destination": "/api/post/:slug" },
+    { "source": "/api/posts/:slug", "destination": "/api/posts?slug=:slug" },
+    { "source": "/api/products/:slug", "destination": "/api/products?slug=:slug" },
+    { "source": "/api/links/:slug", "destination": "/api/links?slug=:slug" },
+    { "source": "/api/hero-slides/:slug", "destination": "/api/hero-slides?slug=:slug" }
   ],
   "headers": [
     { "source": "/api/(.*)", "headers": [{ "key": "Cache-Control", "value": "no-store" }] }
