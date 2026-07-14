@@ -5,7 +5,7 @@ import { requireAuth } from "../lib/auth.js";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const UPLOAD_DIR = path.join(ROOT, "public", "uploads");
-const MAX_BYTES = 8 * 1024 * 1024;
+const MAX_BYTES = 4 * 1024 * 1024; // 4 MB — Vercel Hobby body limit is ~4.5 MB
 const ALLOWED_TYPES = {
   "image/jpeg": ".jpg",
   "image/png": ".png",
@@ -26,62 +26,60 @@ function magicBytesMatch(type, data) {
   }
 }
 
-function parseMultipart(body, contentType) {
-  const match = String(contentType || "").match(/boundary=(?:"([^\"]+)"|([^;]+))/i);
-  if (!match) return null;
-  const boundary = Buffer.from("--" + (match[1] || match[2]));
-  const start = body.indexOf(boundary);
-  if (start < 0) return null;
-  const headerEnd = body.indexOf(Buffer.from("\r\n\r\n"), start);
-  if (headerEnd < 0) return null;
-  const headers = body.subarray(start + boundary.length + 2, headerEnd).toString("utf8");
-  const disposition = headers.match(/content-disposition:[^\r\n]*name="([^"]+)"[^\r\n]*filename="([^"]*)"/i);
-  const type = headers.match(/content-type:\s*([^\r\n]+)/i);
-  if (!disposition || !type) return null;
-  const fileStart = headerEnd + 4;
-  const endMarker = Buffer.concat([Buffer.from("\r\n"), boundary]);
-  const fileEnd = body.indexOf(endMarker, fileStart);
-  if (fileEnd < 0) return null;
-  return { filename: disposition[2], contentType: type[1].trim().toLowerCase(), data: body.subarray(fileStart, fileEnd) };
-}
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.statusCode = 405;
     return res.end(JSON.stringify({ error: "Method not allowed" }));
   }
   return requireAuth(async (req, res) => {
-    const raw = Buffer.isBuffer(req.body) ? req.body : Buffer.from(req.body || "", "binary");
-    const file = parseMultipart(raw, req.headers?.["content-type"]);
-    if (!file || !file.data.length) {
+    // Parse JSON body (base64-encoded image data)
+    let body = req.body;
+    if (typeof body === "string") { try { body = JSON.parse(body); } catch { body = {}; } }
+    if (!body || !body.data || !body.contentType || !body.filename) {
       res.statusCode = 400;
-      return res.end(JSON.stringify({ error: "Choose an image file to upload" }));
+      return res.end(JSON.stringify({ error: "Missing image data" }));
     }
-    if (!ALLOWED_TYPES[file.contentType]) {
+
+    const contentType = String(body.contentType).toLowerCase();
+    if (!ALLOWED_TYPES[contentType]) {
       res.statusCode = 400;
       return res.end(JSON.stringify({ error: "Only JPG, PNG, WebP, and GIF images are supported" }));
     }
-    if (file.data.length > MAX_BYTES) {
-      res.statusCode = 413;
-      return res.end(JSON.stringify({ error: "Images must be 8 MB or smaller" }));
+
+    let data;
+    try {
+      data = Buffer.from(body.data, "base64");
+    } catch {
+      res.statusCode = 400;
+      return res.end(JSON.stringify({ error: "Invalid image data" }));
     }
-    if (!magicBytesMatch(file.contentType, file.data)) {
+
+    if (!data.length) {
+      res.statusCode = 400;
+      return res.end(JSON.stringify({ error: "Empty image data" }));
+    }
+    if (data.length > MAX_BYTES) {
+      res.statusCode = 413;
+      return res.end(JSON.stringify({ error: "Images must be 4 MB or smaller" }));
+    }
+    if (!magicBytesMatch(contentType, data)) {
       res.statusCode = 400;
       return res.end(JSON.stringify({ error: "File contents don't match the image type" }));
     }
-    const base = path.basename(file.filename, path.extname(file.filename)).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "image";
-    const filename = `${base}-${Date.now()}-${randomBytes(4).toString("hex")}${ALLOWED_TYPES[file.contentType]}`;
+
+    const base = path.basename(String(body.filename), path.extname(String(body.filename))).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "image";
+    const filename = `${base}-${Date.now()}-${randomBytes(4).toString("hex")}${ALLOWED_TYPES[contentType]}`;
 
     let url;
     if (process.env.BLOB_READ_WRITE_TOKEN) {
       // Production (Vercel): persist to Vercel Blob — the serverless filesystem is ephemeral.
       const { put } = await import("@vercel/blob");
-      const blob = await put(`uploads/${filename}`, file.data, { access: "public", contentType: file.contentType });
+      const blob = await put(`uploads/${filename}`, data, { access: "public", contentType });
       url = blob.url;
     } else {
       // Local dev: write to public/uploads/ and serve statically.
       await fs.mkdir(UPLOAD_DIR, { recursive: true });
-      await fs.writeFile(path.join(UPLOAD_DIR, filename), file.data);
+      await fs.writeFile(path.join(UPLOAD_DIR, filename), data);
       url = `/uploads/${filename}`;
     }
     res.statusCode = 201;
