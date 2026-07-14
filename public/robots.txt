@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /api/
+Disallow: /go/
+
+Sitemap: https://eira.example/sitemap.xml

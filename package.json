@@ -10,7 +10,8 @@
     "migrate": "node scripts/migrate.js"
   },
   "dependencies": {
-    "@libsql/client": "^0.5.0"
+    "@libsql/client": "^0.5.0",
+    "@vercel/blob": "2.5.0"
   },
   "engines": {
     "node": ">=18"

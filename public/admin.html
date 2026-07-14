@@ -192,8 +192,12 @@
             </div>
 
             <div class="field">
-              <label for="p-ogimage">Pinterest / OG image URL <span class="muted">or local image path</span></label>
-              <input class="input" id="p-ogimage" placeholder="https://pin.it/... or pins/post-pin.svg" />
+              <label for="p-ogimage">Pinterest / OG image URL <span class="muted">or upload from your computer</span></label>
+              <div style="display:flex; gap:var(--space-3); align-items:center; flex-wrap:wrap;">
+                <input class="input" id="p-ogimage" placeholder="https://pin.it/... or /uploads/image.jpg" style="flex:1; min-width:240px;" />
+                <button class="btn btn--secondary" type="button" data-upload-for="p-ogimage">Upload image</button>
+                <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-upload-input="p-ogimage" hidden />
+              </div>
               <img class="og-preview" id="p-og-preview" alt="OG image preview" />
               <div class="og-preview-fallback" id="p-og-fallback">No image preview</div>
             </div>
@@ -265,8 +269,12 @@
             </div>
 
             <div class="field">
-              <label for="pr-image">Product image URL</label>
-              <input class="input" id="pr-image" placeholder="https://m.media-amazon.com/images/... or Pinterest image" />
+              <label for="pr-image">Product image URL <span class="muted">or upload from your computer</span></label>
+              <div style="display:flex; gap:var(--space-3); align-items:center; flex-wrap:wrap;">
+                <input class="input" id="pr-image" placeholder="https://m.media-amazon.com/images/... or /uploads/image.jpg" style="flex:1; min-width:240px;" />
+                <button class="btn btn--secondary" type="button" data-upload-for="pr-image">Upload image</button>
+                <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-upload-input="pr-image" hidden />
+              </div>
               <img class="og-preview" id="pr-image-preview" alt="Product image preview" />
               <div class="og-preview-fallback" id="pr-image-fallback">No image preview</div>
             </div>
@@ -319,8 +327,12 @@
           </div>
           <form class="simple-form" id="hero-form">
             <div class="field">
-              <label for="h-image-url">Image URL</label>
-              <input class="input" id="h-image-url" placeholder="https://images.unsplash.com/photo-..." required />
+              <label for="h-image-url">Image URL <span class="muted">or upload from your computer</span></label>
+              <div style="display:flex; gap:var(--space-3); align-items:center; flex-wrap:wrap;">
+                <input class="input" id="h-image-url" placeholder="https://images.unsplash.com/photo-... or /uploads/image.jpg" style="flex:1; min-width:240px;" required />
+                <button class="btn btn--secondary" type="button" data-upload-for="h-image-url">Upload image</button>
+                <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-upload-input="h-image-url" hidden />
+              </div>
               <img class="og-preview" id="h-image-preview" alt="Hero image preview" />
               <div class="og-preview-fallback" id="h-image-fallback">No image preview</div>
             </div>
@@ -449,6 +461,25 @@
       });
     }
     function esc(s) { return String(s||"").replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+    function uploadImage(input) {
+      var file = input.files && input.files[0];
+      if (!file) return;
+      if (file.size > 8 * 1024 * 1024) { toast("Images must be 8 MB or smaller"); input.value = ""; return; }
+      var form = new FormData(); form.append("image", file);
+      toast("Uploading image…");
+      fetch("/api/uploads", { method: "POST", body: form }).then(function (r) {
+        return r.json().then(function (data) { if (!r.ok) throw new Error(data.error || "Upload failed"); return data; });
+      }).then(function (data) {
+        var target = $("#" + input.dataset.uploadInput);
+        target.value = data.url;
+        target.dispatchEvent(new Event("input"));
+        toast("Image uploaded");
+      }).catch(function (err) { toast(err.message || "Upload failed"); }).finally(function () { input.value = ""; });
+    }
+    $$('[data-upload-for]').forEach(function (button) {
+      button.addEventListener("click", function () { $("[data-upload-input='" + button.dataset.uploadFor + "']").click(); });
+    });
+    $$('[data-upload-input]').forEach(function (input) { input.addEventListener("change", function () { uploadImage(input); }); });
 
     // ---- Auth ----
     function showLogin() { $("#login-view").hidden = false; $("#dash-view").hidden = true; }
@@ -541,12 +572,14 @@
     var attachedProducts = [];   // array of { id, name, image_url, why_html, link_slug, link_label, section_heading, image_text }
     var slugManuallyEdited = false;
 
+    function isPublished(value) { return value === true || value === 1 || value === "1"; }
+
     function loadPosts() {
       api("/api/posts").then(function (r) {
         var tb = $("#posts-table tbody"); tb.innerHTML = "";
         (r.posts || []).forEach(function (p) {
           var tr = document.createElement("tr");
-          tr.innerHTML = "<td><a href='/post/" + esc(p.slug) + "/' target='_blank'>" + esc(p.title) + "</a></td><td>" + esc(p.category) + "</td><td>" + (p.published ? "<span class='badge'>Published</span>" : "Draft") + "</td><td><button class='btn btn--secondary' data-edit='" + esc(p.slug) + "'>Edit</button> <button class='btn btn--error' data-delete-post='" + esc(p.slug) + "'>Delete</button></td>";
+          tr.innerHTML = "<td><a href='/post/" + esc(p.slug) + "/' target='_blank'>" + esc(p.title) + "</a></td><td>" + esc(p.category) + "</td><td>" + (isPublished(p.published) ? "<span class='badge'>Published</span>" : "<span class='badge' style='background:var(--color-surface-base);'>Draft</span>") + "</td><td><button class='btn btn--secondary' data-edit='" + esc(p.slug) + "'>Edit</button> <button class='btn btn--error' data-delete-post='" + esc(p.slug) + "'>Delete</button></td>";
           tb.appendChild(tr);
         });
         $$("[data-edit]").forEach(function (b) { b.addEventListener("click", function () { openEditor(b.dataset.edit); }); });
@@ -560,7 +593,17 @@
     }
 
     $("#new-post-btn").addEventListener("click", function () { openEditor(null); });
+
+    // Unsaved-changes tracking for the post editor
+    var postFormDirty = false;
+    $("#post-form").addEventListener("input", function () { postFormDirty = true; });
+    window.addEventListener("beforeunload", function (e) {
+      if (postFormDirty && !$("#posts-editor-view").hidden) { e.preventDefault(); e.returnValue = ""; }
+    });
+
     $("#cancel-post-btn").addEventListener("click", function () {
+      if (postFormDirty && !confirm("You have unsaved changes. Discard them?")) return;
+      postFormDirty = false;
       $("#posts-list-view").hidden = false; $("#posts-editor-view").hidden = true;
     });
 
@@ -609,7 +652,7 @@
             if (p.og_image) { $("#p-ogimage").dispatchEvent(new Event("input")); }
             $("#p-intro").value = p.intro_html || "";
             loadQuillContent(p.intro_html || "");
-            $("#p-published").value = p.published ? "1" : "0";
+            $("#p-published").value = isPublished(p.published) ? "1" : "0";
             $("#p-slug").disabled = true;
             $("#p-slug-hint").textContent = "locked on edit";
             $("#p-slug-edit-note").style.display = "block";
@@ -626,11 +669,13 @@
               };
             });
             renderAttachedProducts();
+            postFormDirty = false;
           });
         } else {
           $("#editor-title").textContent = "New post";
         }
       });
+      postFormDirty = false;
       $("#posts-list-view").hidden = true; $("#posts-editor-view").hidden = false;
     }
 
@@ -771,6 +816,7 @@
       var path = editingSlug ? "/api/posts/" + encodeURIComponent(editingSlug) : "/api/posts";
       api(path, { method: editingSlug ? "PUT" : "POST", body: payload }).then(function (r) {
         if (r.ok || r.slug) {
+          postFormDirty = false;
           toast(editingSlug ? "Post updated" : "Post created");
           loadPosts();
           $("#posts-list-view").hidden = false;
@@ -806,7 +852,7 @@
             + "<td>" + esc(p.name) + "</td>"
             + "<td>" + esc(p.category || "—") + "</td>"
             + "<td><code>/go/" + esc(p.link_slug || "—") + "</code></td>"
-            + "<td>" + (p.published ? "<span class='badge'>Published</span>" : "Draft") + "</td>"
+            + "<td>" + (isPublished(p.published) ? "<span class='badge'>Published</span>" : "<span class='badge' style='background:var(--color-surface-base);'>Draft</span>") + "</td>"
             + "<td><button class='btn btn--secondary' data-edit-product='" + p.id + "'>Edit</button> <button class='btn btn--error' data-delete-product='" + p.id + "'>Delete</button></td>";
           tb.appendChild(tr);
         });

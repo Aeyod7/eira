@@ -13,20 +13,21 @@
 /* ---------- 1. Design Tokens ---------- */
 :root {
   /* Color — semantic */
-  --color-text-primary:   #3D2B24;   /* deep espresso brown — body text */
-  --color-text-secondary: #FFFFFF;   /* text on dark surfaces */
-  --color-text-muted:     #6B5849;   /* muted brown — meta/captions */
-  --color-border-subtle:  #E6D5C3;   /* soft cream border */
-  --color-border-strong:  #B76E7E;   /* rose pink — emphasis borders */
-  --color-surface-base:   #FDF8F4;   /* warm cream page background */
-  --color-surface-strong: #F2E3D5;   /* deeper cream — cards/sections */
-  --color-surface-dark:   #4A3528;   /* brown — footer/header bands */
-  --color-accent-primary: #C98B9B;   /* dusty pink — primary accent */
-  --color-accent-strong:  #8B4F5E;   /* mauve rose — hover/active */
-  --color-accent-soft:    #E8C4CE;   /* blush — soft fills */
-  --color-state-error:    #A33A2A;   /* warm clay red — errors */
-  --color-state-success:  #5E6B3A;   /* olive — success */
-  --color-focus:          #4A3528;   /* focus ring — high contrast on cream */
+  --color-text-primary:   #0a0a0a;   /* deep espresso brown — body text */
+  --color-text-secondary: #e8e8e8;   /* text on dark surfaces */
+  --color-text-inverse:   #ffffff;
+  --color-text-muted:     #eb6f6b;   /* muted brown — meta/captions */
+  --color-border-subtle:  #8c3c3c;   /* soft cream border */
+  --color-border-strong:  #ba0000;   /* rose pink — emphasis borders */
+  --color-surface-base:   #efecec;   /* warm cream page background */
+  --color-surface-strong: #ee8989;   /* deeper cream — cards/sections */
+  --color-surface-dark:   #ef8e8e;   /* brown — footer/header bands */
+  --color-accent-primary: #d1d1d1;   /* dusty pink — primary accent */
+  --color-accent-strong:  #ffa7a7;   /* mauve rose — hover/active */
+  --color-accent-soft:    #813f3f;   /* blush — soft fills */
+  --color-state-error:    #d63f3f;   /* warm clay red — errors */
+  --color-state-success:  #ef7f7fab;   /* olive — success */
+  --color-focus:          #e9514c;   /* focus ring — high contrast on cream */
 
   /* Typography — families */
   --font-family-primary:  "Playfair Display", Georgia, "Times New Roman", serif;
@@ -128,6 +129,14 @@ a {
 a:hover { color: var(--color-accent-primary); }
 
 img { max-width: 100%; display: block; }
+.container--narrow img:not(.product-block__media) {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 520px;
+  object-fit: contain;
+  margin: var(--space-6) auto;
+}
 
 ul, ol { margin: 0 0 var(--space-6); padding-left: 1.2em; }
 
@@ -164,6 +173,7 @@ small { font-size: var(--font-size-sm); }
 }
 
 .section-header { text-align: center; margin-bottom: var(--space-12); }
+#featured-products :is(.eyebrow, h2), .category-hero h1, .hero.blog-hero :is(h1, p) { color: var(--color-text-inverse); }
 .filter-bar { display: flex; flex-wrap: wrap; gap: var(--space-3); justify-content: center; margin-bottom: var(--space-12); }
 
 /* ---------- 5. Header / Nav ---------- */
@@ -357,7 +367,7 @@ small { font-size: var(--font-size-sm); }
 
 /* ---------- 9. Hero ---------- */
 .hero {
-  background: linear-gradient(160deg, var(--color-surface-strong) 0%, var(--color-accent-soft) 100%);
+  background: var(--color-surface-dark);
   border-bottom: 1px solid var(--color-border-subtle);
   padding-block: var(--space-20);
   text-align: center;
@@ -551,10 +561,11 @@ small { font-size: var(--font-size-sm); }
   padding: var(--space-6) var(--space-8);
   flex-wrap: wrap;
 }
+.newsletter-strip__text .eyebrow { color: var(--color-text-inverse) !important; }
 .newsletter-strip__title {
   font-family: var(--font-family-primary);
   font-size: var(--font-size-xl);
-  color: var(--color-text-primary);
+  color: var(--color-text-inverse);
   margin: 0;
   line-height: 1.2;
 }
@@ -622,11 +633,12 @@ small { font-size: var(--font-size-sm); }
   padding-block: var(--space-16);
   margin-top: var(--space-20);
 }
-.site-footer a { color: var(--color-accent-soft); text-decoration: none; transition: color var(--motion-duration-fast) var(--motion-ease); }
-.site-footer a:hover { color: var(--color-text-secondary); text-decoration: underline; }
+.site-footer :is(.footer-brand, .footer-col h4, p, a, .footer-bottom) { color: var(--color-text-inverse) !important; }
+.site-footer a { text-decoration: none; transition: color var(--motion-duration-fast) var(--motion-ease); }
+.site-footer a:hover { text-decoration: underline; }
 .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: var(--space-12); }
-.footer-brand { font-family: var(--font-family-primary); font-size: var(--font-size-2xl); margin-bottom: var(--space-4); color: var(--color-text-secondary); }
-.footer-col h4 { color: var(--color-text-secondary); font-family: var(--font-family-stack); font-size: var(--font-size-sm); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: var(--space-5); }
+.footer-brand { font-family: var(--font-family-primary); font-size: var(--font-size-2xl); margin-bottom: var(--space-4); }
+.footer-col h4 { font-family: var(--font-family-stack); font-size: var(--font-size-sm); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: var(--space-5); }
 .footer-col ul { list-style: none; padding: 0; margin: 0; }
 .footer-col li { margin-bottom: var(--space-4); }
 .footer-bottom {

@@ -18,6 +18,9 @@ const MIME = {
   ".svg":  "image/svg+xml",
   ".png":  "image/png",
   ".jpg":  "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".gif":  "image/gif",
   ".json": "application/json; charset=utf-8",
   ".ico":  "image/x-icon"
 };
@@ -69,9 +72,12 @@ function resolveApiFile(reqPath) {
 
 function readBody(req) {
   return new Promise((resolve) => {
-    let data = "";
-    req.on("data", c => data += c);
-    req.on("end", () => resolve(data));
+    const chunks = [];
+    req.on("data", c => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c)));
+    req.on("end", () => {
+      const body = Buffer.concat(chunks);
+      resolve(String(req.headers["content-type"] || "").startsWith("multipart/") ? body : body.toString("utf8"));
+    });
   });
 }
 
@@ -112,6 +118,11 @@ const server = http.createServer(async (req, res) => {
     const slug = reqPath.split("/")[2]?.replace(/\/$/, "");
     const mod = await import(pathToFileURL(path.join(ROOT, "api/post/[slug].js")).href + "?t=" + Date.now());
     req.query = { slug };
+    return mod.default(req, res);
+  }
+  if (reqPath === "/sitemap.xml") {
+    const mod = await import(pathToFileURL(path.join(ROOT, "api/sitemap.js")).href + "?t=" + Date.now());
+    req.query = {};
     return mod.default(req, res);
   }
 

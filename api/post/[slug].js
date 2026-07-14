@@ -55,17 +55,46 @@ export default async function handler(req, res) {
     return res.end("Not found");
   }
 
+  const notFoundHtml = `<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post not found — Eira</title>
+  <meta name="robots" content="noindex" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Raleway:wght@300;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="/" aria-label="Eira — home">Eira</a>
+    </div>
+  </header>
+  <main id="main">
+    <section class="section">
+      <div class="container container--narrow" style="text-align:center;">
+        <p class="eyebrow">404</p>
+        <h1>Post not found</h1>
+        <p>This post may have been moved or unpublished.</p>
+        <p style="margin-top: var(--space-8);"><a class="btn btn--primary" href="/blog.html">Browse all posts</a></p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>`;
+
   const r = await db.execute({ sql: `SELECT * FROM posts WHERE slug = ?`, args: [slug] });
   if (r.rows.length === 0) {
     res.statusCode = 404;
     res.setHeader("Content-Type", "text/html; charset=utf-8");
-    return res.end(`<!doctype html><h1>Post not found</h1>`);
+    return res.end(notFoundHtml);
   }
   const p = r.rows[0];
   if (!p.published && !(await verify(getTokenFromRequest(req)))) {
     res.statusCode = 404;
     res.setHeader("Content-Type", "text/html; charset=utf-8");
-    return res.end(`<!doctype html><h1>Post not found</h1>`);
+    return res.end(notFoundHtml);
   }
 
   const ogImage = p.og_image ? `${SITE}/${p.og_image.replace(/^\/+/, "")}` : `${SITE}/pins/home-pin.svg`;
@@ -118,6 +147,21 @@ export default async function handler(req, res) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${title} — Eira</title>
   <meta name="description" content="${desc}" />
+  <link rel="canonical" href="${SITE}/post/${encodeURIComponent(slug)}/" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": ${JSON.stringify(p.title)},
+    "description": ${JSON.stringify(p.meta_description || p.title)},
+    "image": ${JSON.stringify(ogImage)},
+    "datePublished": ${JSON.stringify(String(p.created_at || "").replace(" ", "T"))},
+    "dateModified": ${JSON.stringify(String(p.updated_at || "").replace(" ", "T"))},
+    "mainEntityOfPage": ${JSON.stringify(`${SITE}/post/${encodeURIComponent(slug)}/`)},
+    "author": { "@type": "Organization", "name": "Eira" },
+    "publisher": { "@type": "Organization", "name": "Eira" }
+  }
+  </script>
   <meta property="og:site_name" content="Eira" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="${title}" />
@@ -170,17 +214,18 @@ export default async function handler(req, res) {
 
         ${body}
 
-        <div class="email-capture">
-          <p class="eyebrow" style="color: var(--color-accent-soft);">The weekly shortlist</p>
-          <h2>Get weekly Fitness in your inbox</h2>
-          <p>One email a week. New posts, current AWIN codes, and the occasional free styling guide.</p>
-          <form class="email-form" novalidate>
-            <div class="field">
-              <label for="email-ssr">Email address</label>
-              <input class="input" id="email-ssr" name="email" type="email" placeholder="you@example.com" required autocomplete="email" />
-              <span class="field__error" aria-live="polite"></span>
+        <div class="newsletter-strip">
+          <div class="newsletter-strip__text">
+            <p class="eyebrow" style="color: var(--color-accent-strong); margin-bottom: var(--space-2);">The weekly shortlist</p>
+            <p class="newsletter-strip__title">Weekly finds, straight to your inbox.</p>
+          </div>
+          <form class="newsletter-strip__form" novalidate>
+            <div class="newsletter-strip__inputwrap">
+              <label for="email-post" class="sr-only">Email address</label>
+              <input class="input" id="email-post" name="email" type="email" placeholder="you@example.com" required autocomplete="email" />
+              <button class="btn btn--primary" type="submit">Subscribe</button>
             </div>
-            <button class="btn btn--primary" type="submit">Subscribe</button>
+            <span class="field__error" aria-live="polite"></span>
           </form>
         </div>
       </div>
@@ -192,7 +237,7 @@ export default async function handler(req, res) {
       <div class="footer-grid">
         <div>
           <p class="footer-brand">Eira</p>
-          <p style="color: var(--color-accent-soft); max-width: 38ch;">A faceless beauty, fashion and self-care affiliate hub. Curated picks, with the context Pinterest can&rsquo;t hold.</p>
+          <p style="color: var(--color-accent-soft); max-width: 38ch;">A beauty, skincare, fashion and fitness affiliate hub. Curated product picks and blog posts, with direct links to the retailers we trust.</p>
           <p style="font-size: var(--font-size-xs); color: var(--color-accent-soft); margin-top: var(--space-6);">
             As an Amazon Associate I earn from qualifying purchases. This site contains affiliate links &mdash; see full disclosure on each post.
           </p>
@@ -212,6 +257,9 @@ export default async function handler(req, res) {
             <li><a href="/">Home</a></li>
             <li><a href="/blog.html">Blog</a></li>
             <li><a href="/about.html">About</a></li>
+            <li><a href="/privacy.html">Privacy</a></li>
+            <li><a href="/terms.html">Terms</a></li>
+            <li><a href="/contact.html">Contact</a></li>
           </ul>
         </div>
       </div>
@@ -233,7 +281,7 @@ export default async function handler(req, res) {
         toggle.setAttribute('aria-expanded', String(!open));
       });
     })();
-    document.querySelectorAll('.email-form').forEach(function (form) {
+    document.querySelectorAll('.newsletter-strip__form').forEach(function (form) {
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         var input = form.querySelector('input[type="email"]');
@@ -259,26 +307,6 @@ export default async function handler(req, res) {
 </html>`;
 
   res.statusCode = 200;
-  res.setHeader("Content-Type", "text/html; charset=utf-8");
-  res.setHeader("Cache-Control", "no-store");
-  res.end(html);
-}
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "text/html; charset=utf-8");
-  res.setHeader("Cache-Control", "no-store");
-  res.end(html);
-}
-
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "text/html; charset=utf-8");
-  res.setHeader("Cache-Control", "no-store");
-  res.end(html);
-}
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "text/html; charset=utf-8");
-  res.setHeader("Cache-Control", "no-store");
-  res.end(html);
-}
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
   res.end(html);

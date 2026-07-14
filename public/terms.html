@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms of Use — Eira</title>
+  <meta name="description" content="Eira's terms of use — the rules for using this site and its content." />
+  <link rel="canonical" href="https://eira.example/terms.html" />
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Raleway:wght@300;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="index.html" aria-label="Eira — home">Eira</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+      <nav id="primary-nav" class="nav" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="category.html?category=Beauty">Beauty</a>
+        <a href="category.html?category=Skincare">Skincare</a>
+        <a href="category.html?category=Fashion">Fashion</a>
+        <a href="category.html?category=Fitness">Fitness</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="section">
+      <div class="container container--narrow">
+        <p class="eyebrow">Legal</p>
+        <h1>Terms of Use</h1>
+        <p class="post-meta">Last updated: 14 July 2026</p>
+
+        <h2>Using this site</h2>
+        <p>By using Eira you agree to these terms. The site's content — posts, product picks, and guides — is provided for general information and inspiration only.</p>
+
+        <h2>Affiliate relationships</h2>
+        <p>As an Amazon Associate we earn from qualifying purchases. Posts contain affiliate links: if you click through and buy, we may earn a commission at no extra cost to you. Affiliate relationships never change our editorial opinion — we only feature products we'd genuinely recommend.</p>
+
+        <h2>No professional advice</h2>
+        <p>Content about skincare, fitness, or wellbeing is not medical advice. Always check product labels, patch-test new skincare, and consult a qualified professional before starting a new fitness or supplement routine.</p>
+
+        <h2>Prices and availability</h2>
+        <p>Product prices, offers, and availability shown or linked from this site are set by the retailer and can change at any time. The price at the retailer's checkout is the one that applies.</p>
+
+        <h2>Intellectual property</h2>
+        <p>The content on this site (text, layout, graphics) belongs to Eira unless otherwise stated. You're welcome to share links to our posts; please don't republish full posts without permission.</p>
+
+        <h2>Liability</h2>
+        <p>We do our best to keep information accurate, but the site is provided "as is" without warranties. We're not liable for issues arising from products you purchase from third-party retailers — those purchases are governed by the retailer's own terms.</p>
+
+        <h2>Contact</h2>
+        <p>Questions about these terms? Reach us via the <a href="contact.html">contact page</a>.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <p class="footer-brand">Eira</p>
+          <p style="color: var(--color-accent-soft); max-width: 38ch;">A beauty, skincare, fashion and fitness affiliate hub. Curated product picks and blog posts, with direct links to the retailers we trust.</p>
+          <p style="font-size: var(--font-size-xs); color: var(--color-accent-soft); margin-top: var(--space-6);">
+            As an Amazon Associate I earn from qualifying purchases. This site contains affiliate links &mdash; see full disclosure on each post.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h4>Categories</h4>
+          <ul>
+            <li><a href="category.html?category=Beauty">Beauty</a></li>
+            <li><a href="category.html?category=Skincare">Skincare</a></li>
+            <li><a href="category.html?category=Fashion">Fashion</a></li>
+            <li><a href="category.html?category=Fitness">Fitness</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Site</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="privacy.html">Privacy</a></li>
+            <li><a href="terms.html">Terms</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Eira. All rights reserved.</span>
+        <span>Made for readers, not algorithms.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var toggle = document.querySelector('.nav-toggle');
+      var nav = document.getElementById('primary-nav');
+      if (!toggle || !nav) return;
+      toggle.addEventListener('click', function () {
+        var open = nav.getAttribute('data-open') === 'true';
+        nav.setAttribute('data-open', String(!open));
+        toggle.setAttribute('aria-expanded', String(!open));
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -3,12 +3,27 @@
   "rewrites": [
     { "source": "/go/:slug", "destination": "/api/go/:slug" },
     { "source": "/post/:slug", "destination": "/api/post/:slug" },
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+    { "source": "/api/admin/:slug", "destination": "/api/admin?slug=:slug" },
     { "source": "/api/posts/:slug", "destination": "/api/posts?slug=:slug" },
     { "source": "/api/products/:slug", "destination": "/api/products?slug=:slug" },
     { "source": "/api/links/:slug", "destination": "/api/links?slug=:slug" },
     { "source": "/api/hero-slides/:slug", "destination": "/api/hero-slides?slug=:slug" }
   ],
   "headers": [
-    { "source": "/api/(.*)", "headers": [{ "key": "Cache-Control", "value": "no-store" }] }
+    { "source": "/api/(.*)", "headers": [{ "key": "Cache-Control", "value": "no-store" }] },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+      ]
+    },
+    {
+      "source": "/(.*)\\.(css|js|svg|png|jpg|jpeg|webp|gif|ico)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }]
+    }
   ]
 }

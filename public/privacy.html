@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Eira</title>
+  <meta name="description" content="Eira's privacy policy — what data we collect, how we use it, and your rights." />
+  <link rel="canonical" href="https://eira.example/privacy.html" />
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Raleway:wght@300;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="index.html" aria-label="Eira — home">Eira</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+      <nav id="primary-nav" class="nav" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="category.html?category=Beauty">Beauty</a>
+        <a href="category.html?category=Skincare">Skincare</a>
+        <a href="category.html?category=Fashion">Fashion</a>
+        <a href="category.html?category=Fitness">Fitness</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="section">
+      <div class="container container--narrow">
+        <p class="eyebrow">Legal</p>
+        <h1>Privacy Policy</h1>
+        <p class="post-meta">Last updated: 14 July 2026</p>
+
+        <h2>Who we are</h2>
+        <p>Eira ("we", "us") is a beauty, skincare, fashion and fitness affiliate blog. This policy explains what personal data we collect when you use the site and how we handle it.</p>
+
+        <h2>What we collect</h2>
+        <ul>
+          <li><strong>Email address</strong> &mdash; only if you subscribe to the newsletter. We use it solely to send the weekly email. We never sell or share it.</li>
+          <li><strong>Click data</strong> &mdash; when you click an affiliate link (a <code>/go/</code> link), we record the link, the referring page, and your browser's user-agent string for aggregate analytics. We do not store your IP address with clicks.</li>
+        </ul>
+
+        <h2>Cookies</h2>
+        <p>The public site does not set tracking cookies. A session cookie is used only for the site administrator's login. Retailers you visit through our affiliate links (such as Amazon) set their own cookies to attribute the referral — see their privacy policies for details.</p>
+
+        <h2>Affiliate links</h2>
+        <p>As an Amazon Associate we earn from qualifying purchases. When you click an affiliate link and buy something, the retailer may pay us a commission at no extra cost to you. The retailer processes your purchase under its own privacy policy.</p>
+
+        <h2>How long we keep data</h2>
+        <p>Newsletter emails are kept until you unsubscribe. Aggregate click data is kept indefinitely for analytics.</p>
+
+        <h2>Your rights</h2>
+        <p>You can ask us to delete your email address or any data we hold about you at any time. Contact us via the <a href="contact.html">contact page</a> and we'll action it promptly. If you're in the UK/EU, you also have the right to lodge a complaint with your data protection authority.</p>
+
+        <h2>Changes</h2>
+        <p>We'll update this page if our data practices change, and update the date at the top.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <p class="footer-brand">Eira</p>
+          <p style="color: var(--color-accent-soft); max-width: 38ch;">A beauty, skincare, fashion and fitness affiliate hub. Curated product picks and blog posts, with direct links to the retailers we trust.</p>
+          <p style="font-size: var(--font-size-xs); color: var(--color-accent-soft); margin-top: var(--space-6);">
+            As an Amazon Associate I earn from qualifying purchases. This site contains affiliate links &mdash; see full disclosure on each post.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h4>Categories</h4>
+          <ul>
+            <li><a href="category.html?category=Beauty">Beauty</a></li>
+            <li><a href="category.html?category=Skincare">Skincare</a></li>
+            <li><a href="category.html?category=Fashion">Fashion</a></li>
+            <li><a href="category.html?category=Fitness">Fitness</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Site</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="privacy.html">Privacy</a></li>
+            <li><a href="terms.html">Terms</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Eira. All rights reserved.</span>
+        <span>Made for readers, not algorithms.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var toggle = document.querySelector('.nav-toggle');
+      var nav = document.getElementById('primary-nav');
+      if (!toggle || !nav) return;
+      toggle.addEventListener('click', function () {
+        var open = nav.getAttribute('data-open') === 'true';
+        nav.setAttribute('data-open', String(!open));
+        toggle.setAttribute('aria-expanded', String(!open));
+      });
+    })();
+  </script>
+</body>
+</html>

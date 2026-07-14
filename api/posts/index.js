@@ -102,7 +102,7 @@ export default async function handler(req, res) {
                   WHERE slug=?`,
             args: [title, category, meta_description || null, eyebrow || null, read_time || null,
                    intro_html || null, body_html || "", finalProductsJson, extra_sections_html || null,
-                   og_image || null, published === false ? 0 : 1, slug]
+                   og_image || null, published === false || published === 0 || published === "0" || published === "false" ? 0 : 1, slug]
           });
 
           if (Array.isArray(attached_product_ids)) {
@@ -199,7 +199,7 @@ export default async function handler(req, res) {
                   updated_at=datetime('now')`,
           args: [slug, title, category, meta_description || null, eyebrow || null, read_time || null,
                  intro_html || null, body_html || "", finalProductsJson, extra_sections_html || null,
-                 og_image || null, published === false ? 0 : 1]
+                 og_image || null, published === false || published === 0 || published === "0" || published === "false" ? 0 : 1]
         });
 
         if (Array.isArray(attached_product_ids)) {

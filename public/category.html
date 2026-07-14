@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Categories — Eira</title>
+  <link rel="canonical" href="https://eira.example/category.html" />
   <meta name="description" content="Browse Eira posts by category — beauty, skincare, fashion, fitness, and more." />
 
   <!-- Open Graph / Pinterest Rich Pins -->
@@ -46,11 +47,9 @@
   </header>
 
   <main id="main">
-    <section class="hero">
+    <section class="hero category-hero">
       <div class="container container--narrow">
-        <p class="eyebrow" id="category-eyebrow">Category hub</p>
         <h1 id="category-heading">Categories</h1>
-        <p id="category-intro">Browse every post by category hub. New posts appear here as soon as you publish them.</p>
       </div>
     </section>
 
@@ -86,6 +85,9 @@
             <li><a href="index.html">Home</a></li>
             <li><a href="blog.html">Blog</a></li>
             <li><a href="about.html">About</a></li>
+            <li><a href="privacy.html">Privacy</a></li>
+            <li><a href="terms.html">Terms</a></li>
+            <li><a href="contact.html">Contact</a></li>
           </ul>
         </div>
       </div>
@@ -112,9 +114,7 @@
     (function () {
       var container = document.getElementById('category-posts');
       var loading = document.getElementById('category-posts-loading');
-      var eyebrow = document.getElementById('category-eyebrow');
       var heading = document.getElementById('category-heading');
-      var intro = document.getElementById('category-intro');
       var params = new URLSearchParams(window.location.search);
       var filterCategory = params.get('category');
       function esc(s) { return String(s||'').replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
@@ -150,9 +150,7 @@
           // Single category view
           var filteredPosts = posts.filter(function (p) { return p.category === filterCategory; });
           var filteredProducts = products.filter(function (p) { return p.category === filterCategory; });
-          if (eyebrow) eyebrow.textContent = 'Category';
           if (heading) heading.textContent = esc(filterCategory);
-          if (intro) intro.textContent = 'All posts and products in ' + esc(filterCategory) + '.';
           var html = '';
           if (filteredPosts.length === 0 && filteredProducts.length === 0) {
             container.innerHTML = '<p class="muted">No posts or products in ' + esc(filterCategory) + ' yet.</p>';

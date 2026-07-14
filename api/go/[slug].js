@@ -20,6 +20,15 @@ export default async function handler(req, res) {
 
   const destination = link.rows[0].destination;
 
+  // Only redirect to http(s) URLs — blocks javascript:, data:, and other schemes.
+  let valid = false;
+  try { valid = ["http:", "https:"].includes(new URL(destination).protocol); } catch {}
+  if (!valid) {
+    res.statusCode = 404;
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    return res.end(`<!doctype html><h1>Link not available</h1>`);
+  }
+
   // Fire-and-forget click log. Don't await in a way that delays the redirect.
   const referrer = req.headers?.referer || req.headers?.referrer || null;
   const ua = req.headers?.["user-agent"] || null;
