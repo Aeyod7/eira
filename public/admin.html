@@ -68,11 +68,23 @@
     .ql-toolbar { border: 1px solid var(--color-border-subtle) !important; border-radius: var(--radius-lg) var(--radius-lg) 0 0; background: var(--color-surface-strong); }
     .ql-container { border: 1px solid var(--color-border-subtle) !important; border-top: none !important; border-radius: 0 0 var(--radius-lg) var(--radius-lg); font-family: var(--font-family-stack) !important; font-size: var(--font-size-md) !important; }
     .ql-editor { min-height: 420px; padding: var(--space-6) !important; line-height: 1.7; }
+    .ql-editor h1 { font-family: var(--font-family-primary); font-size: var(--font-size-3xl); margin: var(--space-6) 0 var(--space-4); }
     .ql-editor h2 { font-family: var(--font-family-primary); font-size: var(--font-size-xl); margin: var(--space-5) 0 var(--space-3); }
     .ql-editor h3 { font-family: var(--font-family-primary); font-size: var(--font-size-lg); margin: var(--space-4) 0 var(--space-2); }
     .ql-editor p { margin-bottom: var(--space-3); }
     .ql-editor ul, .ql-editor ol { padding-left: var(--space-6); margin-bottom: var(--space-3); }
     .ql-editor li { margin-bottom: var(--space-1); }
+    .ql-editor img { max-width: 100%; height: auto; border-radius: var(--radius-md); margin: var(--space-4) 0; }
+    .ql-editor blockquote { border-left: 4px solid var(--color-accent-strong); padding-left: var(--space-5); margin: var(--space-4) 0; color: var(--color-text-muted); font-style: italic; }
+    .ql-editor pre.ql-syntax { background: var(--color-surface-strong); padding: var(--space-4); border-radius: var(--radius-md); overflow-x: auto; }
+    .ql-toolbar.ql-snow .ql-picker-label { color: var(--color-text-primary); }
+    .ql-toolbar.ql-snow .ql-stroke { stroke: var(--color-text-primary); }
+    .ql-toolbar.ql-snow .ql-fill { fill: var(--color-text-primary); }
+    .ql-toolbar.ql-snow .ql-picker-item.ql-selected { color: var(--color-accent-strong); }
+    .ql-toolbar button:hover .ql-stroke { stroke: var(--color-accent-strong); }
+    .ql-toolbar button:hover .ql-fill { fill: var(--color-accent-strong); }
+    .ql-toolbar button.ql-active .ql-stroke { stroke: var(--color-accent-strong); }
+    .ql-toolbar button.ql-active .ql-fill { fill: var(--color-accent-strong); }
 
     .login-box { max-width: 360px; margin: var(--space-20) auto; text-align: center; }
     .login-box form { display: flex; flex-direction: column; gap: var(--space-5); margin-top: var(--space-6); }
@@ -183,11 +195,8 @@
                 <p class="muted" id="p-slug-edit-note" style="display:none; margin-top:var(--space-2);">Locked on edit. Changing it would break existing links.</p>
               </div>
               <div class="field">
-                <label for="p-published">Status</label>
-                <select class="input" id="p-published">
-                  <option value="1">Published</option>
-                  <option value="0">Draft</option>
-                </select>
+                <label>Current status</label>
+                <p class="muted" id="p-status-display" style="margin:0; padding:var(--space-5) 0; font-weight:var(--font-weight-bold);">New draft</p>
               </div>
             </div>
 
@@ -206,7 +215,7 @@
               <label for="p-intro">Blog post content</label>
               <div id="p-editor" class="content-editor"></div>
               <input type="hidden" id="p-intro" />
-              <p class="content-editor-hint">Write normally. Use the toolbar for headings, bold, lists, and links.</p>
+              <p class="content-editor-hint">Write or paste your content. Formatting from Word, Google Docs, or web pages will be preserved.</p>
             </div>
 
             <div class="card" style="margin-top: var(--space-6);">
@@ -227,7 +236,8 @@
             </div>
 
             <div class="actions">
-              <button class="btn btn--primary" id="save-post-btn" type="submit">Save post</button>
+              <button class="btn btn--secondary" id="save-draft-btn" type="button">Save draft</button>
+              <button class="btn btn--primary" id="publish-post-btn" type="button">Publish</button>
               <button class="btn btn--secondary" id="cancel-post-btn" type="button">Cancel</button>
               <button class="btn btn--error" id="delete-post-btn" type="button" hidden>Delete</button>
             </div>
@@ -639,7 +649,9 @@
       editingSlug = slug;
       $("#post-form").reset();
       $("#p-category").value = "";
-      $("#p-published").value = "1";
+      $("#p-status-display").textContent = "New draft";
+      $("#publish-post-btn").textContent = "Publish";
+      $("#save-draft-btn").textContent = "Save draft";
       loadQuillContent("");
       $("#p-slug").disabled = false;
       $("#p-slug-hint").textContent = "auto-generated";
@@ -661,7 +673,9 @@
             if (p.og_image) { $("#p-ogimage").dispatchEvent(new Event("input")); }
             $("#p-intro").value = p.intro_html || "";
             loadQuillContent(p.intro_html || "");
-            $("#p-published").value = isPublished(p.published) ? "1" : "0";
+            $("#p-status-display").textContent = isPublished(p.published) ? "Published" : "Draft";
+            $("#publish-post-btn").textContent = isPublished(p.published) ? "Update post" : "Publish";
+            $("#save-draft-btn").textContent = isPublished(p.published) ? "Unpublish & save" : "Save draft";
             $("#p-slug").disabled = true;
             $("#p-slug-hint").textContent = "locked on edit";
             $("#p-slug-edit-note").style.display = "block";
@@ -802,10 +816,11 @@
       $("#panel-products").hidden = false;
     });
 
-    $("#post-form").addEventListener("submit", function (e) {
-      e.preventDefault();
+    function savePost(published) {
       var slug = $("#p-slug").value.trim();
-      if (!slug) { toast("Slug is required"); return; }
+      if (!slug) { toast("Slug is required — add a title first"); return; }
+      if (!$("#p-title").value.trim()) { toast("Title is required"); return; }
+      if (!$("#p-category").value) { toast("Category is required"); return; }
       syncQuillToInput();
       var htmlContent = $("#p-intro").value;
       var attachedIds = attachedProducts.map(function (a) {
@@ -820,19 +835,22 @@
         body_html: "",
         products_json: "[]",
         attached_product_ids: attachedIds,
-        published: $("#p-published").value === "1"
+        published: published
       };
       var path = editingSlug ? "/api/posts/" + encodeURIComponent(editingSlug) : "/api/posts";
       api(path, { method: editingSlug ? "PUT" : "POST", body: payload }).then(function (r) {
         if (r.ok || r.slug) {
           postFormDirty = false;
-          toast(editingSlug ? "Post updated" : "Post created");
+          toast(published ? "Post published" : "Draft saved");
           loadPosts();
           $("#posts-list-view").hidden = false;
           $("#posts-editor-view").hidden = true;
         } else { toast(r.error || "Save failed"); }
-      });
-    });
+      }).catch(function () { toast("Save failed — check your connection"); });
+    }
+
+    $("#save-draft-btn").addEventListener("click", function () { savePost(false); });
+    $("#publish-post-btn").addEventListener("click", function () { savePost(true); });
 
     $("#delete-post-btn").addEventListener("click", function () {
       if (!editingSlug || !confirm("Delete this post?")) return;
@@ -1157,13 +1175,46 @@
       theme: 'snow',
       placeholder: 'Write your blog post here. Just type or paste your content — no coding needed.',
       modules: {
-        toolbar: [
-          [{ header: [1, 2, 3, false] }],
-          ['bold', 'italic', 'underline'],
-          [{ list: 'ordered' }, { list: 'bullet' }],
-          ['link', 'blockquote'],
-          ['clean']
-        ]
+        toolbar: {
+          container: [
+            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+            [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'align': [] }, { 'indent': '-1' }, { 'indent': '+1' }],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            ['blockquote', 'code-block'],
+            ['link', 'image'],
+            [{ 'script': 'sub' }, { 'script': 'super' }],
+            ['clean']
+          ]
+        },
+        clipboard: {
+          matchVisual: true,
+          matchers: []
+        }
+      }
+    });
+
+    // Preserve paste formatting — insert HTML directly instead of letting Quill strip it
+    quill.root.addEventListener('paste', function (e) {
+      e.preventDefault();
+      var html = e.clipboardData.getData('text/html');
+      var text = e.clipboardData.getData('text/plain');
+      if (html) {
+        var range = quill.getSelection();
+        if (range) {
+          quill.clipboard.dangerouslyPasteHTML(range.index, html);
+        } else {
+          quill.clipboard.dangerouslyPasteHTML(html);
+        }
+      } else if (text) {
+        var range2 = quill.getSelection();
+        if (range2) {
+          quill.insertText(range2.index, text);
+        } else {
+          quill.insertText(0, text);
+        }
       }
     });
 
