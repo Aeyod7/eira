@@ -77,6 +77,21 @@
     .ql-editor img { max-width: 100%; height: auto; border-radius: var(--radius-md); margin: var(--space-4) 0; }
     .ql-editor blockquote { border-left: 4px solid var(--color-accent-strong); padding-left: var(--space-5); margin: var(--space-4) 0; color: var(--color-text-muted); font-style: italic; }
     .ql-editor pre.ql-syntax { background: var(--color-surface-strong); padding: var(--space-4); border-radius: var(--radius-md); overflow-x: auto; }
+    /* Custom font classes — registered in Quill whitelist */
+    .ql-editor .ql-font-serif { font-family: Georgia, "Times New Roman", serif; }
+    .ql-editor .ql-font-monospace { font-family: "Courier New", monospace; }
+    .ql-editor .ql-font-sans-serif { font-family: -apple-system, "Segoe UI", sans-serif; }
+    /* Size classes — use !important so they override header font-size */
+    .ql-editor .ql-size-small { font-size: 0.75rem !important; }
+    .ql-editor .ql-size-large { font-size: 1.5rem !important; }
+    .ql-editor .ql-size-huge { font-size: 2.5rem !important; }
+    /* Font classes override header font-family */
+    .ql-editor h1 .ql-font-serif, .ql-editor h2 .ql-font-serif, .ql-editor h3 .ql-font-serif,
+    .ql-editor h4 .ql-font-serif, .ql-editor h5 .ql-font-serif, .ql-editor h6 .ql-font-serif { font-family: Georgia, "Times New Roman", serif !important; }
+    .ql-editor h1 .ql-font-monospace, .ql-editor h2 .ql-font-monospace, .ql-editor h3 .ql-font-monospace,
+    .ql-editor h4 .ql-font-monospace, .ql-editor h5 .ql-font-monospace, .ql-editor h6 .ql-font-monospace { font-family: "Courier New", monospace !important; }
+    .ql-editor h1 .ql-font-sans-serif, .ql-editor h2 .ql-font-sans-serif, .ql-editor h3 .ql-font-sans-serif,
+    .ql-editor h4 .ql-font-sans-serif, .ql-editor h5 .ql-font-sans-serif, .ql-editor h6 .ql-font-sans-serif { font-family: -apple-system, "Segoe UI", sans-serif !important; }
     .ql-toolbar.ql-snow .ql-picker-label { color: var(--color-text-primary); }
     .ql-toolbar.ql-snow .ql-stroke { stroke: var(--color-text-primary); }
     .ql-toolbar.ql-snow .ql-fill { fill: var(--color-text-primary); }
@@ -1170,6 +1185,11 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
   <script>
+    // Register custom fonts so the font dropdown actually has options
+    var FontAttributor = Quill.import('formats/font');
+    FontAttributor.whitelist = ['serif', 'monospace', 'sans-serif'];
+    Quill.register(FontAttributor, true);
+
     // Initialize Quill rich text editor
     var quill = new Quill('#p-editor', {
       theme: 'snow',
@@ -1178,7 +1198,7 @@
         toolbar: {
           container: [
             [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-            [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }],
+            [{ 'font': ['serif', 'monospace', 'sans-serif'] }, { 'size': ['small', false, 'large', 'huge'] }],
             ['bold', 'italic', 'underline', 'strike'],
             [{ 'color': [] }, { 'background': [] }],
             [{ 'align': [] }, { 'indent': '-1' }, { 'indent': '+1' }],
@@ -1187,7 +1207,71 @@
             ['link', 'image'],
             [{ 'script': 'sub' }, { 'script': 'super' }],
             ['clean']
-          ]
+          ],
+          handlers: {
+            // Custom handlers that apply formats across multi-block selections
+            'font': function (value) {
+              var range = quill.getSelection();
+              if (!range) return;
+              if (value) {
+                quill.formatText(range.index, range.length, 'font', value);
+              } else {
+                quill.formatText(range.index, range.length, 'font', false);
+              }
+            },
+            'size': function (value) {
+              var range = quill.getSelection();
+              if (!range) return;
+              if (value) {
+                quill.formatText(range.index, range.length, 'size', value);
+              } else {
+                quill.formatText(range.index, range.length, 'size', false);
+              }
+              // Keep toolbar in sync
+              setTimeout(function () { quill.setSelection(range.index, range.length); }, 0);
+            },
+            // Also fix bold/italic/underline/strike for multi-block selections
+            'bold': function () {
+              var range = quill.getSelection();
+              if (!range) return;
+              var current = quill.getFormat(range.index, range.length).bold;
+              quill.formatText(range.index, range.length, 'bold', !current);
+              setTimeout(function () { quill.setSelection(range.index, range.length); }, 0);
+            },
+            'italic': function () {
+              var range = quill.getSelection();
+              if (!range) return;
+              var current = quill.getFormat(range.index, range.length).italic;
+              quill.formatText(range.index, range.length, 'italic', !current);
+              setTimeout(function () { quill.setSelection(range.index, range.length); }, 0);
+            },
+            'underline': function () {
+              var range = quill.getSelection();
+              if (!range) return;
+              var current = quill.getFormat(range.index, range.length).underline;
+              quill.formatText(range.index, range.length, 'underline', !current);
+              setTimeout(function () { quill.setSelection(range.index, range.length); }, 0);
+            },
+            'strike': function () {
+              var range = quill.getSelection();
+              if (!range) return;
+              var current = quill.getFormat(range.index, range.length).strike;
+              quill.formatText(range.index, range.length, 'strike', !current);
+              setTimeout(function () { quill.setSelection(range.index, range.length); }, 0);
+            },
+            'color': function (value) {
+              var range = quill.getSelection();
+              if (!range) return;
+              quill.formatText(range.index, range.length, 'color', value);
+              setTimeout(function () { quill.setSelection(range.index, range.length); }, 0);
+            },
+            'background': function (value) {
+              var range = quill.getSelection();
+              if (!range) return;
+              quill.formatText(range.index, range.length, 'background', value);
+              setTimeout(function () { quill.setSelection(range.index, range.length); }, 0);
+            }
+          }
         },
         clipboard: {
           matchVisual: true,
