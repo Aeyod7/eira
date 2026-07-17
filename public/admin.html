@@ -682,7 +682,7 @@
       loadLinks().then(function () {
         if (slug) {
           api("/api/posts/" + encodeURIComponent(slug)).then(function (r) {
-            var p = r.post; if (!p) return;
+            var p = r.post; if (!p) { toast("Could not load post content"); return; }
             $("#p-slug").value = p.slug; $("#p-title").value = p.title; $("#p-category").value = p.category;
             $("#p-ogimage").value = p.og_image || "";
             if (p.og_image) { $("#p-ogimage").dispatchEvent(new Event("input")); }
@@ -1311,11 +1311,22 @@
     }
 
     // Load content into Quill when editing existing post
+    // Uses Quill's clipboard converter to properly parse HTML into Quill's Delta model
     function loadQuillContent(html) {
-      if (html) {
-        quill.root.innerHTML = html;
-      } else {
-        quill.setText('');
+      // Clear editor first
+      quill.setText('');
+      if (html && html.trim()) {
+        // Use Quill's API to convert HTML to Delta and set contents
+        // This properly syncs Quill's internal model (unlike setting innerHTML directly)
+        try {
+          var delta = quill.clipboard.convert({ html: html });
+          quill.setContents(delta, Quill.sources.SILENT);
+        } catch (e) {
+          // Fallback: set innerHTML directly and force update
+          console.error('loadQuillContent convert failed, using fallback:', e);
+          quill.root.innerHTML = html;
+          quill.update(Quill.sources.SILENT);
+        }
       }
     }
   </script>
