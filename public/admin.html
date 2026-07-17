@@ -1311,23 +1311,31 @@
     }
 
     // Load content into Quill when editing existing post
-    // Uses Quill's clipboard converter to properly parse HTML into Quill's Delta model
     function loadQuillContent(html) {
       // Clear editor first
       quill.setText('');
-      if (html && html.trim()) {
-        // Use Quill's API to convert HTML to Delta and set contents
-        // This properly syncs Quill's internal model (unlike setting innerHTML directly)
-        try {
-          var delta = quill.clipboard.convert({ html: html });
-          quill.setContents(delta, Quill.sources.SILENT);
-        } catch (e) {
-          // Fallback: set innerHTML directly and force update
-          console.error('loadQuillContent convert failed, using fallback:', e);
-          quill.root.innerHTML = html;
-          quill.update(Quill.sources.SILENT);
-        }
+      if (!html || !html.trim()) return;
+
+      // Method 1: Try dangerouslyPasteHTML into an empty editor (most reliable in Quill 2)
+      try {
+        quill.clipboard.dangerouslyPasteHTML(0, html, Quill.sources.SILENT);
+        return;
+      } catch (e) {
+        console.error('loadQuillContent: dangerouslyPasteHTML failed:', e);
       }
+
+      // Method 2: Try convert + setContents
+      try {
+        var delta = quill.clipboard.convert({ html: html });
+        quill.setContents(delta, Quill.sources.SILENT);
+        return;
+      } catch (e2) {
+        console.error('loadQuillContent: convert failed:', e2);
+      }
+
+      // Method 3: Last resort — set innerHTML and force Quill to reindex
+      quill.root.innerHTML = html;
+      quill.update(Quill.sources.SILENT);
     }
   </script>
 </body>

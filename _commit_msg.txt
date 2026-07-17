@@ -1,0 +1,16 @@
+Fix 404 on published posts and content not loading in editor
+
+Two fixes:
+
+1. 404 on published posts: vercel.json rewrite /post/:slug didn't match
+   URLs with trailing slash (/post/slug/). Added /post/:slug/ rewrite rule.
+   Same fix for /go/:slug/.
+
+2. Content not loading in editor: loadQuillContent was using
+   clipboard.convert() which has a different API in Quill 2.0. Now uses
+   dangerouslyPasteHTML() as primary method (most reliable in Quill 2),
+   with convert() and innerHTML as fallbacks.
+
+Generated with [Devin](https://devin.ai)
+
+Co-Authored-By: Devin <158243242+devin-ai-integration[bot]@users.noreply.github.com>

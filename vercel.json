@@ -2,7 +2,9 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     { "source": "/go/:slug", "destination": "/api/go/:slug" },
+    { "source": "/go/:slug/", "destination": "/api/go/:slug" },
     { "source": "/post/:slug", "destination": "/api/post/:slug" },
+    { "source": "/post/:slug/", "destination": "/api/post/:slug" },
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
     { "source": "/api/admin/:slug", "destination": "/api/admin?slug=:slug" },
     { "source": "/api/posts/:slug", "destination": "/api/posts?slug=:slug" },
