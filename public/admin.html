@@ -7,7 +7,7 @@
   <title>Admin — Eira</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Raleway:wght@300;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css" />
   <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
   <style>
@@ -23,7 +23,7 @@
       cursor: pointer; border-radius: var(--radius-sm);
     }
     .admin-tabs button:hover { color: var(--color-text-primary); }
-    .admin-tabs button[aria-selected="true"] { color: var(--color-accent-strong); background: var(--color-accent-soft); }
+    .admin-tabs button[aria-selected="true"] { color: var(--color-text-secondary); background: var(--color-surface-dark); }
     [hidden] { display: none !important; }
     .panel h2 { font-size: var(--font-size-xl); margin-bottom: var(--space-6); font-family: var(--font-family-primary); }
 
@@ -57,7 +57,7 @@
     .product-item__head button { font-size: var(--font-size-xs); color: var(--color-text-muted); background: none; border: none; cursor: pointer; }
     .product-item__head button:hover { color: var(--color-state-error); }
     .add-btn { width: 100%; padding: var(--space-5); border: 2px dashed var(--color-border-strong); border-radius: var(--radius-md); background: transparent; color: var(--color-accent-strong); font-weight: var(--font-weight-bold); cursor: pointer; margin-top: var(--space-4); }
-    .add-btn:hover { background: var(--color-accent-soft); }
+    .add-btn:hover { background: var(--color-surface-strong); }
     .product-item .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
     .product-item .full { grid-column: 1 / -1; }
     @media (max-width: 600px) {
@@ -107,7 +107,7 @@
     .toast.show { opacity: 1; }
     .link { color: var(--color-accent-strong); text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font-size: inherit; }
     .link:hover { color: var(--color-accent-primary); }
-    .badge { display: inline-block; font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3); border-radius: var(--radius-pill); background: var(--color-accent-soft); color: var(--color-accent-strong); font-weight: var(--font-weight-bold); }
+    .badge { display: inline-block; font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3); border-radius: var(--radius-pill); background: var(--color-surface-strong); color: var(--color-text-primary); font-weight: var(--font-weight-bold); }
     .og-preview { width: 100%; max-width: 200px; aspect-ratio: 2/3; object-fit: cover; border-radius: var(--radius-md); border: 1px solid var(--color-border-subtle); background: var(--color-surface-base); margin-top: var(--space-4); display: none; }
     .og-preview[src] { display: block; }
     .og-preview-fallback { width: 100%; max-width: 200px; aspect-ratio: 2/3; border-radius: var(--radius-md); border: 1px dashed var(--color-border-subtle); background: var(--color-surface-base); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: var(--font-size-sm); margin-top: var(--space-4); }
@@ -764,7 +764,7 @@
         div.className = "product-item";
         var thumb = prod.image_url
           ? '<img src="' + esc(prod.image_url) + '" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:var(--radius-sm);flex-shrink:0;" />'
-          : '<div style="width:56px;height:56px;border-radius:var(--radius-sm);background:var(--color-accent-soft);flex-shrink:0;"></div>';
+          : '<div style="width:56px;height:56px;border-radius:var(--radius-sm);background:var(--color-surface-strong);flex-shrink:0;"></div>';
         div.innerHTML = ''
           + '<div class="product-item__head"><span>' + esc(prod.name || "Product") + '</span>'
           +   '<div style="display:flex;gap:var(--space-3);">'
@@ -891,7 +891,7 @@
           var tr = document.createElement("tr");
           var thumb = p.image_url
             ? '<img src="' + esc(p.image_url) + '" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:var(--radius-sm);" />'
-            : '<div style="width:48px;height:48px;border-radius:var(--radius-sm);background:var(--color-accent-soft);"></div>';
+            : '<div style="width:48px;height:48px;border-radius:var(--radius-sm);background:var(--color-surface-strong);"></div>';
           tr.innerHTML = "<td>" + thumb + "</td>"
             + "<td>" + esc(p.name) + "</td>"
             + "<td>" + esc(p.category || "—") + "</td>"

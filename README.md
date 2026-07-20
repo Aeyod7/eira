@@ -4,7 +4,7 @@ Faceless beauty / fashion / self-care affiliate blog. Static frontend + Vercel s
 
 ## Stack
 
-- **Frontend:** static HTML/CSS in `public/` (Playfair Display + Raleway, pink/cream/brown palette)
+- **Frontend:** static HTML/CSS in `public/` (Inter, minimal black-on-white palette — mockups in `new ui/`)
 - **Backend:** Vercel serverless functions in `api/` (Node, no framework)
 - **Database:** Turso (libSQL) — SQLite locally, network-attached SQLite in prod
 - **CMS:** single-page admin at `/admin.html` (login, structured post editor with product blocks + affiliate link selector, link manager, subscriber export, click stats)
