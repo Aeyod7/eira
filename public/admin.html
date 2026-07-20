@@ -688,6 +688,15 @@
             if (p.og_image) { $("#p-ogimage").dispatchEvent(new Event("input")); }
             $("#p-intro").value = p.intro_html || "";
             loadQuillContent(p.intro_html || "");
+            // Retry loading after a short delay in case Quill wasn't ready
+            if (p.intro_html && p.intro_html.trim()) {
+              setTimeout(function () {
+                if (quill.root.innerHTML.length < 20) {
+                  console.log('loadQuillContent: retrying — editor appears empty');
+                  loadQuillContent(p.intro_html);
+                }
+              }, 200);
+            }
             $("#p-status-display").textContent = isPublished(p.published) ? "Published" : "Draft";
             $("#publish-post-btn").textContent = isPublished(p.published) ? "Update post" : "Publish";
             $("#save-draft-btn").textContent = isPublished(p.published) ? "Unpublish & save" : "Save draft";
@@ -1312,37 +1321,31 @@
 
     // Load content into Quill when editing existing post
     function loadQuillContent(html) {
-      // Clear editor first
-      quill.setText('');
-      if (!html || !html.trim()) return;
-
-      // Method 1: Try dangerouslyPasteHTML into an empty editor (most reliable in Quill 2)
-      try {
-        quill.clipboard.dangerouslyPasteHTML(0, html, Quill.sources.SILENT);
+      if (typeof quill === 'undefined' || !quill) {
+        console.error('loadQuillContent: quill not initialized yet');
         return;
-      } catch (e) {
-        console.error('loadQuillContent: dangerouslyPasteHTML failed:', e);
       }
-
-      // Method 2: Try convert + setContents
-      try {
-        var delta = quill.clipboard.convert({ html: html });
-        quill.setContents(delta, Quill.sources.SILENT);
-        return;
-      } catch (e2) {
-        console.error('loadQuillContent: convert failed:', e2);
+      if (html && html.trim()) {
+        console.log('loadQuillContent: loading', html.length, 'chars');
+        // Approach 1: Use dangerouslyPasteHTML without index (replaces all content)
+        try {
+          quill.setText('');
+          quill.clipboard.dangerouslyPasteHTML(html, Quill.sources.SILENT);
+          console.log('loadQuillContent: pasteHTML done, editor has', quill.root.innerHTML.length, 'chars');
+          return;
+        } catch (e) {
+          console.error('loadQuillContent: pasteHTML failed, trying innerHTML:', e);
+        }
+        // Approach 2: Set innerHTML directly (do NOT call update — it would overwrite with empty Delta)
+        quill.root.innerHTML = html;
+        console.log('loadQuillContent: innerHTML set, editor has', quill.root.innerHTML.length, 'chars');
+      } else {
+        console.log('loadQuillContent: clearing editor');
+        quill.root.innerHTML = '<p><br></p>';
       }
-
-      // Method 3: Last resort — set innerHTML and force Quill to reindex
-      quill.root.innerHTML = html;
-      quill.update(Quill.sources.SILENT);
     }
   </script>
 </body>
 </html>
-</html>
-</body>
-</html>
-</body>
 </html>
 </html>
