@@ -231,6 +231,8 @@
               <div id="p-editor" class="content-editor"></div>
               <input type="hidden" id="p-intro" />
               <p class="content-editor-hint">Write or paste your content. Formatting from Word, Google Docs, or web pages will be preserved.</p>
+              <div id="quill-debug" style="display:none; margin-top:8px; padding:8px 12px; background:#fff3cd; border:1px solid #ffc107; border-radius:4px; font-size:12px; font-family:monospace; word-break:break-all;"></div>
+              <button type="button" id="quill-reload-btn" style="display:none; margin-top:8px;" class="btn btn--secondary">Reload content into editor</button>
             </div>
 
             <div class="card" style="margin-top: var(--space-6);">
@@ -688,15 +690,6 @@
             if (p.og_image) { $("#p-ogimage").dispatchEvent(new Event("input")); }
             $("#p-intro").value = p.intro_html || "";
             loadQuillContent(p.intro_html || "");
-            // Retry loading after a short delay in case Quill wasn't ready
-            if (p.intro_html && p.intro_html.trim()) {
-              setTimeout(function () {
-                if (quill.root.innerHTML.length < 20) {
-                  console.log('loadQuillContent: retrying — editor appears empty');
-                  loadQuillContent(p.intro_html);
-                }
-              }, 200);
-            }
             $("#p-status-display").textContent = isPublished(p.published) ? "Published" : "Draft";
             $("#publish-post-btn").textContent = isPublished(p.published) ? "Update post" : "Publish";
             $("#save-draft-btn").textContent = isPublished(p.published) ? "Unpublish & save" : "Save draft";
@@ -1319,31 +1312,87 @@
       document.getElementById('p-intro').value = html;
     }
 
-    // Load content into Quill when editing existing post
-    function loadQuillContent(html) {
-      if (typeof quill === 'undefined' || !quill) {
-        console.error('loadQuillContent: quill not initialized yet');
-        return;
-      }
-      if (html && html.trim()) {
-        console.log('loadQuillContent: loading', html.length, 'chars');
-        // Approach 1: Use dangerouslyPasteHTML without index (replaces all content)
-        try {
-          quill.setText('');
-          quill.clipboard.dangerouslyPasteHTML(html, Quill.sources.SILENT);
-          console.log('loadQuillContent: pasteHTML done, editor has', quill.root.innerHTML.length, 'chars');
-          return;
-        } catch (e) {
-          console.error('loadQuillContent: pasteHTML failed, trying innerHTML:', e);
-        }
-        // Approach 2: Set innerHTML directly (do NOT call update — it would overwrite with empty Delta)
-        quill.root.innerHTML = html;
-        console.log('loadQuillContent: innerHTML set, editor has', quill.root.innerHTML.length, 'chars');
-      } else {
-        console.log('loadQuillContent: clearing editor');
-        quill.root.innerHTML = '<p><br></p>';
+    // Last loaded HTML — kept for manual reload button
+    var lastLoadedHtml = '';
+
+    // Visible + console debug logging
+    function quillDebug(msg) {
+      console.log('[Quill] ' + msg);
+      var el = document.getElementById('quill-debug');
+      if (el) {
+        el.textContent = (el.textContent ? el.textContent + ' | ' : '') + msg;
+        el.style.display = 'block';
       }
     }
+
+    // Load content into Quill when editing existing post
+    // Uses Quill 2's canonical approach: convert HTML to Delta, then setContents
+    function loadQuillContent(html) {
+      var debugEl = document.getElementById('quill-debug');
+      if (debugEl) { debugEl.textContent = ''; debugEl.style.display = 'none'; }
+
+      if (typeof quill === 'undefined' || !quill) {
+        quillDebug('ERROR: quill not initialized');
+        return;
+      }
+
+      if (!html || !html.trim()) {
+        quillDebug('Clearing editor (empty content)');
+        try { quill.setContents([]); } catch (e) { quill.root.innerHTML = '<p><br></p>'; }
+        return;
+      }
+
+      lastLoadedHtml = html;
+      quillDebug('Loading ' + html.length + ' chars of HTML');
+
+      // Method 1 (canonical Quill 2): convert HTML to Delta, then setContents
+      try {
+        var delta = quill.clipboard.convert({ html: html });
+        if (delta && delta.ops && delta.ops.length > 0) {
+          quill.setContents(delta, Quill.sources.SILENT);
+          var resultLen = quill.root.innerHTML.length;
+          quillDebug('Method 1 OK: editor now has ' + resultLen + ' chars');
+          if (resultLen > 20) {
+            document.getElementById('quill-reload-btn').style.display = 'none';
+            return;
+          }
+          quillDebug('Method 1 result too short, trying fallback');
+        } else {
+          quillDebug('Method 1: convert returned empty delta, trying fallback');
+        }
+      } catch (e) {
+        quillDebug('Method 1 FAILED: ' + e.message);
+      }
+
+      // Method 2: dangerouslyPasteHTML at index 0 after clearing
+      try {
+        quill.setContents([], Quill.sources.SILENT);
+        quill.clipboard.dangerouslyPasteHTML(0, html, Quill.sources.SILENT);
+        var resultLen2 = quill.root.innerHTML.length;
+        quillDebug('Method 2 OK: editor now has ' + resultLen2 + ' chars');
+        if (resultLen2 > 20) {
+          document.getElementById('quill-reload-btn').style.display = 'none';
+          return;
+        }
+      } catch (e2) {
+        quillDebug('Method 2 FAILED: ' + e2.message);
+      }
+
+      // Method 3 (last resort): set innerHTML directly — content shows even if Quill's Delta is out of sync
+      quill.root.innerHTML = html;
+      var resultLen3 = quill.root.innerHTML.length;
+      quillDebug('Method 3 (innerHTML): editor has ' + resultLen3 + ' chars');
+      // Show manual reload button in case user needs to retry
+      document.getElementById('quill-reload-btn').style.display = 'inline-block';
+    }
+
+    // Manual reload button — lets user retry loading content
+    document.getElementById('quill-reload-btn').addEventListener('click', function () {
+      if (lastLoadedHtml) {
+        quillDebug('Manual reload triggered');
+        loadQuillContent(lastLoadedHtml);
+      }
+    });
   </script>
 </body>
 </html>

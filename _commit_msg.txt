@@ -1,0 +1,11 @@
+Fix content loading in Quill editor with visible debug + 3 fallback methods
+
+- Use canonical Quill 2 approach: clipboard.convert({html}) + setContents(delta)
+- Add 3-method fallback chain: convert+setContents -> pasteHTML at index 0 -> innerHTML
+- Add visible debug banner showing exactly what happens (no DevTools needed)
+- Add manual 'Reload content' button as last-resort workaround
+- Remove retry timer (new approach handles timing internally)
+
+Generated with [Devin](https://devin.ai)
+
+Co-Authored-By: Devin <158243242+devin-ai-integration[bot]@users.noreply.github.com>
