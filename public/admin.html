@@ -229,6 +229,7 @@
             <div class="field">
               <label for="p-intro">Blog post content</label>
               <div id="p-editor" class="content-editor"></div>
+              <input type="file" id="p-editor-image-input" accept="image/jpeg,image/png,image/webp,image/gif" hidden />
               <input type="hidden" id="p-intro" />
               <p class="content-editor-hint">Write or paste your content. Formatting from Word, Google Docs, or web pages will be preserved.</p>
               <div id="quill-debug" style="display:none; margin-top:8px; padding:8px 12px; background:#fff3cd; border:1px solid #ffc107; border-radius:4px; font-size:12px; font-family:monospace; word-break:break-all;"></div>
@@ -1272,6 +1273,14 @@
               if (!range) return;
               quill.formatText(range.index, range.length, 'background', value);
               setTimeout(function () { quill.setSelection(range.index, range.length); }, 0);
+            },
+            // Custom image handler — uploads to /api/uploads and inserts the URL
+            // instead of embedding a huge base64 data URL (which blows past the
+            // Vercel body limit and breaks save/publish).
+            'image': function () {
+              var imageInput = document.getElementById('p-editor-image-input');
+              imageInput.value = "";
+              imageInput.click();
             }
           }
         },
@@ -1302,6 +1311,39 @@
           quill.insertText(0, text);
         }
       }
+    });
+
+    // Upload image selected via the Quill toolbar image button, then insert the
+    // returned URL as an <img> in the editor. Avoids embedding base64 data URLs
+    // (which would blow past the Vercel body limit and break save/publish).
+    document.getElementById('p-editor-image-input').addEventListener('change', function () {
+      var input = this;
+      var file = input.files && input.files[0];
+      if (!file) return;
+      if (file.size > 4 * 1024 * 1024) { toast("Images must be 4 MB or smaller"); input.value = ""; return; }
+      // Remember where to insert so we restore it after the async upload.
+      var savedRange = quill.getSelection();
+      toast("Uploading image…");
+      var reader = new FileReader();
+      reader.onload = function () {
+        var base64 = reader.result.split(",")[1];
+        fetch("/api/uploads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filename: file.name, contentType: file.type, data: base64 })
+        }).then(function (r) {
+          return r.json().then(function (data) { if (!r.ok) throw new Error(data.error || "Upload failed"); return data; });
+        }).then(function (data) {
+          var index = savedRange ? savedRange.index : (quill.getLength() || 0);
+          quill.insertEmbed(index, 'image', data.url);
+          // Move cursor after the inserted image.
+          quill.setSelection(index + 1, 0);
+          toast("Image added");
+        }).catch(function (err) { toast(err.message || "Upload failed"); })
+          .finally(function () { input.value = ""; });
+      };
+      reader.onerror = function () { toast("Could not read file"); input.value = ""; };
+      reader.readAsDataURL(file);
     });
 
     // Sync Quill content to hidden input before form submit
