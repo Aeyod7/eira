@@ -190,7 +190,7 @@ export default async function handler(req, res) {
         <a href="/category.html?category=Beauty">Beauty</a>
         <a href="/category.html?category=Skincare">Skincare</a>
         <a href="/category.html?category=Fashion">Fashion</a>
-        <a href="/category.html?category=Fitness">Fitness</a>
+        <a href="/category.html?category=Selfcare">Selfcare</a>
         <a href="/blog.html">Blog</a>
         <a href="/about.html">About</a>
       </nav>
@@ -237,7 +237,7 @@ export default async function handler(req, res) {
       <div class="footer-grid">
         <div>
           <p class="footer-brand">Eira</p>
-          <p style="color: var(--color-accent-soft); max-width: 38ch;">A beauty, skincare, fashion and fitness affiliate hub. Curated product picks and blog posts, with direct links to the retailers we trust.</p>
+          <p style="color: var(--color-accent-soft); max-width: 38ch;">A beauty, skincare, fashion and selfcare affiliate hub. Curated product picks and blog posts, with direct links to the retailers we trust.</p>
           <p style="font-size: var(--font-size-xs); color: var(--color-accent-soft); margin-top: var(--space-6);">
             As an Amazon Associate I earn from qualifying purchases. This site contains affiliate links &mdash; see full disclosure on each post.
           </p>
@@ -248,7 +248,7 @@ export default async function handler(req, res) {
             <li><a href="/category.html?category=Beauty">Beauty</a></li>
             <li><a href="/category.html?category=Skincare">Skincare</a></li>
             <li><a href="/category.html?category=Fashion">Fashion</a></li>
-            <li><a href="/category.html?category=Fitness">Fitness</a></li>
+            <li><a href="/category.html?category=Selfcare">Selfcare</a></li>
           </ul>
         </div>
         <div class="footer-col">

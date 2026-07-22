@@ -198,7 +198,7 @@
                   <option value="Beauty">Beauty</option>
                   <option value="Skincare">Skincare</option>
                   <option value="Fashion">Fashion</option>
-                  <option value="Fitness">Fitness</option>
+                  <option value="Selfcare">Selfcare</option>
                 </select>
               </div>
             </div>
@@ -291,7 +291,7 @@
                   <option value="Beauty">Beauty</option>
                   <option value="Skincare">Skincare</option>
                   <option value="Fashion">Fashion</option>
-                  <option value="Fitness">Fitness</option>
+                  <option value="Selfcare">Selfcare</option>
                 </select>
               </div>
             </div>
@@ -690,7 +690,19 @@
             $("#p-ogimage").value = p.og_image || "";
             if (p.og_image) { $("#p-ogimage").dispatchEvent(new Event("input")); }
             $("#p-intro").value = p.intro_html || "";
-            loadQuillContent(p.intro_html || "");
+            // If the saved HTML contains base64 images (from before the upload
+            // fix), upload them first so Quill doesn't choke on a 9MB string.
+            var rawHtml = p.intro_html || "";
+            if (rawHtml.indexOf("data:image") !== -1 || rawHtml.indexOf("blob:") !== -1) {
+              toast("Uploading embedded images…");
+              uploadEmbeddedImagesInHtml(rawHtml).then(function (cleanHtml) {
+                loadQuillContent(cleanHtml);
+                // Mark dirty so the next save persists the cleaned version.
+                postFormDirty = true;
+              });
+            } else {
+              loadQuillContent(rawHtml);
+            }
             $("#p-status-display").textContent = isPublished(p.published) ? "Published" : "Draft";
             $("#publish-post-btn").textContent = isPublished(p.published) ? "Update post" : "Publish";
             $("#save-draft-btn").textContent = isPublished(p.published) ? "Unpublish & save" : "Save draft";
@@ -1457,8 +1469,12 @@
       }
     }
 
-    // Load content into Quill when editing existing post
-    // Uses Quill 2's canonical approach: convert HTML to Delta, then setContents
+    // Load content into Quill when editing existing post.
+    // Strips any remaining base64 images as a safety net, then uses Quill 2's
+    // clipboard.convert to turn HTML into a Delta. Falls back to dangerouslyPasteHTML
+    // if convert fails. Avoids setting innerHTML directly (Method 3) because that
+    // leaves Quill's internal Delta out of sync — the content vanishes on the
+    // first keystroke.
     function loadQuillContent(html) {
       var debugEl = document.getElementById('quill-debug');
       if (debugEl) { debugEl.textContent = ''; debugEl.style.display = 'none'; }
@@ -1472,6 +1488,15 @@
         quillDebug('Clearing editor (empty content)');
         try { quill.setContents([]); } catch (e) { quill.root.innerHTML = '<p><br></p>'; }
         return;
+      }
+
+      // Safety net: strip any base64 images that slipped through (e.g. very
+      // large ones that failed to upload). They crash Quill's converter.
+      if (html.indexOf('data:image') !== -1) {
+        quillDebug('Stripping base64 images before load');
+        html = html.replace(/<img[^>]*src="data:image[^"]*"[^>]*>/gi, '');
+        // Clean up empty <p> tags left behind.
+        html = html.replace(/<p>\s*<\/p>/gi, '');
       }
 
       lastLoadedHtml = html;
@@ -1496,7 +1521,8 @@
         quillDebug('Method 1 FAILED: ' + e.message);
       }
 
-      // Method 2: dangerouslyPasteHTML at index 0 after clearing
+      // Method 2: dangerouslyPasteHTML at index 0 after clearing.
+      // This properly converts HTML to a Delta (unlike setting innerHTML directly).
       try {
         quill.setContents([], Quill.sources.SILENT);
         quill.clipboard.dangerouslyPasteHTML(0, html, Quill.sources.SILENT);
@@ -1510,11 +1536,19 @@
         quillDebug('Method 2 FAILED: ' + e2.message);
       }
 
-      // Method 3 (last resort): set innerHTML directly — content shows even if Quill's Delta is out of sync
+      // Method 3 (last resort): set innerHTML directly and sync Quill's Delta
+      // from the resulting DOM so the content doesn't vanish on first keystroke.
       quill.root.innerHTML = html;
+      try {
+        var syncDelta = quill.clipboard.convert({ html: quill.root.innerHTML });
+        if (syncDelta && syncDelta.ops && syncDelta.ops.length > 0) {
+          quill.setContents(syncDelta, Quill.sources.SILENT);
+        }
+      } catch (e3) {
+        quillDebug('Method 3 sync FAILED: ' + e3.message);
+      }
       var resultLen3 = quill.root.innerHTML.length;
       quillDebug('Method 3 (innerHTML): editor has ' + resultLen3 + ' chars');
-      // Show manual reload button in case user needs to retry
       document.getElementById('quill-reload-btn').style.display = 'inline-block';
     }
 
