@@ -1291,19 +1291,77 @@
       }
     });
 
-    // Preserve paste formatting — insert HTML directly instead of letting Quill strip it
+    // Upload a single base64/blob image to /api/uploads and resolve to its URL.
+    // Used by the paste and drag-drop handlers so embedded images become real
+    // hosted URLs instead of huge base64 strings that break save/publish.
+    function uploadEmbeddedImage(src, filename) {
+      return fetch(src)
+        .then(function (r) { return r.blob(); })
+        .then(function (blob) {
+          if (blob.size > 4 * 1024 * 1024) throw new Error("Image must be 4 MB or smaller");
+          return new Promise(function (resolve, reject) {
+            var reader = new FileReader();
+            reader.onload = function () {
+              var base64 = reader.result.split(",")[1];
+              fetch("/api/uploads", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ filename: filename || "pasted-image", contentType: blob.type, data: base64 })
+              }).then(function (r) {
+                return r.json().then(function (data) { if (!r.ok) throw new Error(data.error || "Upload failed"); return data; });
+              }).then(resolve, reject);
+            };
+            reader.onerror = function () { reject(new Error("Could not read image")); };
+            reader.readAsDataURL(blob);
+          });
+        });
+    }
+
+    // Find every <img> in an HTML string whose src is a data: or blob: URL,
+    // upload each one, and replace the src with the hosted URL. Returns a
+    // Promise that resolves to the cleaned HTML.
+    function uploadEmbeddedImagesInHtml(html) {
+      var container = document.createElement("div");
+      container.innerHTML = html;
+      var imgs = Array.prototype.slice.call(container.querySelectorAll("img"));
+      var embeds = imgs.filter(function (img) {
+        var s = img.getAttribute("src") || "";
+        return s.indexOf("data:") === 0 || s.indexOf("blob:") === 0;
+      });
+      if (embeds.length === 0) return Promise.resolve(html);
+      toast("Uploading " + embeds.length + " image" + (embeds.length > 1 ? "s" : "") + "…");
+      return Promise.all(embeds.map(function (img, i) {
+        var src = img.getAttribute("src");
+        return uploadEmbeddedImage(src, "pasted-image-" + (i + 1)).then(function (data) {
+          img.setAttribute("src", data.url);
+        }).catch(function (err) {
+          // If upload fails, drop the broken image rather than leaving base64.
+          img.parentNode && img.parentNode.removeChild(img);
+        });
+      })).then(function () {
+        toast("Images uploaded");
+        return container.innerHTML;
+      });
+    }
+
+    // Preserve paste formatting — insert HTML directly instead of letting Quill strip it.
+    // Images pasted from Word/Google Docs/web come in as base64 data URLs, which would
+    // blow past the Vercel body limit on save. Upload them first, then insert cleaned HTML.
     quill.root.addEventListener('paste', function (e) {
-      e.preventDefault();
       var html = e.clipboardData.getData('text/html');
       var text = e.clipboardData.getData('text/plain');
       if (html) {
+        e.preventDefault();
         var range = quill.getSelection();
-        if (range) {
-          quill.clipboard.dangerouslyPasteHTML(range.index, html);
-        } else {
-          quill.clipboard.dangerouslyPasteHTML(html);
-        }
+        uploadEmbeddedImagesInHtml(html).then(function (cleanHtml) {
+          if (range) {
+            quill.clipboard.dangerouslyPasteHTML(range.index, cleanHtml);
+          } else {
+            quill.clipboard.dangerouslyPasteHTML(cleanHtml);
+          }
+        });
       } else if (text) {
+        e.preventDefault();
         var range2 = quill.getSelection();
         if (range2) {
           quill.insertText(range2.index, text);
@@ -1312,6 +1370,38 @@
         }
       }
     });
+
+    // Drag-and-drop images into the editor — upload and insert as a hosted URL.
+    quill.root.addEventListener('drop', function (e) {
+      if (!e.dataTransfer || !e.dataTransfer.files || !e.dataTransfer.files.length) return;
+      var file = e.dataTransfer.files[0];
+      if (!file.type || file.type.indexOf("image/") !== 0) return;
+      e.preventDefault();
+      if (file.size > 4 * 1024 * 1024) { toast("Images must be 4 MB or smaller"); return; }
+      var savedRange = quill.getSelection();
+      // Drop position is where the cursor is over in the editor.
+      var dropIndex = savedRange ? savedRange.index : (quill.getLength() || 0);
+      toast("Uploading image…");
+      var reader = new FileReader();
+      reader.onload = function () {
+        var base64 = reader.result.split(",")[1];
+        fetch("/api/uploads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filename: file.name, contentType: file.type, data: base64 })
+        }).then(function (r) {
+          return r.json().then(function (data) { if (!r.ok) throw new Error(data.error || "Upload failed"); return data; });
+        }).then(function (data) {
+          quill.insertEmbed(dropIndex, 'image', data.url);
+          quill.setSelection(dropIndex + 1, 0);
+          toast("Image added");
+        }).catch(function (err) { toast(err.message || "Upload failed"); });
+      };
+      reader.onerror = function () { toast("Could not read file"); };
+      reader.readAsDataURL(file);
+    });
+    // Allow drop on the editor (default is to navigate to the file).
+    quill.root.addEventListener('dragover', function (e) { e.preventDefault(); });
 
     // Upload image selected via the Quill toolbar image button, then insert the
     // returned URL as an <img> in the editor. Avoids embedding base64 data URLs
