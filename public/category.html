@@ -137,10 +137,12 @@
           ? '<a href="/go/' + esc(p.link_slug) + '" rel="sponsored nofollow noopener" target="_blank" class="card__media"><img src="' + imgSrc + '" alt="' + esc(p.name) + '" loading="lazy" /></a>'
           : '<a href="/go/' + esc(p.link_slug) + '" rel="sponsored nofollow noopener" target="_blank" class="card__media">' + esc(p.name) + '</a>';
         var linkLabel = esc(p.link_label || 'Shop now');
+        var priceHtml = p.price ? '<p class="card__price">' + esc(p.price) + '</p>' : '';
         return '<article class="card">' + media +
           '<div class="card__body">' +
             '<p class="card__meta">Product</p>' +
             '<h3 class="card__title">' + esc(p.name) + '</h3>' +
+            priceHtml +
             '<a class="affiliate-link" href="/go/' + esc(p.link_slug) + '" rel="sponsored nofollow noopener" target="_blank">' + linkLabel + '</a>' +
           '</div>' +
         '</article>';

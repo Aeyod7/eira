@@ -60,7 +60,7 @@ export default async function handler(req, res) {
         }
       }
       const attached = await db.execute({
-        sql: `SELECT p.id, p.slug, p.name, p.image_url, p.why_html, p.link_slug, p.link_label,
+        sql: `SELECT p.id, p.slug, p.name, p.image_url, p.price, p.why_html, p.link_slug, p.link_label,
                      pp.position, pp.section_heading, pp.image_text
               FROM post_products pp
               JOIN products p ON p.id = pp.product_id

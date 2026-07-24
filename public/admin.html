@@ -267,6 +267,11 @@
               <div class="og-preview-fallback" id="pr-image-fallback">No image preview</div>
             </div>
 
+            <div class="field">
+              <label for="pr-price">Price <span class="muted">e.g. £12.99</span></label>
+              <input class="input" id="pr-price" placeholder="£12.99" />
+            </div>
+
             <div class="two-col">
               <div class="field">
                 <label for="pr-linkurl">Affiliate URL</label>
@@ -894,6 +899,7 @@
           $("#pr-category").value = p.category || "";
           $("#pr-image").value = p.image_url || "";
           if (p.image_url) { $("#pr-image").dispatchEvent(new Event("input")); }
+          $("#pr-price").value = p.price || "";
 
           $("#pr-linkurl").value = "";
           $("#pr-linklabel").value = p.link_label || "";
@@ -927,6 +933,7 @@
         name: name,
         image_url: $("#pr-image").value || null,
         category: $("#pr-category").value || null,
+        price: $("#pr-price").value.trim() || null,
         link_url: $("#pr-linkurl").value || null,
         link_label: $("#pr-linklabel").value || null,
         published: $("#pr-published").value === "1"

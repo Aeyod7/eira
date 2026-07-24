@@ -32,6 +32,7 @@ function renderProductsHtml(products) {
       const link = p.link_slug ? `/go/${encodeURIComponent(p.link_slug)}` : "#";
       const linkAttr = p.link_slug ? 'rel="sponsored nofollow noopener" target="_blank"' : '';
       const linkText = p.link_label || "Check price on Amazon UK";
+      const priceHtml = p.price ? `<p class="product-block__price">${escapeHtml(p.price)}</p>` : "";
       const media = p.image_url
         ? `<img class="product-block__media" src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.name || "Product image")}" loading="lazy" />`
         : `<div class="product-block__media" role="img" aria-label="Product image">${escapeHtml(p.image_text || num)}</div>`;
@@ -39,6 +40,7 @@ function renderProductsHtml(products) {
   ${media}
   <div>
     <h3>${escapeHtml(p.name || "Untitled product")}</h3>
+    ${priceHtml}
     <a class="affiliate-link" href="${link}" ${linkAttr}>${escapeHtml(linkText)}</a>
   </div>
 </section>\n`;
@@ -116,7 +118,7 @@ export default async function handler(req, res) {
 
   // Also render attached standalone products (post_products join).
   const attached = await db.execute({
-    sql: `SELECT p.id, p.slug, p.name, p.image_url, p.why_html, p.link_slug, p.link_label,
+    sql: `SELECT p.id, p.slug, p.name, p.image_url, p.price, p.why_html, p.link_slug, p.link_label,
                  pp.position, pp.section_heading, pp.image_text
           FROM post_products pp
           JOIN products p ON p.id = pp.product_id
@@ -131,6 +133,7 @@ export default async function handler(req, res) {
       image_url: r.image_url,
       image_text: r.image_text,
       why: r.why_html,
+      price: r.price,
       link_slug: r.link_slug,
       link_label: r.link_label,
       section_heading: r.section_heading || "The shortlist"

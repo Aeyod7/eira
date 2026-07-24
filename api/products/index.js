@@ -73,7 +73,7 @@ export default async function handler(req, res) {
       return requireAuth(async (req, res) => {
         let body = req.body;
         if (typeof body === "string") { try { body = JSON.parse(body); } catch { body = {}; } }
-        const { name, image_url, category, link_url, link_slug, link_label, published } = body || {};
+        const { name, image_url, category, price, link_url, link_slug, link_label, published } = body || {};
         try {
           let finalLinkSlug = link_slug || null;
           if (!finalLinkSlug && link_url) {
@@ -81,9 +81,9 @@ export default async function handler(req, res) {
           }
           await db.execute({
             sql: `UPDATE products SET
-                    name=?, image_url=?, category=?, link_slug=?, link_label=?, published=?, updated_at=datetime('now')
+                    name=?, image_url=?, category=?, price=?, link_slug=?, link_label=?, published=?, updated_at=datetime('now')
                   WHERE id=?`,
-            args: [name, image_url || null, category || null,
+            args: [name, image_url || null, category || null, price || null,
                    finalLinkSlug, link_label || null, published === false ? 0 : 1, id]
           });
           res.statusCode = 200;
@@ -131,7 +131,7 @@ export default async function handler(req, res) {
     // Public list: /api/products?public=1
     if (req.query?.public !== undefined) {
       const r = await db.execute(
-        `SELECT p.id, p.slug, p.name, p.image_url, p.category, p.why_html, p.link_slug, p.link_label,
+        `SELECT p.id, p.slug, p.name, p.image_url, p.category, p.price, p.why_html, p.link_slug, p.link_label,
                 p.published, p.updated_at
          FROM products p
          WHERE p.published = 1
@@ -145,7 +145,7 @@ export default async function handler(req, res) {
     // Admin list
     return requireAuth(async (req, res) => {
       const r = await db.execute(
-        `SELECT p.id, p.slug, p.name, p.image_url, p.category, p.why_html, p.link_slug, p.link_label,
+        `SELECT p.id, p.slug, p.name, p.image_url, p.category, p.price, p.why_html, p.link_slug, p.link_label,
                 p.published, p.created_at, p.updated_at,
                 l.network AS link_network
          FROM products p
@@ -162,7 +162,7 @@ export default async function handler(req, res) {
     return requireAuth(async (req, res) => {
       let body = req.body;
       if (typeof body === "string") { try { body = JSON.parse(body); } catch { body = {}; } }
-      const { name, image_url, category, link_url, link_slug, link_label, published } = body || {};
+      const { name, image_url, category, price, link_url, link_slug, link_label, published } = body || {};
       if (!name) {
         res.statusCode = 400;
         res.setHeader("Content-Type", "application/json");
@@ -175,9 +175,9 @@ export default async function handler(req, res) {
           finalLinkSlug = await ensureLinkFromUrl(db, link_url, name);
         }
         await db.execute({
-          sql: `INSERT INTO products (slug, name, image_url, category, link_slug, link_label, published)
-                VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          args: [slug, name, image_url || null, category || null,
+          sql: `INSERT INTO products (slug, name, image_url, category, price, link_slug, link_label, published)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          args: [slug, name, image_url || null, category || null, price || null,
                  finalLinkSlug, link_label || null, published === false ? 0 : 1]
         });
         const r2 = await db.execute({ sql: `SELECT * FROM products WHERE slug = ?`, args: [slug] });
