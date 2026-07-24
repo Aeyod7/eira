@@ -249,33 +249,41 @@
             </div>
 
             <div class="field">
-              <label for="p-body">Blog post content</label>
+              <label>Blog Post Content (Block Builder)</label>
 
-              <!-- Option 1 Editor: Helper Buttons + Write/Preview Tabs -->
-              <div style="border: 1px solid var(--color-border-subtle); border-bottom: none; border-radius: var(--radius-sm) var(--radius-sm) 0 0; background: var(--color-surface-subtle); padding: var(--space-3) var(--space-4); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3);">
-                <div style="display: flex; gap: var(--space-2); flex-wrap: wrap; align-items: center;">
-                  <button type="button" class="btn-tool" id="btn-h2" title="Heading 2"><b>H2</b></button>
-                  <button type="button" class="btn-tool" id="btn-h3" title="Heading 3"><b>H3</b></button>
-                  <button type="button" class="btn-tool" id="btn-bold" title="Bold"><b>B</b></button>
-                  <button type="button" class="btn-tool" id="btn-italic" title="Italic"><i>I</i></button>
-                  <button type="button" class="btn-tool" id="btn-quote" title="Quote">“”</button>
-                  <button type="button" class="btn-tool" id="btn-p" title="Paragraph">P</button>
-                  <button type="button" class="btn-tool" id="btn-ul" title="Bullet list">• List</button>
-                  <button type="button" class="btn-tool" id="btn-link" title="Add link">🔗 Link</button>
-                  <button type="button" class="btn-tool btn-tool--accent" id="btn-img-upload" title="Upload and insert image">📷 Upload image</button>
-                  <input type="file" id="p-body-image-input" accept="image/jpeg,image/png,image/webp,image/gif" hidden />
-                </div>
-
+              <!-- Option 2: Modular Block Builder Header & Mode Switcher -->
+              <div style="display: flex; justify-content: space-between; align-items: center; background: var(--color-surface-subtle); border: 1px solid var(--color-border-subtle); border-bottom: none; border-radius: var(--radius-sm) var(--radius-sm) 0 0; padding: var(--space-3) var(--space-4);">
+                <span style="font-weight: var(--font-weight-bold); font-size: var(--font-size-xs); text-transform: uppercase; color: var(--color-text-muted);">Content Blocks</span>
                 <div style="display: flex; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); overflow: hidden; background: var(--color-surface-base);">
-                  <button type="button" id="tab-write-btn" class="tab-mode-btn active-tab">Write</button>
-                  <button type="button" id="tab-preview-btn" class="tab-mode-btn">Live Preview</button>
+                  <button type="button" id="tab-blocks-btn" class="tab-mode-btn active-tab">Block Editor</button>
+                  <button type="button" id="tab-blocks-preview-btn" class="tab-mode-btn">Live Preview</button>
                 </div>
               </div>
 
-              <textarea class="input" id="p-body" rows="16" style="border-radius: 0 0 var(--radius-sm) var(--radius-sm); font-family: monospace, sans-serif; font-size: 14px; line-height: 1.6; resize: vertical;" placeholder="Write or paste your blog post content here..."></textarea>
-              <div id="p-body-preview" style="display: none; border: 1px solid var(--color-border-subtle); border-radius: 0 0 var(--radius-sm) var(--radius-sm); min-height: 320px; padding: var(--space-6); background: var(--color-surface-strong); line-height: 1.7; overflow-y: auto;"></div>
+              <!-- Block Editor Container -->
+              <div id="block-editor-panel" style="border: 1px solid var(--color-border-subtle); border-radius: 0 0 var(--radius-sm) var(--radius-sm); padding: var(--space-5); background: var(--color-surface-base);">
+                <div id="blocks-container" style="display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-5);"></div>
 
-              <p class="content-editor-hint" style="margin-top: var(--space-2);">Write or paste your content directly. Use the toolbar buttons above to add headings, bold text, links, or images.</p>
+                <!-- Add Block Buttons -->
+                <div style="background: var(--color-surface-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-sm); padding: var(--space-4); text-align: center;">
+                  <p style="margin: 0 0 var(--space-3) 0; font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; color: var(--color-text-muted);">+ Add New Content Block</p>
+                  <div style="display: flex; gap: var(--space-2); flex-wrap: wrap; justify-content: center;">
+                    <button type="button" class="btn-tool" id="add-block-p">+ Paragraph</button>
+                    <button type="button" class="btn-tool" id="add-block-heading">+ Heading</button>
+                    <button type="button" class="btn-tool btn-tool--accent" id="add-block-image">+ Image</button>
+                    <button type="button" class="btn-tool" id="add-block-product">+ Product Card</button>
+                    <button type="button" class="btn-tool" id="add-block-quote">+ Quote</button>
+                    <button type="button" class="btn-tool" id="add-block-list">+ Bullet List</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Live Preview Panel -->
+              <div id="blocks-preview-panel" style="display: none; border: 1px solid var(--color-border-subtle); border-radius: 0 0 var(--radius-sm) var(--radius-sm); min-height: 380px; padding: var(--space-6); background: var(--color-surface-strong); line-height: 1.7; overflow-y: auto;"></div>
+
+              <input type="hidden" id="p-intro" />
+              <input type="hidden" id="p-body" />
+              <p class="content-editor-hint" style="margin-top: var(--space-2);">Build your post block by block. Reorder sections with Up/Down buttons or delete sections with the Trash button.</p>
             </div>
 
             <div class="card" style="margin-top: var(--space-6);">
@@ -712,8 +720,8 @@
       $("#p-status-display").textContent = "New draft";
       $("#publish-post-btn").textContent = "Publish";
       $("#save-draft-btn").textContent = "Save draft";
-      $("#p-body").value = "";
-      switchEditorTab("write");
+      parseHtmlToBlocks("");
+      switchBlockTab("editor");
       $("#p-slug").disabled = false;
       $("#p-slug-hint").textContent = "auto-generated";
       $("#p-slug-edit-note").style.display = "none";
@@ -732,7 +740,7 @@
             $("#p-slug").value = p.slug; $("#p-title").value = p.title; $("#p-category").value = p.category;
             $("#p-ogimage").value = p.og_image || "";
             if (p.og_image) { $("#p-ogimage").dispatchEvent(new Event("input")); }
-            $("#p-body").value = p.intro_html || p.body_html || "";
+            parseHtmlToBlocks(p.intro_html || p.body_html || "");
             $("#p-status-display").textContent = isPublished(p.published) ? "Published" : "Draft";
             $("#publish-post-btn").textContent = isPublished(p.published) ? "Update post" : "Publish";
             $("#save-draft-btn").textContent = isPublished(p.published) ? "Unpublish & save" : "Save draft";
@@ -881,7 +889,7 @@
       if (!slug) { toast("Slug is required — add a title first"); return; }
       if (!$("#p-title").value.trim()) { toast("Title is required"); return; }
       if (!$("#p-category").value) { toast("Category is required"); return; }
-      var htmlContent = $("#p-body").value;
+      var htmlContent = compileBlocksToHtml();
       var attachedIds = attachedProducts.map(function (a) {
         return { product_id: a.id, section_heading: a.section_heading || null, image_text: a.image_text || null };
       });
@@ -1228,90 +1236,382 @@
   })();
   </script>
   <script>
-    // Option 1 Editor Helper Functions
-    function insertTag(startTag, endTag) {
-      var textarea = document.getElementById("p-body");
-      if (!textarea) return;
-      var start = textarea.selectionStart;
-      var end = textarea.selectionEnd;
-      var val = textarea.value;
-      var selected = val.substring(start, end);
-      var replacement = startTag + (selected || "text") + endTag;
-      textarea.value = val.substring(0, start) + replacement + val.substring(end);
-      textarea.focus();
-      textarea.setSelectionRange(start + startTag.length, start + startTag.length + (selected || "text").length);
+    // ==========================================
+    // Option 2: Modular Section / Block Builder
+    // ==========================================
+    var blocks = []; // Global array of block objects
+
+    function createBlockId() {
+      return "blk_" + Math.random().toString(36).substr(2, 9);
     }
 
-    function insertLink() {
-      var url = prompt("Enter link URL:", "https://");
-      if (!url) return;
-      var label = prompt("Enter link text:", "Click here");
-      var html = '<a href="' + url + '" target="_blank" rel="noopener">' + (label || url) + '</a>';
-      var textarea = document.getElementById("p-body");
-      var start = textarea.selectionStart;
-      var val = textarea.value;
-      textarea.value = val.substring(0, start) + html + val.substring(start);
+    function addBlock(type, data) {
+      data = data || {};
+      if (type === "paragraph") data.text = data.text || "";
+      if (type === "heading") { data.level = data.level || "h2"; data.text = data.text || ""; }
+      if (type === "image") { data.url = data.url || ""; data.caption = data.caption || ""; }
+      if (type === "product") {
+        data.title = data.title || "";
+        data.image_url = data.image_url || "";
+        data.why_html = data.why_html || "";
+        data.link_label = data.link_label || "Check price on Amazon UK";
+        data.link_url = data.link_url || "";
+      }
+      if (type === "quote") { data.text = data.text || ""; data.author = data.author || ""; }
+      if (type === "list") { data.items = data.items || [""]; }
+
+      blocks.push({ id: createBlockId(), type: type, data: data });
+      renderBlocks();
     }
 
-    function switchEditorTab(tab) {
-      var writeBtn = document.getElementById("tab-write-btn");
-      var previewBtn = document.getElementById("tab-preview-btn");
-      var textarea = document.getElementById("p-body");
-      var previewDiv = document.getElementById("p-body-preview");
+    function moveBlock(index, dir) {
+      var target = index + dir;
+      if (target < 0 || target >= blocks.length) return;
+      var temp = blocks[index];
+      blocks[index] = blocks[target];
+      blocks[target] = temp;
+      renderBlocks();
+    }
 
-      if (tab === "write") {
-        writeBtn.classList.add("active-tab");
-        previewBtn.classList.remove("active-tab");
-        textarea.style.display = "block";
-        previewDiv.style.display = "none";
+    function deleteBlock(index) {
+      if (blocks.length === 1 && !confirm("Remove the last remaining section?")) return;
+      blocks.splice(index, 1);
+      renderBlocks();
+    }
+
+    function renderBlocks() {
+      var container = document.getElementById("blocks-container");
+      if (!container) return;
+      container.innerHTML = "";
+
+      if (blocks.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:30px; color:#888;">No blocks yet. Click an option below to add a section.</div>';
+        return;
+      }
+
+      blocks.forEach(function (block, idx) {
+        var card = document.createElement("div");
+        card.className = "card";
+        card.style.margin = "0";
+        card.style.background = "#fafafa";
+        card.style.border = "1px solid #e5e7eb";
+
+        // Block Header with Controls
+        var header = document.createElement("div");
+        header.style.display = "flex";
+        header.style.justifyContent = "space-between";
+        header.style.alignItems = "center";
+        header.style.marginBottom = "12px";
+        header.style.paddingBottom = "8px";
+        header.style.borderBottom = "1px solid #eee";
+
+        var badge = document.createElement("span");
+        badge.style.fontSize = "11px";
+        badge.style.fontWeight = "bold";
+        badge.style.textTransform = "uppercase";
+        badge.style.letterSpacing = "0.05em";
+        badge.style.background = "#111";
+        badge.style.color = "#fff";
+        badge.style.padding = "2px 8px";
+        badge.style.borderRadius = "4px";
+        badge.textContent = block.type.toUpperCase() + " BLOCK";
+
+        var actions = document.createElement("div");
+        actions.style.display = "flex";
+        actions.style.gap = "4px";
+
+        var upBtn = document.createElement("button");
+        upBtn.type = "button"; upBtn.className = "btn-tool"; upBtn.textContent = "▲ Up";
+        upBtn.disabled = (idx === 0);
+        upBtn.onclick = function() { moveBlock(idx, -1); };
+
+        var downBtn = document.createElement("button");
+        downBtn.type = "button"; downBtn.className = "btn-tool"; downBtn.textContent = "▼ Down";
+        downBtn.disabled = (idx === blocks.length - 1);
+        downBtn.onclick = function() { moveBlock(idx, 1); };
+
+        var delBtn = document.createElement("button");
+        delBtn.type = "button"; delBtn.className = "btn-tool"; delBtn.style.color = "#dc2626"; delBtn.textContent = "🗑 Delete";
+        delBtn.onclick = function() { deleteBlock(idx); };
+
+        actions.appendChild(upBtn);
+        actions.appendChild(downBtn);
+        actions.appendChild(delBtn);
+
+        header.appendChild(badge);
+        header.appendChild(actions);
+        card.appendChild(header);
+
+        // Block Form Fields by Type
+        var body = document.createElement("div");
+
+        if (block.type === "paragraph") {
+          var ta = document.createElement("textarea");
+          ta.className = "input";
+          ta.rows = 4;
+          ta.placeholder = "Enter paragraph text... HTML tags like <b>bold</b> or <a href='...'>links</a> allowed.";
+          ta.value = block.data.text || "";
+          ta.oninput = function() { block.data.text = ta.value; };
+          body.appendChild(ta);
+        } else if (block.type === "heading") {
+          var flex = document.createElement("div");
+          flex.style.display = "flex"; flex.style.gap = "8px";
+
+          var sel = document.createElement("select");
+          sel.className = "input"; sel.style.width = "150px";
+          sel.innerHTML = '<option value="h2">Heading 2 (H2)</option><option value="h3">Heading 3 (H3)</option>';
+          sel.value = block.data.level || "h2";
+          sel.onchange = function() { block.data.level = sel.value; };
+
+          var inp = document.createElement("input");
+          inp.className = "input"; inp.style.flex = "1";
+          inp.placeholder = "Enter section title...";
+          inp.value = block.data.text || "";
+          inp.oninput = function() { block.data.text = inp.value; };
+
+          flex.appendChild(sel); flex.appendChild(inp);
+          body.appendChild(flex);
+        } else if (block.type === "image") {
+          var imgFlex = document.createElement("div");
+          imgFlex.style.display = "flex"; imgFlex.style.gap = "8px"; imgFlex.style.flexWrap = "wrap";
+
+          var urlInp = document.createElement("input");
+          urlInp.className = "input"; urlInp.style.flex = "1"; urlInp.style.minWidth = "220px";
+          urlInp.placeholder = "Image URL (e.g. /uploads/photo.jpg or https://...)";
+          urlInp.value = block.data.url || "";
+          urlInp.oninput = function() { block.data.url = urlInp.value; };
+
+          var fileBtn = document.createElement("button");
+          fileBtn.type = "button"; fileBtn.className = "btn-tool btn-tool--accent";
+          fileBtn.textContent = "📷 Upload Image";
+          var hiddenFile = document.createElement("input");
+          hiddenFile.type = "file"; hiddenFile.accept = "image/*"; hiddenFile.style.display = "none";
+          fileBtn.onclick = function() { hiddenFile.click(); };
+          hiddenFile.onchange = function() {
+            var file = hiddenFile.files && hiddenFile.files[0];
+            if (!file) return;
+            toast("Uploading image…");
+            var reader = new FileReader();
+            reader.onload = function() {
+              var base64 = reader.result.split(",")[1];
+              fetch("/api/uploads", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ filename: file.name, contentType: file.type, data: base64 })
+              }).then(function(r) { return r.json(); })
+              .then(function(res) {
+                if (res.url) {
+                  block.data.url = res.url;
+                  urlInp.value = res.url;
+                  toast("Image uploaded!");
+                } else { toast("Upload failed"); }
+              }).catch(function() { toast("Upload failed"); });
+            };
+            reader.readAsDataURL(file);
+          };
+
+          imgFlex.appendChild(urlInp); imgFlex.appendChild(fileBtn); imgFlex.appendChild(hiddenFile);
+
+          var capInp = document.createElement("input");
+          capInp.className = "input"; capInp.style.marginTop = "8px";
+          capInp.placeholder = "Optional image caption / alt text...";
+          capInp.value = block.data.caption || "";
+          capInp.oninput = function() { block.data.caption = capInp.value; };
+
+          body.appendChild(imgFlex); body.appendChild(capInp);
+        } else if (block.type === "product") {
+          var pTitle = document.createElement("input");
+          pTitle.className = "input"; pTitle.placeholder = "Product Title (e.g. 01 — Glow-boosting Vitamin C)";
+          pTitle.value = block.data.title || "";
+          pTitle.oninput = function() { block.data.title = pTitle.value; };
+
+          var pWhy = document.createElement("textarea");
+          pWhy.className = "input"; pWhy.rows = 2; pWhy.style.marginTop = "8px";
+          pWhy.placeholder = "Why this works (e.g. 15% L-ascorbic formula that brightens post-acne marks...)";
+          pWhy.value = block.data.why_html || "";
+          pWhy.oninput = function() { block.data.why_html = pWhy.value; };
+
+          var pLinkRow = document.createElement("div");
+          pLinkRow.style.display = "flex"; pLinkRow.style.gap = "8px"; pLinkRow.style.marginTop = "8px";
+
+          var pLabel = document.createElement("input");
+          pLabel.className = "input"; pLabel.style.width = "180px";
+          pLabel.placeholder = "Button Text (e.g. Check price on Amazon UK)";
+          pLabel.value = block.data.link_label || "Check price on Amazon UK";
+          pLabel.oninput = function() { block.data.link_label = pLabel.value; };
+
+          var pUrl = document.createElement("input");
+          pUrl.className = "input"; pUrl.style.flex = "1";
+          pUrl.placeholder = "Affiliate / Product Link URL (e.g. /go/vitamin-c-serum or https://...)";
+          pUrl.value = block.data.link_url || "";
+          pUrl.oninput = function() { block.data.link_url = pUrl.value; };
+
+          pLinkRow.appendChild(pLabel); pLinkRow.appendChild(pUrl);
+
+          body.appendChild(pTitle); body.appendChild(pWhy); body.appendChild(pLinkRow);
+        } else if (block.type === "quote") {
+          var qText = document.createElement("textarea");
+          qText.className = "input"; qText.rows = 3;
+          qText.placeholder = "Quote text...";
+          qText.value = block.data.text || "";
+          qText.oninput = function() { block.data.text = qText.value; };
+
+          var qAuthor = document.createElement("input");
+          qAuthor.className = "input"; qAuthor.style.marginTop = "8px";
+          qAuthor.placeholder = "Optional author / source...";
+          qAuthor.value = block.data.author || "";
+          qAuthor.oninput = function() { block.data.author = qAuthor.value; };
+
+          body.appendChild(qText); body.appendChild(qAuthor);
+        } else if (block.type === "list") {
+          var listTa = document.createElement("textarea");
+          listTa.className = "input"; listTa.rows = 4;
+          listTa.placeholder = "Enter list items (one item per line)...";
+          listTa.value = (block.data.items || []).join("\n");
+          listTa.oninput = function() {
+            block.data.items = listTa.value.split("\n").filter(function(line) { return line.trim() !== ""; });
+          };
+          body.appendChild(listTa);
+        }
+
+        card.appendChild(body);
+        container.appendChild(card);
+      });
+    }
+
+    function compileBlocksToHtml() {
+      var html = "";
+      blocks.forEach(function (block, idx) {
+        if (block.type === "paragraph" && block.data.text) {
+          var pText = block.data.text.trim();
+          if (pText.indexOf("<p>") === 0) { html += pText + "\n"; }
+          else { html += "<p>" + pText.replace(/\n/g, "<br>") + "</p>\n"; }
+        } else if (block.type === "heading" && block.data.text) {
+          var lvl = block.data.level || "h2";
+          html += "<" + lvl + ">" + block.data.text.trim() + "</" + lvl + ">\n";
+        } else if (block.type === "image" && block.data.url) {
+          html += '<figure style="margin: 20px 0;"><img src="' + block.data.url + '" alt="' + (block.data.caption || "Post image") + '" style="max-width:100%; height:auto; border-radius:8px;" />';
+          if (block.data.caption) { html += '<figcaption style="font-size:13px; color:#666; margin-top:6px;">' + block.data.caption + '</figcaption>'; }
+          html += '</figure>\n';
+        } else if (block.type === "product" && (block.data.title || block.data.why_html)) {
+          var numStr = (idx + 1 < 10 ? "0" : "") + (idx + 1);
+          html += '<section class="product-block">';
+          html += '<div class="product-block__media" role="img" aria-label="Product image placeholder">' + numStr + '</div>';
+          html += '<div>';
+          if (block.data.title) { html += '<h3>' + block.data.title + '</h3>'; }
+          if (block.data.why_html) { html += '<p class="why">Why this works: ' + block.data.why_html + '</p>'; }
+          if (block.data.link_url) {
+            html += '<a class="affiliate-link" href="' + block.data.link_url + '" rel="sponsored nofollow noopener" target="_blank">' + (block.data.link_label || "Check price on Amazon UK") + '</a>';
+          }
+          html += '</div></section>\n';
+        } else if (block.type === "quote" && block.data.text) {
+          html += '<blockquote><p>"' + block.data.text + '"</p>';
+          if (block.data.author) { html += '<cite>— ' + block.data.author + '</cite>'; }
+          html += '</blockquote>\n';
+        } else if (block.type === "list" && block.data.items && block.data.items.length > 0) {
+          html += '<ul>\n';
+          block.data.items.forEach(function(item) {
+            if (item.trim()) html += '  <li>' + item.trim() + '</li>\n';
+          });
+          html += '</ul>\n';
+        }
+      });
+      return html;
+    }
+
+    function parseHtmlToBlocks(html) {
+      blocks = [];
+      if (!html || !html.trim()) {
+        blocks.push({ id: createBlockId(), type: "paragraph", data: { text: "" } });
+        renderBlocks();
+        return;
+      }
+
+      var div = document.createElement("div");
+      div.innerHTML = html;
+      var children = Array.prototype.slice.call(div.children);
+
+      if (children.length === 0) {
+        blocks.push({ id: createBlockId(), type: "paragraph", data: { text: html } });
       } else {
-        previewBtn.classList.add("active-tab");
-        writeBtn.classList.remove("active-tab");
-        textarea.style.display = "none";
-        previewDiv.style.display = "block";
-        previewDiv.innerHTML = textarea.value || "<em>(No content to preview)</em>";
+        children.forEach(function(el) {
+          var tag = el.tagName ? el.tagName.toLowerCase() : "";
+          if (tag === "h2" || tag === "h3") {
+            blocks.push({ id: createBlockId(), type: "heading", data: { level: tag, text: el.innerText || el.textContent } });
+          } else if (tag === "p") {
+            blocks.push({ id: createBlockId(), type: "paragraph", data: { text: el.innerHTML } });
+          } else if (tag === "figure" || tag === "img") {
+            var img = tag === "img" ? el : el.querySelector("img");
+            var cap = el.querySelector("figcaption");
+            if (img) {
+              blocks.push({ id: createBlockId(), type: "image", data: { url: img.getAttribute("src"), caption: cap ? cap.innerText : (img.getAttribute("alt") || "") } });
+            }
+          } else if (tag === "section" && el.classList.contains("product-block")) {
+            var h3 = el.querySelector("h3");
+            var why = el.querySelector(".why");
+            var link = el.querySelector("a.affiliate-link");
+            var whyText = why ? why.innerHTML.replace(/^Why this works:\s*/i, "") : "";
+            blocks.push({
+              id: createBlockId(),
+              type: "product",
+              data: {
+                title: h3 ? h3.innerText : "",
+                why_html: whyText,
+                link_label: link ? link.innerText : "Check price on Amazon UK",
+                link_url: link ? link.getAttribute("href") : ""
+              }
+            });
+          } else if (tag === "blockquote") {
+            var cite = el.querySelector("cite");
+            var p = el.querySelector("p");
+            blocks.push({
+              id: createBlockId(),
+              type: "quote",
+              data: {
+                text: p ? p.innerText.replace(/^"/, "").replace(/"$/, "") : el.innerText,
+                author: cite ? cite.innerText.replace(/^—\s*/, "") : ""
+              }
+            });
+          } else if (tag === "ul" || tag === "ol") {
+            var lis = Array.prototype.slice.call(el.querySelectorAll("li")).map(function(li) { return li.innerText; });
+            blocks.push({ id: createBlockId(), type: "list", data: { items: lis } });
+          } else {
+            blocks.push({ id: createBlockId(), type: "paragraph", data: { text: el.outerHTML } });
+          }
+        });
+      }
+      renderBlocks();
+    }
+
+    function switchBlockTab(tab) {
+      var editorTab = document.getElementById("tab-blocks-btn");
+      var previewTab = document.getElementById("tab-blocks-preview-btn");
+      var editorPanel = document.getElementById("block-editor-panel");
+      var previewPanel = document.getElementById("blocks-preview-panel");
+
+      if (tab === "editor") {
+        editorTab.classList.add("active-tab");
+        previewTab.classList.remove("active-tab");
+        editorPanel.style.display = "block";
+        previewPanel.style.display = "none";
+      } else {
+        previewTab.classList.add("active-tab");
+        editorTab.classList.remove("active-tab");
+        editorPanel.style.display = "none";
+        previewPanel.style.display = "block";
+        previewPanel.innerHTML = compileBlocksToHtml() || "<em>(No blocks added yet to preview)</em>";
       }
     }
 
-    document.getElementById("btn-h2").addEventListener("click", function() { insertTag("<h2>", "</h2>"); });
-    document.getElementById("btn-h3").addEventListener("click", function() { insertTag("<h3>", "</h3>"); });
-    document.getElementById("btn-bold").addEventListener("click", function() { insertTag("<strong>", "</strong>"); });
-    document.getElementById("btn-italic").addEventListener("click", function() { insertTag("<em>", "</em>"); });
-    document.getElementById("btn-quote").addEventListener("click", function() { insertTag("<blockquote>", "</blockquote>"); });
-    document.getElementById("btn-p").addEventListener("click", function() { insertTag("<p>", "</p>"); });
-    document.getElementById("btn-ul").addEventListener("click", function() { insertTag("<ul>\n  <li>", "</li>\n</ul>"); });
-    document.getElementById("btn-link").addEventListener("click", insertLink);
-    document.getElementById("btn-img-upload").addEventListener("click", function() { document.getElementById("p-body-image-input").click(); });
-    document.getElementById("tab-write-btn").addEventListener("click", function() { switchEditorTab("write"); });
-    document.getElementById("tab-preview-btn").addEventListener("click", function() { switchEditorTab("preview"); });
+    document.getElementById("add-block-p").addEventListener("click", function() { addBlock("paragraph"); });
+    document.getElementById("add-block-heading").addEventListener("click", function() { addBlock("heading"); });
+    document.getElementById("add-block-image").addEventListener("click", function() { addBlock("image"); });
+    document.getElementById("add-block-product").addEventListener("click", function() { addBlock("product"); });
+    document.getElementById("add-block-quote").addEventListener("click", function() { addBlock("quote"); });
+    document.getElementById("add-block-list").addEventListener("click", function() { addBlock("list"); });
 
-    document.getElementById("p-body-image-input").addEventListener("change", function () {
-      var file = this.files && this.files[0];
-      if (!file) return;
-      toast("Uploading image…");
-      var reader = new FileReader();
-      reader.onload = function () {
-        var base64 = reader.result.split(",")[1];
-        fetch("/api/uploads", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ filename: file.name, contentType: file.type, data: base64 })
-        }).then(function (r) { return r.json(); })
-        .then(function (data) {
-          if (data.url) {
-            var imgHtml = '\n<img src="' + data.url + '" alt="' + file.name + '" style="max-width:100%; height:auto; border-radius:8px; margin:16px 0;" />\n';
-            var textarea = document.getElementById("p-body");
-            var start = textarea.selectionStart;
-            var val = textarea.value;
-            textarea.value = val.substring(0, start) + imgHtml + val.substring(start);
-            toast("Image inserted into post!");
-          } else {
-            toast("Image upload failed");
-          }
-        }).catch(function () { toast("Image upload failed"); });
-      };
-      reader.readAsDataURL(file);
-    });
+    document.getElementById("tab-blocks-btn").addEventListener("click", function() { switchBlockTab("editor"); });
+    document.getElementById("tab-blocks-preview-btn").addEventListener("click", function() { switchBlockTab("preview"); });
   </script>
 </body>
 </html>
