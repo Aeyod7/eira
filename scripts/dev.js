@@ -8,6 +8,7 @@ import url from "node:url";
 import { pathToFileURL } from "node:url";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
+try { process.loadEnvFile(path.join(ROOT, ".env")); } catch {}
 const PUBLIC = path.join(ROOT, "public");
 const PORT = process.env.PORT || 3000;
 

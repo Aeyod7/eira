@@ -11,29 +11,6 @@
   <link rel="stylesheet" href="/styles.css" />
   <style>
     body { background: var(--color-surface-base); color: var(--color-text-primary); }
-    .btn-tool {
-      background: var(--color-surface-base);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-xs, 4px);
-      padding: var(--space-2) var(--space-3);
-      font-size: var(--font-size-xs, 12px);
-      font-family: var(--font-family-stack);
-      cursor: pointer;
-      color: var(--color-text-primary);
-      transition: background 0.15s;
-    }
-    .btn-tool:hover { background: var(--color-surface-dark); }
-    .btn-tool--accent { background: var(--color-surface-dark); color: #fff; border-color: var(--color-surface-dark); }
-    .tab-mode-btn {
-      border: none;
-      background: transparent;
-      padding: var(--space-2) var(--space-4);
-      font-size: var(--font-size-xs);
-      font-weight: var(--font-weight-bold);
-      cursor: pointer;
-      color: var(--color-text-muted);
-    }
-    .tab-mode-btn.active-tab { background: var(--color-surface-dark); color: #fff; }
     .admin-shell { max-width: 800px; margin: 0 auto; padding: var(--space-10) var(--space-6); }
     .admin-header { display:flex; align-items:center; justify-content:space-between; margin-bottom: var(--space-10); flex-wrap:wrap; gap:var(--space-4); }
     .admin-header h1 { margin:0; font-size: var(--font-size-2xl); font-family: var(--font-family-primary); }
@@ -87,41 +64,6 @@
     }
     .content-editor { min-height: 420px; background: var(--color-surface-base); border-radius: var(--radius-lg); }
     .content-editor-hint { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: var(--space-2); }
-    .ql-toolbar { border: 1px solid var(--color-border-subtle) !important; border-radius: var(--radius-lg) var(--radius-lg) 0 0; background: var(--color-surface-strong); }
-    .ql-container { border: 1px solid var(--color-border-subtle) !important; border-top: none !important; border-radius: 0 0 var(--radius-lg) var(--radius-lg); font-family: var(--font-family-stack) !important; font-size: var(--font-size-md) !important; }
-    .ql-editor { min-height: 420px; padding: var(--space-6) !important; line-height: 1.7; }
-    .ql-editor h1 { font-family: var(--font-family-primary); font-size: var(--font-size-3xl); margin: var(--space-6) 0 var(--space-4); }
-    .ql-editor h2 { font-family: var(--font-family-primary); font-size: var(--font-size-xl); margin: var(--space-5) 0 var(--space-3); }
-    .ql-editor h3 { font-family: var(--font-family-primary); font-size: var(--font-size-lg); margin: var(--space-4) 0 var(--space-2); }
-    .ql-editor p { margin-bottom: var(--space-3); }
-    .ql-editor ul, .ql-editor ol { padding-left: var(--space-6); margin-bottom: var(--space-3); }
-    .ql-editor li { margin-bottom: var(--space-1); }
-    .ql-editor img { max-width: 100%; height: auto; border-radius: var(--radius-md); margin: var(--space-4) 0; }
-    .ql-editor blockquote { border-left: 4px solid var(--color-accent-strong); padding-left: var(--space-5); margin: var(--space-4) 0; color: var(--color-text-muted); font-style: italic; }
-    .ql-editor pre.ql-syntax { background: var(--color-surface-strong); padding: var(--space-4); border-radius: var(--radius-md); overflow-x: auto; }
-    /* Custom font classes — registered in Quill whitelist */
-    .ql-editor .ql-font-serif { font-family: Georgia, "Times New Roman", serif; }
-    .ql-editor .ql-font-monospace { font-family: "Courier New", monospace; }
-    .ql-editor .ql-font-sans-serif { font-family: -apple-system, "Segoe UI", sans-serif; }
-    /* Size classes — use !important so they override header font-size */
-    .ql-editor .ql-size-small { font-size: 0.75rem !important; }
-    .ql-editor .ql-size-large { font-size: 1.5rem !important; }
-    .ql-editor .ql-size-huge { font-size: 2.5rem !important; }
-    /* Font classes override header font-family */
-    .ql-editor h1 .ql-font-serif, .ql-editor h2 .ql-font-serif, .ql-editor h3 .ql-font-serif,
-    .ql-editor h4 .ql-font-serif, .ql-editor h5 .ql-font-serif, .ql-editor h6 .ql-font-serif { font-family: Georgia, "Times New Roman", serif !important; }
-    .ql-editor h1 .ql-font-monospace, .ql-editor h2 .ql-font-monospace, .ql-editor h3 .ql-font-monospace,
-    .ql-editor h4 .ql-font-monospace, .ql-editor h5 .ql-font-monospace, .ql-editor h6 .ql-font-monospace { font-family: "Courier New", monospace !important; }
-    .ql-editor h1 .ql-font-sans-serif, .ql-editor h2 .ql-font-sans-serif, .ql-editor h3 .ql-font-sans-serif,
-    .ql-editor h4 .ql-font-sans-serif, .ql-editor h5 .ql-font-sans-serif, .ql-editor h6 .ql-font-sans-serif { font-family: -apple-system, "Segoe UI", sans-serif !important; }
-    .ql-toolbar.ql-snow .ql-picker-label { color: var(--color-text-primary); }
-    .ql-toolbar.ql-snow .ql-stroke { stroke: var(--color-text-primary); }
-    .ql-toolbar.ql-snow .ql-fill { fill: var(--color-text-primary); }
-    .ql-toolbar.ql-snow .ql-picker-item.ql-selected { color: var(--color-accent-strong); }
-    .ql-toolbar button:hover .ql-stroke { stroke: var(--color-accent-strong); }
-    .ql-toolbar button:hover .ql-fill { fill: var(--color-accent-strong); }
-    .ql-toolbar button.ql-active .ql-stroke { stroke: var(--color-accent-strong); }
-    .ql-toolbar button.ql-active .ql-fill { fill: var(--color-accent-strong); }
 
     .login-box { max-width: 360px; margin: var(--space-20) auto; text-align: center; }
     .login-box form { display: flex; flex-direction: column; gap: var(--space-5); margin-top: var(--space-6); }
@@ -250,46 +192,8 @@
 
             <div class="field">
               <label for="p-body">Blog post content</label>
-
-              <!-- Option 1 Editor: Helper Buttons + Write/Preview Tabs -->
-              <div style="border: 1px solid var(--color-border-subtle); border-bottom: none; border-radius: var(--radius-sm) var(--radius-sm) 0 0; background: var(--color-surface-subtle); padding: var(--space-3) var(--space-4); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3);">
-                <div style="display: flex; gap: var(--space-2); flex-wrap: wrap; align-items: center;">
-                  <button type="button" class="btn-tool" id="btn-h2" title="Heading 2"><b>H2</b></button>
-                  <button type="button" class="btn-tool" id="btn-h3" title="Heading 3"><b>H3</b></button>
-                  <button type="button" class="btn-tool" id="btn-bold" title="Bold"><b>B</b></button>
-                  <button type="button" class="btn-tool" id="btn-italic" title="Italic"><i>I</i></button>
-                  <button type="button" class="btn-tool" id="btn-quote" title="Quote">“”</button>
-                  <button type="button" class="btn-tool" id="btn-p" title="Paragraph">P</button>
-                  <button type="button" class="btn-tool" id="btn-ul" title="Bullet list">• List</button>
-                  <button type="button" class="btn-tool" id="btn-link" title="Add link">🔗 Link</button>
-                  <button type="button" class="btn-tool btn-tool--accent" id="btn-img-upload" title="Upload image from computer">📷 Upload Image</button>
-                  <button type="button" class="btn-tool" id="btn-img-url" title="Insert image from web URL">🌐 Insert Image URL</button>
-                  <input type="file" id="p-body-image-input" accept="image/jpeg,image/png,image/webp,image/gif" hidden />
-                </div>
-
-                <div style="display: flex; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); overflow: hidden; background: var(--color-surface-base);">
-                  <button type="button" id="tab-write-btn" class="tab-mode-btn active-tab">Write</button>
-                  <button type="button" id="tab-preview-btn" class="tab-mode-btn">Live Preview</button>
-                </div>
-              </div>
-
-              <textarea class="input" id="p-body" rows="16" style="border-radius: 0 0 var(--radius-sm) var(--radius-sm); font-family: monospace, sans-serif; font-size: 14px; line-height: 1.6; resize: vertical;" placeholder="Write or paste your blog post content here... You can paste text, HTML, or drag-and-drop images directly."></textarea>
-              <div id="p-body-preview" style="display: none; border: 1px solid var(--color-border-subtle); border-radius: 0 0 var(--radius-sm) var(--radius-sm); min-height: 320px; padding: var(--space-6); background: var(--color-surface-strong); line-height: 1.7; overflow-y: auto;"></div>
-
-              <p class="content-editor-hint" style="margin-top: var(--space-2);">Write or paste your content directly. Use the toolbar buttons above to add headings, bold text, links, or images.</p>
-            </div>
-
-            <!-- Dedicated Post Images & Gallery Box -->
-            <div class="card" style="margin-top: var(--space-4); background: var(--color-surface-subtle);">
-              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-                <div>
-                  <h3 style="margin:0;">Post Images</h3>
-                  <p class="muted" style="margin: 2px 0 0 0; font-size: 12px;">Upload photos to use in your post. Click "Insert into Post" to place an image in your text.</p>
-                </div>
-                <button class="btn btn--secondary" type="button" id="gallery-upload-btn">+ Upload Image to Post</button>
-                <input type="file" id="gallery-image-input" accept="image/jpeg,image/png,image/webp,image/gif" hidden />
-              </div>
-              <div id="post-gallery-list" style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px;"></div>
+              <textarea id="p-body" class="content-editor"></textarea>
+              <p class="content-editor-hint">Write or paste your content. Images pasted from Word/Google Docs or uploaded via the toolbar are automatically saved to your uploads folder.</p>
             </div>
 
             <div class="card" style="margin-top: var(--space-6);">
@@ -727,7 +631,7 @@
       $("#publish-post-btn").textContent = "Publish";
       $("#save-draft-btn").textContent = "Save draft";
       $("#p-body").value = "";
-      switchEditorTab("write");
+      setEditorContent("");
       $("#p-slug").disabled = false;
       $("#p-slug-hint").textContent = "auto-generated";
       $("#p-slug-edit-note").style.display = "none";
@@ -747,6 +651,7 @@
             $("#p-ogimage").value = p.og_image || "";
             if (p.og_image) { $("#p-ogimage").dispatchEvent(new Event("input")); }
             $("#p-body").value = p.intro_html || p.body_html || "";
+            setEditorContent(p.intro_html || p.body_html || "");
             $("#p-status-display").textContent = isPublished(p.published) ? "Published" : "Draft";
             $("#publish-post-btn").textContent = isPublished(p.published) ? "Update post" : "Publish";
             $("#save-draft-btn").textContent = isPublished(p.published) ? "Unpublish & save" : "Save draft";
@@ -895,7 +800,7 @@
       if (!slug) { toast("Slug is required — add a title first"); return; }
       if (!$("#p-title").value.trim()) { toast("Title is required"); return; }
       if (!$("#p-category").value) { toast("Category is required"); return; }
-      var htmlContent = $("#p-body").value;
+      var htmlContent = getEditorContent();
       var attachedIds = attachedProducts.map(function (a) {
         return { product_id: a.id, section_heading: a.section_heading || null, image_text: a.image_text || null };
       });
@@ -1241,187 +1146,77 @@
     });
   })();
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.4/tinymce.min.js"></script>
   <script>
     // ==========================================
-    // Option 1 Editor Helper & Image Functions
+    // TinyMCE rich text editor (what WordPress uses)
+    // Handles paste from Word/Google Docs natively, auto-uploads pasted/dropped
+    // images via /api/uploads, and produces clean HTML.
     // ==========================================
-    var postUploadedImages = [];
+    var tinymceReady = false;
+    var pendingContent = null;
 
-    function insertTag(startTag, endTag) {
-      var textarea = document.getElementById("p-body");
-      if (!textarea) return;
-      var start = textarea.selectionStart;
-      var end = textarea.selectionEnd;
-      var val = textarea.value;
-      var selected = val.substring(start, end);
-      var replacement = startTag + (selected || "text") + endTag;
-      textarea.value = val.substring(0, start) + replacement + val.substring(end);
-      textarea.focus();
-      textarea.setSelectionRange(start + startTag.length, start + startTag.length + (selected || "text").length);
-    }
-
-    function insertLink() {
-      var url = prompt("Enter link URL:", "https://");
-      if (!url) return;
-      var label = prompt("Enter link text:", "Click here");
-      var html = '<a href="' + url + '" target="_blank" rel="noopener">' + (label || url) + '</a>';
-      var textarea = document.getElementById("p-body");
-      var start = textarea.selectionStart || textarea.value.length;
-      var val = textarea.value;
-      textarea.value = val.substring(0, start) + html + val.substring(start);
-    }
-
-    function insertImageTag(url, alt) {
-      alt = alt || "Post image";
-      var imgHtml = '\n<img src="' + url + '" alt="' + alt + '" style="max-width:100%; height:auto; border-radius:8px; margin:16px 0;" />\n';
-      var textarea = document.getElementById("p-body");
-      if (!textarea) return;
-      var start = textarea.selectionStart || textarea.value.length;
-      var val = textarea.value;
-      textarea.value = val.substring(0, start) + imgHtml + val.substring(start);
-      textarea.focus();
-      textarea.setSelectionRange(start + imgHtml.length, start + imgHtml.length);
-      addGalleryImage(url, alt);
-    }
-
-    function insertImageUrl() {
-      var url = prompt("Enter image URL (e.g. https://... or /uploads/...):", "https://");
-      if (!url) return;
-      var alt = prompt("Enter image description / alt text (optional):", "Post image");
-      insertImageTag(url, alt);
-    }
-
-    function addGalleryImage(url, alt) {
-      if (postUploadedImages.some(function(img) { return img.url === url; })) return;
-      postUploadedImages.push({ url: url, alt: alt || "Uploaded image" });
-      renderPostGallery();
-    }
-
-    function renderPostGallery() {
-      var container = document.getElementById("post-gallery-list");
-      if (!container) return;
-      container.innerHTML = "";
-      if (postUploadedImages.length === 0) {
-        container.innerHTML = '<span style="font-size:12px; color:#888;">No images uploaded yet for this post.</span>';
-        return;
-      }
-      postUploadedImages.forEach(function(img, idx) {
-        var card = document.createElement("div");
-        card.style.display = "flex"; card.style.alignItems = "center"; card.style.gap = "8px";
-        card.style.background = "#fff"; card.style.border = "1px solid #e5e7eb"; card.style.padding = "6px 10px";
-        card.style.borderRadius = "6px";
-
-        var thumb = document.createElement("img");
-        thumb.src = img.url; thumb.style.width = "40px"; thumb.style.height = "40px"; thumb.style.objectFit = "cover"; thumb.style.borderRadius = "4px";
-
-        var btnInsert = document.createElement("button");
-        btnInsert.type = "button"; btnInsert.className = "btn-tool";
-        btnInsert.textContent = "+ Insert into Post";
-        btnInsert.onclick = function() { insertImageTag(img.url, img.alt); toast("Image inserted into post!"); };
-
-        var btnRemove = document.createElement("button");
-        btnRemove.type = "button"; btnRemove.className = "btn-tool"; btnRemove.style.color = "#dc2626";
-        btnRemove.textContent = "✕";
-        btnRemove.onclick = function() { postUploadedImages.splice(idx, 1); renderPostGallery(); };
-
-        card.appendChild(thumb); card.appendChild(btnInsert); card.appendChild(btnRemove);
-        container.appendChild(card);
-      });
-    }
-
-    function uploadAndInsertFile(file) {
-      if (!file) return;
-      toast("Uploading image…");
-      var reader = new FileReader();
-      reader.onload = function () {
-        var base64 = reader.result.split(",")[1];
-        fetch("/api/uploads", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ filename: file.name, contentType: file.type, data: base64 })
-        }).then(function (r) { return r.json(); })
-        .then(function (data) {
-          if (data.url) {
-            insertImageTag(data.url, file.name);
-            toast("Image uploaded & inserted!");
-          } else { toast("Image upload failed"); }
-        }).catch(function () { toast("Image upload failed"); });
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function switchEditorTab(tab) {
-      var writeBtn = document.getElementById("tab-write-btn");
-      var previewBtn = document.getElementById("tab-preview-btn");
-      var textarea = document.getElementById("p-body");
-      var previewDiv = document.getElementById("p-body-preview");
-
-      if (tab === "write") {
-        writeBtn.classList.add("active-tab");
-        previewBtn.classList.remove("active-tab");
-        textarea.style.display = "block";
-        previewDiv.style.display = "none";
-      } else {
-        previewBtn.classList.add("active-tab");
-        writeBtn.classList.remove("active-tab");
-        textarea.style.display = "none";
-        previewDiv.style.display = "block";
-        previewDiv.innerHTML = textarea.value || "<em>(No content to preview)</em>";
-      }
-    }
-
-    // Event Listeners
-    document.getElementById("btn-h2").addEventListener("click", function() { insertTag("<h2>", "</h2>"); });
-    document.getElementById("btn-h3").addEventListener("click", function() { insertTag("<h3>", "</h3>"); });
-    document.getElementById("btn-bold").addEventListener("click", function() { insertTag("<strong>", "</strong>"); });
-    document.getElementById("btn-italic").addEventListener("click", function() { insertTag("<em>", "</em>"); });
-    document.getElementById("btn-quote").addEventListener("click", function() { insertTag("<blockquote>", "</blockquote>"); });
-    document.getElementById("btn-p").addEventListener("click", function() { insertTag("<p>", "</p>"); });
-    document.getElementById("btn-ul").addEventListener("click", function() { insertTag("<ul>\n  <li>", "</li>\n</ul>"); });
-    document.getElementById("btn-link").addEventListener("click", insertLink);
-    document.getElementById("btn-img-upload").addEventListener("click", function() { document.getElementById("p-body-image-input").click(); });
-    document.getElementById("btn-img-url").addEventListener("click", insertImageUrl);
-    document.getElementById("gallery-upload-btn").addEventListener("click", function() { document.getElementById("gallery-image-input").click(); });
-
-    document.getElementById("tab-write-btn").addEventListener("click", function() { switchEditorTab("write"); });
-    document.getElementById("tab-preview-btn").addEventListener("click", function() { switchEditorTab("preview"); });
-
-    document.getElementById("p-body-image-input").addEventListener("change", function () {
-      var file = this.files && this.files[0];
-      uploadAndInsertFile(file);
-      this.value = "";
-    });
-
-    document.getElementById("gallery-image-input").addEventListener("change", function () {
-      var file = this.files && this.files[0];
-      uploadAndInsertFile(file);
-      this.value = "";
-    });
-
-    // Paste & Drag-Drop handlers on textarea
-    var textareaEl = document.getElementById("p-body");
-    if (textareaEl) {
-      textareaEl.addEventListener("paste", function (e) {
-        var items = e.clipboardData && e.clipboardData.items;
-        if (!items) return;
-        for (var i = 0; i < items.length; i++) {
-          if (items[i].type.indexOf("image") !== -1) {
-            e.preventDefault();
-            var file = items[i].getAsFile();
-            uploadAndInsertFile(file);
-            break;
+    tinymce.init({
+      selector: '#p-body',
+      height: 500,
+      menubar: false,
+      plugins: 'lists link image code table',
+      toolbar: 'undo redo | blocks | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | removeformat code',
+      block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Preformatted=pre',
+      content_style: 'body { font-family: -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.7; padding: 16px; } h1 { font-size: 2rem; margin: 1.5rem 0 1rem; } h2 { font-size: 1.5rem; margin: 1.25rem 0 0.75rem; } h3 { font-size: 1.25rem; margin: 1rem 0 0.5rem; } p { margin-bottom: 0.75rem; } img { max-width: 100%; height: auto; border-radius: 8px; margin: 1rem 0; } ul, ol { padding-left: 1.5rem; margin-bottom: 0.75rem; } blockquote { border-left: 4px solid #000; padding-left: 1rem; margin: 1rem 0; font-style: italic; color: #666; } a { color: #000; } table { border-collapse: collapse; } td, th { border: 1px solid #ddd; padding: 8px; }',
+      paste_data_images: true,
+      image_advtab: true,
+      image_caption: true,
+      images_upload_handler: function (blobInfo, progress) {
+        return new Promise(function (resolve, reject) {
+          var file = blobInfo.blob();
+          if (file.size > 4 * 1024 * 1024) { reject('Images must be 4 MB or smaller'); return; }
+          var reader = new FileReader();
+          reader.onload = function () {
+            var base64 = reader.result.split(',')[1];
+            fetch('/api/uploads', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ filename: blobInfo.filename(), contentType: file.type, data: base64 })
+            }).then(function (r) {
+              return r.json().then(function (data) {
+                if (!r.ok) reject(data.error || 'Upload failed');
+                else resolve(data.url);
+              });
+            }).catch(function (err) { reject(err.message || 'Upload failed'); });
+          };
+          reader.onerror = function () { reject('Could not read file'); };
+          reader.readAsDataURL(file);
+        });
+      },
+      setup: function (editor) {
+        editor.on('init', function () {
+          tinymceReady = true;
+          // If openEditor was called before TinyMCE finished initializing,
+          // apply the pending content now.
+          if (pendingContent !== null) {
+            editor.setContent(pendingContent);
+            pendingContent = null;
           }
-        }
-      });
+        });
+      }
+    });
 
-      textareaEl.addEventListener("drop", function (e) {
-        var files = e.dataTransfer && e.dataTransfer.files;
-        if (files && files.length > 0 && files[0].type.indexOf("image") === 0) {
-          e.preventDefault();
-          uploadAndInsertFile(files[0]);
-        }
-      });
-      textareaEl.addEventListener("dragover", function (e) { e.preventDefault(); });
+    // Helper: set editor content (waits for TinyMCE to be ready if needed)
+    function setEditorContent(html) {
+      if (tinymceReady && tinymce.get('p-body')) {
+        tinymce.get('p-body').setContent(html || '');
+      } else {
+        pendingContent = html || '';
+      }
+    }
+
+    // Helper: get editor content
+    function getEditorContent() {
+      if (tinymceReady && tinymce.get('p-body')) {
+        return tinymce.get('p-body').getContent();
+      }
+      return '';
     }
   </script>
 </body>
