@@ -54,7 +54,7 @@ export default async function handler(req, res) {
     const token = await login(body?.password || "");
     if (!token) return json(res, 401, { ok: false, error: "Wrong password" });
     attempts.delete(ip);
-    res.setHeader("Set-Cookie", `eira_admin=${token}; HttpOnly; Path=/; Max-Age=604800; SameSite=Strict${process.env.NODE_ENV === "production" ? "; Secure" : ""}`);
+    res.setHeader("Set-Cookie", `eira_admin=${token}; HttpOnly; Path=/; Max-Age=604800; SameSite=Lax`);
     return json(res, 200, { ok: true });
   }
 
@@ -63,13 +63,7 @@ export default async function handler(req, res) {
       res.setHeader("Allow", "POST");
       return json(res, 405, { error: "Method not allowed" });
     }
-    const token = getTokenFromRequest(req);
-    if (token) {
-      await ensureSchema();
-      try { await db.execute({ sql: `DELETE FROM admin_sessions WHERE token = ?`, args: [token] }); }
-      catch (e) { console.error("logout session delete failed:", e.message); }
-    }
-    res.setHeader("Set-Cookie", `eira_admin=; HttpOnly; Path=/; Max-Age=0; SameSite=Strict`);
+    res.setHeader("Set-Cookie", `eira_admin=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax`);
     return json(res, 200, { ok: true });
   }
 
