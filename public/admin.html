@@ -1168,10 +1168,9 @@
       height: 500,
       menubar: false,
       plugins: 'lists link image code table',
-      toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | removeformat code',
+      toolbar: 'undo redo | blocks fontfamily customfontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | linespacing link image table | removeformat code',
       block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Preformatted=pre',
       font_family_formats: 'Andale Mono=andale mono,times; Arial=arial,helvetica,sans-serif; Arial Black=arial black,avant garde; Book Antiqua=book antiqua,palatino; Comic Sans MS=comic sans ms,sans-serif; Courier New=courier new,courier; Georgia=georgia,palatino; Helvetica=helvetica; Impact=impact,chicago; Symbol=symbol; Tahoma=tahoma,arial,helvetica,sans-serif; Terminal=terminal,monaco; Times New Roman=times new roman,times; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva; Webdings=webdings; Wingdings=wingdings,zapf dingbats',
-      font_size_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt 48pt 64pt',
       content_style: 'body { font-family: -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.7; padding: 16px; } h1 { font-size: 2rem; margin: 1.5rem 0 1rem; } h2 { font-size: 1.5rem; margin: 1.25rem 0 0.75rem; } h3 { font-size: 1.25rem; margin: 1rem 0 0.5rem; } p { margin-bottom: 0.75rem; } img { max-width: 100%; height: auto; border-radius: 8px; margin: 1rem 0; } ul, ol { padding-left: 1.5rem; margin-bottom: 0.75rem; } blockquote { border-left: 4px solid #000; padding-left: 1rem; margin: 1rem 0; font-style: italic; color: #666; } a { color: #000; } table { border-collapse: collapse; } td, th { border: 1px solid #ddd; padding: 8px; }',
       paste_data_images: true,
       image_advtab: true,
@@ -1199,7 +1198,85 @@
         });
       },
       setup: function (editor) {
+        editor.ui.registry.addSplitButton('customfontsize', {
+          text: '16px',
+          tooltip: 'Font size (click to type a value)',
+          onAction: function () {
+            // Click on the button body: prompt for a custom size
+            var current = editor.queryCommandValue('FontSize') || '16px';
+            var input = window.prompt('Enter font size (e.g. 16, 20px, 1.5em, 120%):', current);
+            if (input !== null && input !== '') {
+              var val = input.trim();
+              // Allow plain numbers (treat as px) or values with units
+              if (/^\d+(\.\d+)?$/.test(val)) { val = val + 'px'; }
+              editor.execCommand('FontSize', false, val);
+              // Update the button label
+              var btn = editor.container.querySelectorAll('.tox-tbtn[data-mce-name="customfontsize"] .tox-tbtn__select-label')[0];
+              if (btn) { btn.textContent = val; }
+            }
+          },
+          onItemAction: function (api, value) {
+            editor.execCommand('FontSize', false, value);
+            var btn = editor.container.querySelectorAll('.tox-tbtn[data-mce-name="customfontsize"] .tox-tbtn__select-label')[0];
+            if (btn) { btn.textContent = value; }
+          },
+          fetch: function (callback) {
+            callback([
+              { type: 'choiceitem', text: '8px', value: '8px' },
+              { type: 'choiceitem', text: '10px', value: '10px' },
+              { type: 'choiceitem', text: '12px', value: '12px' },
+              { type: 'choiceitem', text: '14px', value: '14px' },
+              { type: 'choiceitem', text: '16px', value: '16px' },
+              { type: 'choiceitem', text: '18px', value: '18px' },
+              { type: 'choiceitem', text: '20px', value: '20px' },
+              { type: 'choiceitem', text: '24px', value: '24px' },
+              { type: 'choiceitem', text: '28px', value: '28px' },
+              { type: 'choiceitem', text: '32px', value: '32px' },
+              { type: 'choiceitem', text: '36px', value: '36px' },
+              { type: 'choiceitem', text: '40px', value: '40px' },
+              { type: 'choiceitem', text: '48px', value: '48px' },
+              { type: 'choiceitem', text: '56px', value: '56px' },
+              { type: 'choiceitem', text: '64px', value: '64px' },
+              { type: 'choiceitem', text: '72px', value: '72px' },
+              { type: 'choiceitem', text: '96px', value: '96px' }
+            ]);
+          }
+        });
+
+        editor.ui.registry.addMenuButton('linespacing', {
+          text: 'Line spacing',
+          tooltip: 'Line spacing',
+          fetch: function (callback) {
+            callback([
+              { type: 'menuitem', text: '1.0', onAction: function () { editor.formatter.apply('linespacing', { value: '1.0' }); } },
+              { type: 'menuitem', text: '1.15', onAction: function () { editor.formatter.apply('linespacing', { value: '1.15' }); } },
+              { type: 'menuitem', text: '1.5', onAction: function () { editor.formatter.apply('linespacing', { value: '1.5' }); } },
+              { type: 'menuitem', text: '2.0', onAction: function () { editor.formatter.apply('linespacing', { value: '2.0' }); } },
+              { type: 'menuitem', text: '2.5', onAction: function () { editor.formatter.apply('linespacing', { value: '2.5' }); } },
+              { type: 'menuitem', text: '3.0', onAction: function () { editor.formatter.apply('linespacing', { value: '3.0' }); } },
+              { type: 'separator' },
+              { type: 'menuitem', text: 'Custom...', onAction: function () {
+                var input = window.prompt('Enter line spacing (e.g. 1.4, 1.75, 2.25):', '1.5');
+                if (input !== null && input !== '' && !isNaN(parseFloat(input))) {
+                  editor.formatter.apply('linespacing', { value: input.trim() });
+                }
+              } }
+            ]);
+          }
+        });
+
         editor.on('init', function () {
+          // Register the line spacing format that wraps selected text in a span
+          // with an inline line-height. Using a span keeps it scoped to the
+          // selection so different paragraphs can have different spacing.
+          editor.formatter.register('linespacing', {
+            inline: 'span',
+            styles: { 'line-height': '%value' },
+            clear_child_styles: true,
+            remove: 'all',
+            split: true,
+            deep: true
+          });
           tinymceReady = true;
           // If openEditor was called before TinyMCE finished initializing,
           // apply the pending content now.
