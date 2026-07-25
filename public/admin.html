@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="/styles.css" />
   <style>
     body { background: var(--color-surface-base); color: var(--color-text-primary); }
-    .admin-shell { max-width: 800px; margin: 0 auto; padding: var(--space-10) var(--space-6); }
+    .admin-shell { max-width: 1100px; margin: 0 auto; padding: var(--space-10) var(--space-6); }
     .admin-header { display:flex; align-items:center; justify-content:space-between; margin-bottom: var(--space-10); flex-wrap:wrap; gap:var(--space-4); }
     .admin-header h1 { margin:0; font-size: var(--font-size-2xl); font-family: var(--font-family-primary); }
     .admin-tabs { display:flex; gap: var(--space-2); flex-wrap:wrap; margin-bottom: var(--space-10); border-bottom: 1px solid var(--color-border-subtle); padding-bottom: var(--space-4); }
@@ -62,7 +62,7 @@
     @media (max-width: 600px) {
       .product-item .two-col { grid-template-columns: 1fr; }
     }
-    .content-editor { min-height: 420px; background: var(--color-surface-base); border-radius: var(--radius-lg); }
+    .content-editor { min-height: 880px; background: var(--color-surface-base); border-radius: var(--radius-lg); }
     .content-editor-hint { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: var(--space-2); }
 
     .login-box { max-width: 360px; margin: var(--space-20) auto; text-align: center; }
@@ -1165,7 +1165,7 @@
 
     tinymce.init({
       selector: '#p-body',
-      height: 500,
+      height: 900,
       menubar: false,
       plugins: 'lists link image code table',
       toolbar: 'undo redo | blocks fontfamily customfontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | linespacing link image table | removeformat code',
