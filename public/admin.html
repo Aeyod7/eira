@@ -7,8 +7,8 @@
   <title>Admin — Eira</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/theme-warm.css" />
   <style>
     body { background: var(--color-surface-base); color: var(--color-text-primary); }
     .admin-shell { max-width: var(--container-max); margin: 0 auto; padding: var(--space-10) var(--space-6); }
@@ -26,8 +26,14 @@
     [hidden] { display: none !important; }
     .panel h2 { font-size: var(--font-size-xl); margin-bottom: var(--space-6); font-family: var(--font-family-primary); }
 
-    /* Simple cards */
-    .card { background: var(--color-surface-strong); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--space-6); margin-bottom: var(--space-6); }
+    /* Admin is a tool, not editorial: keep the UI sans-serif even though the
+       site theme sets a display serif on headings. */
+    h1, h2, h3, h4 { font-family: var(--font-family-primary); letter-spacing: 0; }
+
+    /* Simple cards — override the site card, which is an editorial tile that
+       lifts and shadows on hover. Admin cards are static panels. */
+    .card { background: var(--color-surface-strong); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--space-6); margin-bottom: var(--space-6); box-shadow: none; transition: none; overflow: visible; }
+    .card:hover { transform: none; box-shadow: none; }
     .card h3 { margin: 0 0 var(--space-4) 0; font-size: var(--font-size-md); font-weight: var(--font-weight-bold); letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-text-muted); }
     .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
     .stat-item { text-align: center; }
@@ -62,8 +68,31 @@
     @media (max-width: 600px) {
       .product-item .two-col { grid-template-columns: 1fr; }
     }
-    .content-editor { min-height: 880px; background: var(--color-surface-base); border-radius: var(--radius-lg); }
+    /* The raw <textarea> is only visible for the split second before TinyMCE
+       swaps it out. Sizing it to the full editor height just makes the page
+       jump on load, so keep it modest. */
+    .content-editor { min-height: 220px; background: var(--color-surface-base); border-radius: var(--radius-lg); }
     .content-editor-hint { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: var(--space-2); }
+
+    /* --- TinyMCE shell ---------------------------------------------------
+       TinyMCE writes a fixed pixel height inline on .tox-tinymce, which means
+       the canvas is either taller than the laptop screen (bottom unreachable)
+       or wastefully short on a large monitor. Size it to the viewport instead,
+       with a floor so it stays usable on short screens and a ceiling so the
+       toolbar and the caret never end up a screen apart. */
+    .tox-tinymce {
+      height: clamp(460px, calc(100vh - 210px), 1080px) !important;
+      border: 1px solid var(--color-border-subtle) !important;
+      border-radius: var(--radius-lg) !important;
+      overflow: hidden;
+    }
+    /* Fullscreen must fill the window, not the clamp. */
+    .tox-fullscreen .tox-tinymce, .tox-tinymce.tox-fullscreen {
+      height: 100% !important;
+      border-radius: 0 !important;
+    }
+    .tox .tox-editor-header { border-bottom: 1px solid var(--color-border-subtle) !important; }
+    .tox .tox-statusbar { border-top: 1px solid var(--color-border-subtle) !important; }
 
     .login-box { max-width: 360px; margin: var(--space-20) auto; text-align: center; }
     .login-box form { display: flex; flex-direction: column; gap: var(--space-5); margin-top: var(--space-6); }
@@ -78,8 +107,10 @@
     .hero-actions { white-space: nowrap; }
     .hero-actions .btn { margin-left: var(--space-2); }
     #hero-slides-list td { vertical-align: middle; }
-    /* Hero preview mirrors the real hero: wide, cover-cropped */
-    #h-image-preview { max-width: 100%; width: 100%; aspect-ratio: 16 / 7; object-fit: cover; object-position: center; }
+    /* Hero preview mirrors the real hero: whole image contained, blurred fill
+       behind it. The wrapper carries the blur so the <img> stays sharp. */
+    #h-image-preview { max-width: 100%; width: 100%; aspect-ratio: 16 / 7; object-fit: cover; object-position: center; position: relative; z-index: 1; background: transparent; border: 0; }
+    .hero-preview-frame { position: relative; width: 100%; max-width: 420px; aspect-ratio: 16 / 7; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border-subtle); background: var(--color-surface-strong); margin-top: var(--space-4); }
 
     @media (max-width: 600px) {
       .two-col, .stat-row { grid-template-columns: 1fr; }
@@ -179,6 +210,23 @@
               </div>
             </div>
 
+            <div class="two-col">
+              <div class="field">
+                <label for="p-eyebrow">Eyebrow <span class="muted">small label above the title</span></label>
+                <input class="input" id="p-eyebrow" placeholder="Skincare edit" />
+              </div>
+              <div class="field">
+                <label for="p-readtime">Read time <span class="muted" id="p-readtime-hint">auto from word count</span></label>
+                <input class="input" id="p-readtime" placeholder="6 min read" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="p-meta">Meta description <span class="muted">the text Google shows under your title</span></label>
+              <textarea class="input" id="p-meta" rows="2" maxlength="200" placeholder="A specific, tempting one-line summary of the post."></textarea>
+              <p class="content-editor-hint"><span id="p-meta-count">0</span> / 155 ideal &middot; <span id="p-meta-warn"></span></p>
+            </div>
+
             <div class="field">
               <label for="p-ogimage">Pinterest / OG image URL <span class="muted">or upload from your computer</span></label>
               <div style="display:flex; gap:var(--space-3); align-items:center; flex-wrap:wrap;">
@@ -193,7 +241,7 @@
             <div class="field">
               <label for="p-body">Blog post content</label>
               <textarea id="p-body" class="content-editor"></textarea>
-              <p class="content-editor-hint">Write or paste your content. Images pasted from Word/Google Docs or uploaded via the toolbar are automatically saved to your uploads folder.</p>
+              <p class="content-editor-hint">Write or paste your content. Images pasted from Word/Google Docs or uploaded via the toolbar are automatically saved to your uploads folder. <span id="draft-status"></span></p>
             </div>
 
             <div class="card" style="margin-top: var(--space-6);">
@@ -326,7 +374,9 @@
                 <button class="btn btn--secondary" type="button" data-upload-for="h-image-url">Upload image</button>
                 <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-upload-input="h-image-url" hidden />
               </div>
-              <img class="og-preview" id="h-image-preview" alt="Hero image preview" />
+              <div class="hero-preview-frame" id="h-preview-frame" hidden>
+                <img class="og-preview" id="h-image-preview" alt="Hero image preview" />
+              </div>
               <div class="og-preview-fallback" id="h-image-fallback">No image preview</div>
             </div>
             <div class="two-col">
@@ -343,7 +393,7 @@
                   <option value="bottom left">Bottom left</option>
                   <option value="bottom right">Bottom right</option>
                 </select>
-                <p class="content-editor-hint">Which part of the image stays visible when cropped. Use "Top" for faces, "Center" for products.</p>
+                <p class="content-editor-hint">The whole image is always shown, so nothing gets cut off. This only decides where it sits when its shape differs from the slot &mdash; "Center" suits almost everything.</p>
               </div>
               <div class="field">
                 <label for="h-active">Status</label>
@@ -493,6 +543,7 @@
       $$(".panel").forEach(function (p) { p.hidden = true; });
       $("#panel-stats").hidden = false;
       loadStats(); loadPosts(); loadLinks(); loadProducts(); loadHeroSlides(); loadSubs(); loadNewsletter();
+      maybeOfferDraftRecovery();
     }
     $("#login-form").addEventListener("submit", function (e) {
       e.preventDefault();
@@ -641,6 +692,8 @@
       $("#p-slug-hint").textContent = "auto-generated";
       $("#p-slug-edit-note").style.display = "none";
       $("#p-og-preview").src = ""; $("#p-og-preview").style.display = "none"; $("#p-og-fallback").style.display = "flex";
+      $("#p-eyebrow").value = ""; $("#p-readtime").value = ""; $("#p-meta").value = "";
+      updateMetaCount();
       $("#delete-post-btn").hidden = true;
       $("#editor-preview-link").hidden = true;
       slugManuallyEdited = false;
@@ -654,6 +707,10 @@
             var p = r.post; if (!p) { toast("Could not load post content"); return; }
             $("#p-slug").value = p.slug; $("#p-title").value = p.title; $("#p-category").value = p.category;
             $("#p-ogimage").value = p.og_image || "";
+            $("#p-eyebrow").value = p.eyebrow || "";
+            $("#p-readtime").value = p.read_time || "";
+            $("#p-meta").value = p.meta_description || "";
+            updateMetaCount();
             if (p.og_image) { $("#p-ogimage").dispatchEvent(new Event("input")); }
             $("#p-body").value = p.intro_html || p.body_html || "";
             setEditorContent(p.intro_html || p.body_html || "");
@@ -684,6 +741,148 @@
       });
       postFormDirty = false;
       $("#posts-list-view").hidden = true; $("#posts-editor-view").hidden = false;
+    }
+
+    // ---- Local draft backup ----
+    // beforeunload only catches deliberate navigation. A crash, a dead battery,
+    // or a killed tab loses everything, so mirror the form to localStorage and
+    // offer it back on next open. Cleared on successful save.
+    var DRAFT_KEY = "eira:post-draft";
+    var draftTimer = null;
+
+    function draftSnapshot() {
+      return {
+        slug: $("#p-slug").value, title: $("#p-title").value,
+        category: $("#p-category").value, eyebrow: $("#p-eyebrow").value,
+        readtime: $("#p-readtime").value, meta: $("#p-meta").value,
+        ogimage: $("#p-ogimage").value,
+        body: tinymceReady ? getEditorContent() : "",
+        editingSlug: editingSlug, savedAt: new Date().toISOString()
+      };
+    }
+    function saveLocalDraft() {
+      if ($("#posts-editor-view").hidden) return;
+      if (!postFormDirty) return;
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draftSnapshot()));
+        var el = $("#draft-status");
+        if (el) el.textContent = "Backed up locally " + new Date().toLocaleTimeString();
+      } catch (e) { /* quota or private mode — backup is best-effort */ }
+    }
+    function clearLocalDraft() {
+      try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+      var el = $("#draft-status"); if (el) el.textContent = "";
+    }
+    function offerDraftRecovery() {
+      var raw = null;
+      try { raw = localStorage.getItem(DRAFT_KEY); } catch (e) { return; }
+      if (!raw) return;
+      var d; try { d = JSON.parse(raw); } catch (e) { clearLocalDraft(); return; }
+      if (!d || (!d.title && !d.body)) { clearLocalDraft(); return; }
+      var when = d.savedAt ? new Date(d.savedAt).toLocaleString() : "earlier";
+      var what = d.title ? '"' + d.title + '"' : "an untitled post";
+      if (!confirm("Unsaved work found for " + what + " from " + when + ".\n\nRestore it?")) { clearLocalDraft(); return; }
+      editingSlug = d.editingSlug || null;
+      $("#p-slug").value = d.slug || ""; $("#p-title").value = d.title || "";
+      $("#p-category").value = d.category || ""; $("#p-eyebrow").value = d.eyebrow || "";
+      $("#p-readtime").value = d.readtime || ""; $("#p-meta").value = d.meta || "";
+      $("#p-ogimage").value = d.ogimage || "";
+      setEditorContent(d.body || "");
+      updateMetaCount(); refreshWordStats();
+      postFormDirty = true;
+      // showDash() leaves the Stats tab active, so the restored editor would be
+      // inside a hidden panel. Bring the Posts tab forward too.
+      $$(".admin-tabs button").forEach(function (b) { b.setAttribute("aria-selected", "false"); });
+      $$(".admin-tabs button[data-tab=posts]")[0].setAttribute("aria-selected", "true");
+      $$(".panel").forEach(function (p) { p.hidden = true; });
+      $("#panel-posts").hidden = false;
+      $("#posts-list-view").hidden = true; $("#posts-editor-view").hidden = false;
+      toast("Draft restored — not saved to the server yet");
+    }
+    draftTimer = setInterval(saveLocalDraft, 8000);
+
+    // Recovery needs two things that finish in a nondeterministic order: the
+    // auth check (so we know the dashboard is up) and TinyMCE init (so the body
+    // can be restored). Call this from both; whichever lands second wins, and
+    // the flag keeps the prompt to once per page load.
+    var draftRecoveryOffered = false;
+    function maybeOfferDraftRecovery() {
+      if (draftRecoveryOffered) return;
+      if (!tinymceReady) return;
+      if ($("#dash-view").hidden) return;
+      draftRecoveryOffered = true;
+      offerDraftRecovery();
+    }
+
+    // ---- Affiliate link insertion ----
+    // Cloaked /go/ links are the core of this blog. Typing them by hand means
+    // leaving the editor to look up a slug, and risks missing the rel
+    // attributes that keep the site compliant with Google + ASA rules.
+    function insertAffiliateLink(editor) {
+      if (!linksCache || !linksCache.length) {
+        toast("No links yet — add one in the Links tab first");
+        return;
+      }
+      var selection = editor.selection.getContent({ format: "text" });
+      var items = linksCache.map(function (l) {
+        var label = "/go/" + l.slug + (l.network ? "  (" + l.network + ")" : "");
+        return { type: "listitem", text: label, value: l.slug };
+      });
+      editor.windowManager.open({
+        title: "Insert affiliate link",
+        body: {
+          type: "panel",
+          items: [
+            { type: "selectbox", name: "slug", label: "Cloaked link", items: items.map(function (i) { return { text: i.text, value: i.value }; }) },
+            { type: "input", name: "text", label: "Link text", placeholder: "Shop this pick" }
+          ]
+        },
+        initialData: { slug: linksCache[0].slug, text: selection || "" },
+        buttons: [
+          { type: "cancel", text: "Cancel" },
+          { type: "submit", text: "Insert", primary: true }
+        ],
+        onSubmit: function (api) {
+          var data = api.getData();
+          var text = (data.text || "").trim() || "Shop this pick";
+          var href = "/go/" + data.slug;
+          var html = '<a href="' + href + '" rel="sponsored nofollow noopener" target="_blank">' + esc(text) + "</a>";
+          editor.insertContent(html);
+          api.close();
+        }
+      });
+    }
+
+    // ---- SEO helpers ----
+    // Google truncates around 155 chars, so warn rather than hard-block.
+    function updateMetaCount() {
+      var el = $("#p-meta"); if (!el) return;
+      var n = el.value.trim().length;
+      $("#p-meta-count").textContent = n;
+      var warn = $("#p-meta-warn");
+      if (n === 0) { warn.textContent = "empty — Google will invent one from the page"; warn.style.color = "var(--color-state-error)"; }
+      else if (n < 70) { warn.textContent = "a bit short"; warn.style.color = "var(--color-text-muted)"; }
+      else if (n > 165) { warn.textContent = "will be cut off in results"; warn.style.color = "var(--color-state-error)"; }
+      else { warn.textContent = "good length"; warn.style.color = "var(--color-state-success)"; }
+    }
+    $("#p-meta").addEventListener("input", updateMetaCount);
+
+    function countWords(html) {
+      var text = String(html || "").replace(/<[^>]*>/g, " ").replace(/&[a-z]+;/gi, " ");
+      var words = text.trim().split(/\s+/).filter(Boolean);
+      return words.length;
+    }
+    // 220 wpm is a common estimate for casual editorial reading.
+    function estimateReadTime(html) {
+      var w = countWords(html);
+      if (!w) return null;
+      return Math.max(1, Math.round(w / 220)) + " min read";
+    }
+    function refreshWordStats() {
+      var html = tinymceReady ? getEditorContent() : ($("#p-body") ? $("#p-body").value : "");
+      var w = countWords(html);
+      var hint = $("#p-readtime-hint");
+      if (hint) hint.textContent = w ? w.toLocaleString() + " words · ~" + estimateReadTime(html) : "auto from word count";
     }
 
     $("#p-title").addEventListener("input", function () {
@@ -813,6 +1012,9 @@
         slug: slug,
         title: $("#p-title").value,
         category: $("#p-category").value,
+        meta_description: $("#p-meta").value.trim() || null,
+        eyebrow: $("#p-eyebrow").value.trim() || null,
+        read_time: $("#p-readtime").value.trim() || estimateReadTime(htmlContent),
         intro_html: htmlContent,
         og_image: $("#p-ogimage").value || null,
         body_html: "",
@@ -824,6 +1026,7 @@
       api(path, { method: editingSlug ? "PUT" : "POST", body: payload }).then(function (r) {
         if (r.ok || r.slug) {
           postFormDirty = false;
+          clearLocalDraft();
           toast(published ? "Post published" : "Draft saved");
           loadPosts();
           $("#posts-list-view").hidden = false;
@@ -968,11 +1171,12 @@
     $("#h-image-url").addEventListener("input", function () {
       var src = this.value.trim();
       var img = $("#h-image-preview");
+      var frame = $("#h-preview-frame");
       var fallback = $("#h-image-fallback");
-      if (!src) { img.src = ""; img.style.display = "none"; fallback.style.display = "flex"; return; }
-      img.src = src; img.style.display = "block"; fallback.style.display = "none";
+      if (!src) { img.src = ""; frame.hidden = true; fallback.style.display = "flex"; return; }
+      img.src = src; frame.hidden = false; fallback.style.display = "none";
       img.style.objectPosition = $("#h-focal").value || "center";
-      img.onerror = function () { img.style.display = "none"; fallback.style.display = "flex"; };
+      img.onerror = function () { frame.hidden = true; fallback.style.display = "flex"; };
     });
     // Update preview crop when focus point changes
     document.addEventListener("change", function (e) {
@@ -1037,7 +1241,9 @@
       editingHeroId = id;
       $("#hero-form").reset();
       $("#h-image-url").value = "";
-      $("#h-image-preview").src = ""; $("#h-image-preview").style.display = "none"; $("#h-image-fallback").style.display = "flex";
+      $("#h-image-preview").src = "";
+      $("#h-preview-frame").hidden = true;
+      $("#h-image-fallback").style.display = "flex";
       $("#h-position").value = "";
       $("#h-active").value = "1";
       $("#h-focal").value = "center";
@@ -1048,10 +1254,13 @@
         api("/api/hero-slides/" + encodeURIComponent(id)).then(function (r) {
           var s = r.slide; if (!s) return;
           $("#h-image-url").value = s.image_url || "";
+          // Focal must be set before the dispatch below — the input handler
+          // reads #h-focal to position the preview, so setting it afterwards
+          // left every saved slide previewing at "center".
+          $("#h-focal").value = s.focal_position || "center";
           $("#h-image-url").dispatchEvent(new Event("input"));
           $("#h-position").value = s.position;
           $("#h-active").value = s.is_active ? "1" : "0";
-          $("#h-focal").value = s.focal_position || "center";
           $("#delete-hero-btn").hidden = false;
         });
       }
@@ -1151,6 +1360,17 @@
         })
         .finally(function () { btn.disabled = false; btn.textContent = "Send to all subscribers"; });
     });
+
+    // TinyMCE is configured in a separate <script> below, because it has to run
+    // after the CDN bundle loads. That block sits outside this closure and so
+    // cannot see anything declared in here. Expose the handful of hooks it needs
+    // instead of moving the whole admin into global scope.
+    window.eiraAdmin = {
+      insertAffiliateLink: insertAffiliateLink,
+      refreshWordStats: refreshWordStats,
+      maybeOfferDraftRecovery: maybeOfferDraftRecovery,
+      markPostDirty: function () { postFormDirty = true; }
+    };
   })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.4/tinymce.min.js"></script>
@@ -1165,13 +1385,35 @@
 
     tinymce.init({
       selector: '#p-body',
-      height: 900,
+      // Fallback only — the .tox-tinymce rule in <style> overrides this with a
+      // viewport-relative clamp. Manual drag-resize is off because the editor
+      // now sizes itself.
+      height: 700,
+      resize: false,
       menubar: false,
-      plugins: 'lists link image code table',
-      toolbar: 'undo redo | blocks fontfamily customfontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | linespacing link image table | removeformat code',
+      plugins: 'lists link image code table autolink searchreplace wordcount fullscreen charmap visualblocks media nonbreaking quickbars',
+      toolbar: 'undo redo | blocks fontfamily customfontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | linespacing blockquote hr | affiliatelink link image media table | charmap removeformat | searchreplace visualblocks code fullscreen',
+      toolbar_sticky: true,
+      toolbar_mode: 'sliding',
       block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Preformatted=pre',
-      font_family_formats: 'Andale Mono=andale mono,times; Arial=arial,helvetica,sans-serif; Arial Black=arial black,avant garde; Book Antiqua=book antiqua,palatino; Comic Sans MS=comic sans ms,sans-serif; Courier New=courier new,courier; Georgia=georgia,palatino; Helvetica=helvetica; Impact=impact,chicago; Symbol=symbol; Tahoma=tahoma,arial,helvetica,sans-serif; Terminal=terminal,monaco; Times New Roman=times new roman,times; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva; Webdings=webdings; Wingdings=wingdings,zapf dingbats',
-      content_style: 'body { font-family: -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.7; padding: 16px; } h1 { font-size: 2rem; margin: 1.5rem 0 1rem; } h2 { font-size: 1.5rem; margin: 1.25rem 0 0.75rem; } h3 { font-size: 1.25rem; margin: 1rem 0 0.5rem; } p { margin-bottom: 0.75rem; } img { max-width: 100%; height: auto; border-radius: 8px; margin: 1rem 0; } ul, ol { padding-left: 1.5rem; margin-bottom: 0.75rem; } blockquote { border-left: 4px solid #000; padding-left: 1rem; margin: 1rem 0; font-style: italic; color: #666; } a { color: #000; } table { border-collapse: collapse; } td, th { border: 1px solid #ddd; padding: 8px; }',
+      font_family_formats: 'Fraunces (headings)=Fraunces,Iowan Old Style,Georgia,serif; Inter (body)=Inter,-apple-system,Segoe UI,sans-serif; Cormorant Garamond=Cormorant Garamond,Georgia,serif; Georgia=georgia,palatino,serif; Times New Roman=times new roman,times,serif; Arial=arial,helvetica,sans-serif; Helvetica=helvetica,arial,sans-serif; Tahoma=tahoma,arial,helvetica,sans-serif; Trebuchet MS=trebuchet ms,geneva,sans-serif; Verdana=verdana,geneva,sans-serif; Courier New=courier new,courier,monospace',
+      quickbars_selection_toolbar: 'bold italic | blocks | affiliatelink link blockquote',
+      quickbars_insert_toolbar: false,
+      link_default_target: '_blank',
+      link_default_protocol: 'https',
+      link_assume_external_targets: true,
+      link_rel_list: [
+        { title: 'Affiliate / paid (sponsored)', value: 'sponsored nofollow noopener' },
+        { title: 'Normal external link', value: 'noopener' },
+        { title: 'Internal link', value: '' }
+      ],
+      content_css: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&display=swap',
+      // The canvas is as wide as the admin shell (~1190px) but a published post
+      // renders inside .container--narrow (760px). Typing at 110+ characters a
+      // line meant paragraphs broke in completely different places once live.
+      // Constrain the writing column to the published measure and set the area
+      // around it in warm sand so it reads as a page.
+      content_style: 'html { background: #F4EDE4; } body { font-family: "Inter", -apple-system, "Segoe UI", sans-serif; font-size: 17px; line-height: 1.7; box-sizing: border-box; max-width: 808px; min-height: calc(100vh - 8px); margin: 0 auto; padding: 32px 24px 96px; color: #2E2A27; background: #FBF8F4; border-left: 1px solid #E9DFD4; border-right: 1px solid #E9DFD4; } h1, h2, h3 { font-family: "Fraunces", "Iowan Old Style", Georgia, serif; font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; color: #2E2A27; } h1 { font-size: 2rem; margin: 1.5rem 0 1rem; } h2 { font-size: 1.5rem; margin: 1.25rem 0 0.75rem; } h3 { font-size: 1.25rem; margin: 1rem 0 0.5rem; } p { margin-bottom: 0.75rem; } img { max-width: 100%; height: auto; border-radius: 16px; margin: 1rem 0; } ul, ol { padding-left: 1.5rem; margin-bottom: 0.75rem; } blockquote { border-left: 4px solid #C4715A; padding-left: 1rem; margin: 1rem 0; font-style: italic; color: #7A6E64; } a { color: #A85742; } table { border-collapse: collapse; } td, th { border: 1px solid #E9DFD4; padding: 8px; }',
       paste_data_images: true,
       image_advtab: true,
       image_caption: true,
@@ -1198,6 +1440,29 @@
         });
       },
       setup: function (editor) {
+        editor.ui.registry.addButton('affiliatelink', {
+          icon: 'bookmark',
+          tooltip: 'Insert affiliate link (cloaked /go/ link)',
+          onAction: function () { eiraAdmin.insertAffiliateLink(editor); }
+        });
+
+        // Ctrl/Cmd+Shift+A — same action from the keyboard while writing.
+        editor.addShortcut('meta+shift+65', 'Insert affiliate link', function () {
+          eiraAdmin.insertAffiliateLink(editor);
+        });
+
+        editor.ui.registry.addButton('blockquote', {
+          icon: 'quote',
+          tooltip: 'Blockquote',
+          onAction: function () { editor.execCommand('mceBlockQuote'); }
+        });
+
+        editor.ui.registry.addButton('hr', {
+          icon: 'horizontal-rule',
+          tooltip: 'Horizontal rule',
+          onAction: function () { editor.execCommand('InsertHorizontalRule'); }
+        });
+
         editor.ui.registry.addSplitButton('customfontsize', {
           text: '16px',
           tooltip: 'Font size (click to type a value)',
@@ -1284,6 +1549,16 @@
             editor.setContent(pendingContent);
             pendingContent = null;
           }
+          eiraAdmin.refreshWordStats();
+          eiraAdmin.maybeOfferDraftRecovery();
+        });
+
+        // The #post-form 'input' listener cannot see inside the editor iframe,
+        // so body edits alone never marked the form dirty and the
+        // unsaved-changes guard stayed silent. Bridge it here.
+        editor.on('input change keyup SetContent ExecCommand', function () {
+          eiraAdmin.markPostDirty();
+          eiraAdmin.refreshWordStats();
         });
       }
     });
