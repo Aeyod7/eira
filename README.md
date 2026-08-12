@@ -1,141 +1,74 @@
 # Eira
 
-Faceless beauty / fashion / self-care affiliate blog. Static frontend + Vercel serverless backend with link cloaking, click tracking, email capture, and a light CMS.
+Eira is an independent editorial journal about Self Discovery, Life and Beauty. The project uses a static HTML/CSS frontend, a small serverless API, a libSQL database and a private editorial studio.
 
-## Stack
+## Current structure
 
-- **Frontend:** static HTML/CSS in `public/` (Inter, minimal black-on-white palette — mockups in `new ui/`)
-- **Backend:** Vercel serverless functions in `api/` (Node, no framework)
-- **Database:** Turso (libSQL) — SQLite locally, network-attached SQLite in prod
-- **CMS:** single-page admin at `/admin.html` (login, structured post editor with product blocks + affiliate link selector, link manager, subscriber export, click stats)
+- `public/index.html` — Home
+- `public/blog.html` — Journal archive and category filters
+- `public/about.html` — About
+- `public/admin.html` — private editorial studio
+- `api/posts/index.js` — Journal post CRUD
+- `api/post/[slug].js` — server-rendered article pages
+- `api/subscribe.js` — reader subscriptions
+- `api/newsletter.js` — newsletter status and sends
+- `api/stats.js` — editorial dashboard and subscriber data
+- `api/uploads.js` — authenticated story-image uploads
+- `lib/db.js` — database client and idempotent schema
 
-## Project structure
+Legacy affiliate and hero tables/routes remain available for data compatibility, but they are not part of the public site or editorial studio.
 
-```
-public/              static site (served as-is)
-  index.html         homepage
-  blog.html          post archive
-  category.html      category hub
-  about.html         about page
-  admin.html         CMS UI (noindex)
-  styles.css         design tokens + components
-  pins/              Pinterest pin SVGs (1000×1500)
-api/                 serverless functions
-  subscribe.js       POST  /api/subscribe       — email capture
-  go/[slug].js       GET   /api/go/:slug        — cloaked redirect + click log
-  post/[slug].js     GET   /api/post/:slug      — SSR post from DB (SEO)
-  posts/index.js     GET/POST /api/posts        — list / create
-  posts/[slug].js    GET/PUT/DELETE /api/posts/:slug
-  links/index.js     GET/POST /api/links        — list / create cloaked links
-  links/[slug].js    DELETE /api/links/:slug
-  admin/login.js     POST  /api/admin/login
-  admin/logout.js    POST  /api/admin/logout
-  admin/me.js        GET   /api/admin/me
-  stats.js           GET   /api/stats           — dashboard numbers
-lib/
-  db.js              Turso client + schema (idempotent)
-  auth.js            session-token auth (single admin)
-scripts/
-  dev.js             local dev server (no Vercel CLI needed)
-  seed.js            import the 5 starter posts + 31 affiliate links into the DB
-  migrate.js         just runs ensureSchema()
-vercel.json          rewrites: /go/:slug → /api/go/:slug, /post/:slug → /api/post/:slug
-```
+## Editorial model
 
-## Quick start (local)
+Every new story belongs to exactly one category:
 
-```bash
+- Self Discovery
+- Life
+- Beauty
+
+Stories can be saved as drafts or published. Only published stories in those three categories appear on the public site. The studio includes a rich-text writer, standfirsts, featured images and image descriptions, live writing metrics, SEO guidance, a publish-readiness checklist, local draft recovery, search and filters, subscriber export and newsletter sending.
+
+## Local development
+
+```powershell
 npm install
-cp .env.example .env       # edit ADMIN_PASSWORD
-npm run seed               # creates data/eira.db + seeds starter content
-npm run dev                # http://localhost:3000
+npm run migrate
+npm run dev
 ```
 
-Then:
-- Site: http://localhost:3000
-- CMS:  http://localhost:3000/admin.html (sign in with your `ADMIN_PASSWORD`)
-- Sample post (SSR from DB): http://localhost:3000/post/10-best-amazon-uk-skincare-finds-dark-skin/
-- Sample cloaked link: http://localhost:3000/go/vitamin-c-serum
+- Site: `http://localhost:3000/`
+- Journal: `http://localhost:3000/blog.html`
+- Studio: `http://localhost:3000/admin.html`
 
-## Deploy to Vercel + Turso
+Local configuration is read from `.env`. Set at least:
 
-### 1. Create the Turso database
-```bash
-npm i -g @turso/cli
-turso auth login
-turso db create eira --location lhr     # London — UK traffic priority
-turso db tokens create eira             # prints your auth token
-turso db show eira --url                # prints your libsql:// URL
+```text
+ADMIN_PASSWORD=use-a-strong-password
+LIBSQL_URL=file:./data/eira.db
 ```
 
-### 2. Push the schema + seed
-Set the env vars locally just for the seed run:
-```bash
-$env:LIBSQL_URL="libsql://eira-XXXX.turso.io"
-$env:LIBSQL_AUTH_TOKEN="eyJhbGciOi..."
-npm run seed
-```
+The development fallback password is `changeme`; production login refuses that default.
 
-### 3. Deploy to Vercel
-```bash
-npm i -g vercel
-vercel              # follow prompts; link the project
-```
+## Production configuration
 
-In the Vercel dashboard → Project → Settings → Environment Variables, add:
-| Key | Value |
-|---|---|
-| `LIBSQL_URL` | `libsql://eira-XXXX.turso.io` |
-| `LIBSQL_AUTH_TOKEN` | (token from step 1) |
-| `ADMIN_PASSWORD` | (a strong password — NOT `changeme`) |
-| `SITE_URL` | `https://your-domain.com` |
-| `RESEND_API_KEY` | (from https://resend.com — enables welcome + newsletter emails) |
-| `FROM_EMAIL` | `Eira <hello@your-domain.com>` (domain must be verified in Resend) |
+Set these environment variables in Vercel:
 
-Then `vercel --prod`.
+- `LIBSQL_URL`
+- `LIBSQL_AUTH_TOKEN`
+- `ADMIN_PASSWORD`
+- `SITE_URL`
+- `BLOB_READ_WRITE_TOKEN` for persistent image uploads
+- `RESEND_API_KEY` and `FROM_EMAIL` for newsletters
 
-### 4. Wire your real affiliate links
-Sign in at `/admin.html` → **Links** tab. Replace each placeholder destination with your real Amazon Associates / AWIN tracking URL. Every post that references `/go/<slug>` updates instantly — no post edits needed.
+Run `npm run migrate` against the production database before first use, then deploy normally.
 
-## How the pieces fit
+## Admin workflow
 
-- **Posts** live in the `posts` table and are rendered server-side at `/post/:slug` — SEO-crawlable, full OG/Pinterest meta.
-- **Affiliate links** are stored once in the `links` table. Posts reference `/go/<slug>`; the redirect logs a click and 302s to the real destination. Edit a destination in the CMS → every post updates.
-- **Email signups** POST to `/api/subscribe` and land in the `subscribers` table. Export to CSV from the admin Subscribers tab.
-- **Click stats** appear in the admin Stats tab. Each `/go/:slug` hit inserts a row in `clicks` with referrer + UA.
-- **Admin auth** is a single shared password (`ADMIN_PASSWORD`) → opaque session token in an `HttpOnly` cookie. 7-day TTL. Fine for a solo blog; upgrade to OAuth if you ever add users.
+1. Sign in to `/admin.html`.
+2. Open Journal and create a story.
+3. Choose Self Discovery, Life or Beauty.
+4. Add the title, standfirst, story, search description and optional featured image with accessible description.
+5. Save as a draft or publish.
+6. Use Preview to review a saved story in the public article layout.
 
-## CMS UI (`/admin.html`)
-
-**Stats tab** — subscriber count, total clicks, top links by clicks, recent subscribers.
-
-**Posts tab** — structured post editor, not raw HTML:
-- Category dropdown (the 6 categories from the build guide)
-- Post title, eyebrow, read time, meta description, OG image path
-- Intro paragraph field
-- **Product blocks**: add/remove/reorder, each with:
-  - Product name
-  - Section heading (group products under different H2s)
-  - Image placeholder text
-  - "Why this works" text
-  - Affiliate link dropdown (picks from cloaked `/go/` links)
-- Extra sections HTML (closing tips, styling combos, etc.)
-- Live preview pane (renders exactly how the SSR post will look)
-- Published/Draft toggle
-- When opening an existing seeded post, the editor auto-parses the legacy HTML into structured product blocks
-
-**Links tab** — create/edit/delete cloaked affiliate links. Shows which post each link is attached to (by title), click counts, and network (Amazon/AWIN/Other). Create links here first, then attach them to products in the post editor.
-
-**Subscribers tab** — recent signups + CSV export.
-
-## Before you go live
-
-1. **Change `ADMIN_PASSWORD`** — the default is `changeme`.
-2. **Swap affiliate link destinations** in the CMS Links tab (placeholders point at `amazon.co.uk/?tag=eira-21`).
-3. **Replace `eira.example`** in `og:url` / `twitter:image` meta with your real domain (set `SITE_URL` env var for SSR posts).
-4. **Export pin SVGs to PNG** — Pinterest/Twitter don't reliably render SVG `og:image`. Open each `public/pins/*.svg` in a browser and export 1000×1500 PNG with the same basename, then update `og:image` URLs from `.svg` to `.png`.
-5. **Set up Resend** (email) — create a free account at [resend.com](https://resend.com), verify your sending domain (add the SPF/DKIM DNS records), then set `RESEND_API_KEY` + `FROM_EMAIL`. You can send newsletters to the whole list from the admin **Newsletter** tab (compose + "Send test" to yourself first, then "Send to all subscribers"). Without `RESEND_API_KEY`, signups are still stored — just no email is sent. The **automatic welcome email** on signup is disabled by default; set `WELCOME_EMAIL_ENABLED=true` to turn it on.
-
-## Legal
-
-Affiliate disclosure is rendered automatically on every SSR post (directly under the title, ASA/CAP compliant). The static homepage and about page carry a site-wide disclosure in the footer. Don't remove either.
+Subscribers and newsletter tools live in their own studio sections. Always send a test email before a full newsletter broadcast.

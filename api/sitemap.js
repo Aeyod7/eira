@@ -4,7 +4,7 @@ import { db, ensureSchema } from "../lib/db.js";
 // Dynamic sitemap: static pages + every published post.
 const SITE = (process.env.SITE_URL || "https://eira.example").replace(/\/+$/, "");
 
-const STATIC_PAGES = ["/", "/blog.html", "/about.html", "/shop.html", "/privacy.html", "/terms.html", "/contact.html"];
+const STATIC_PAGES = ["/", "/blog.html", "/about.html", "/privacy.html", "/terms.html", "/contact.html"];
 
 export default async function handler(req, res) {
   await ensureSchema();

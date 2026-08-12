@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blog — Eira</title>
+  <title>Journal — Eira</title>
   <link rel="canonical" href="https://eira.example/blog.html" />
-  <meta name="description" content="The Eira blog archive — curated beauty, skincare, fashion, and selfcare posts with affiliate product picks." />
+  <meta name="description" content="The Eira Journal — thoughtful stories about self discovery, life and beauty." />
 
   <!-- Open Graph / Pinterest Rich Pins -->
   <meta property="og:site_name" content="Eira" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Blog — Eira" />
-  <meta property="og:description" content="The Eira blog archive — curated beauty, skincare, fashion, and selfcare posts with affiliate product picks." />
+  <meta property="og:title" content="Journal — Eira" />
+  <meta property="og:description" content="Thoughtful stories about self discovery, life and beauty." />
   <meta property="og:url" content="https://eira.example/blog/" />
   <meta property="og:image" content="https://eira.example/pins/home-pin.svg" />
   <meta property="og:image:width" content="1000" />
   <meta property="og:image:height" content="1500" />
   <meta property="og:image:alt" content="Eira — blog archive" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Blog — Eira" />
-  <meta name="twitter:description" content="The Eira blog archive — curated beauty, skincare, fashion, and selfcare posts." />
+  <meta name="twitter:title" content="Journal — Eira" />
+  <meta name="twitter:description" content="Thoughtful stories about self discovery, life and beauty." />
   <meta name="twitter:image" content="https://eira.example/pins/home-pin.svg" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -36,11 +36,7 @@
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
       <nav id="primary-nav" class="nav" aria-label="Primary">
         <a href="index.html">Home</a>
-        <a href="category.html?category=Beauty">Beauty</a>
-        <a href="category.html?category=Skincare">Skincare</a>
-        <a href="category.html?category=Fashion">Fashion</a>
-        <a href="category.html?category=Selfcare">Selfcare</a>
-        <a href="blog.html" aria-current="page">Blog</a>
+        <a href="blog.html" aria-current="page">Journal</a>
         <a href="about.html">About</a>
       </nav>
     </div>
@@ -49,20 +45,20 @@
   <main id="main">
     <section class="hero blog-hero">
       <div class="container container--narrow">
-        <h1>The blog</h1>
-        <p>Every post, newest first. Filter by category hub below.</p>
+        <p class="eyebrow">Stories for the whole person</p>
+        <h1>The Journal</h1>
+        <p>Read everything, or settle into the part of life that is speaking to you now.</p>
       </div>
     </section>
 
     <section class="section">
       <div class="container">
-        <p class="eyebrow">Filter</p>
+        <p class="eyebrow">Explore by category</p>
         <div class="filter-bar" id="filter-bar">
           <button class="chip chip--active" data-filter="all">All</button>
+          <button class="chip" data-filter="Self Discovery">Self Discovery</button>
+          <button class="chip" data-filter="Life">Life</button>
           <button class="chip" data-filter="Beauty">Beauty</button>
-          <button class="chip" data-filter="Skincare">Skincare</button>
-          <button class="chip" data-filter="Fashion">Fashion</button>
-          <button class="chip" data-filter="Selfcare">Selfcare</button>
         </div>
 
         <div class="blog-title-grid" id="blog-posts">
@@ -77,29 +73,14 @@
       <div class="footer-grid">
         <div>
           <p class="footer-brand">Eira</p>
-          <p style="color: var(--color-accent-soft); max-width: 38ch;">A beauty, skincare, fashion and selfcare affiliate hub. Curated product picks and blog posts, with direct links to the retailers we trust.</p>
-          <p style="font-size: var(--font-size-xs); color: var(--color-accent-soft); margin-top: var(--space-6);">
-            As an Amazon Associate I earn from qualifying purchases. This site contains affiliate links &mdash; see full disclosure on each post.
-          </p>
+          <p style="color: var(--color-accent-soft); max-width: 38ch;">An independent journal about self discovery, life and beauty — made for readers, not algorithms.</p>
         </div>
         <div class="footer-col">
           <h4>Categories</h4>
           <ul>
-            <li><a href="category.html?category=Beauty">Beauty</a></li>
-            <li><a href="category.html?category=Skincare">Skincare</a></li>
-            <li><a href="category.html?category=Fashion">Fashion</a></li>
-            <li><a href="category.html?category=Selfcare">Selfcare</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Site</h4>
-          <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="blog.html">Blog</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="privacy.html">Privacy</a></li>
-            <li><a href="terms.html">Terms</a></li>
-            <li><a href="contact.html">Contact</a></li>
+            <li><a href="blog.html?category=Self%20Discovery">Self Discovery</a></li>
+            <li><a href="blog.html?category=Life">Life</a></li>
+            <li><a href="blog.html?category=Beauty">Beauty</a></li>
           </ul>
         </div>
       </div>
@@ -128,14 +109,16 @@
       var loading = document.getElementById('blog-posts-loading');
       var filterBar = document.getElementById('filter-bar');
       var allPosts = [];
-      var currentFilter = 'all';
+      var allowedCategories = ['Self Discovery', 'Life', 'Beauty'];
+      var requestedCategory = new URLSearchParams(window.location.search).get('category');
+      var currentFilter = allowedCategories.indexOf(requestedCategory) !== -1 ? requestedCategory : 'all';
 
       function esc(s) { return String(s||'').replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
 
       function renderPosts() {
         var posts = currentFilter === 'all' ? allPosts : allPosts.filter(function (p) { return p.category === currentFilter; });
         if (posts.length === 0) {
-          container.innerHTML = '<p class="muted" style="grid-column: 1 / -1;">No posts in this category yet.</p>';
+          container.innerHTML = '<p class="muted" style="grid-column: 1 / -1;">No stories in this category yet.</p>';
           return;
         }
         container.innerHTML = posts.map(function (p) {
@@ -146,8 +129,13 @@
       fetch('/api/posts?published=1')
         .then(function (r) { return r.json(); })
         .then(function (data) {
-          allPosts = data.posts || [];
+          allPosts = (data.posts || []).filter(function (p) {
+            return allowedCategories.indexOf(p.category) !== -1;
+          });
           if (loading) loading.remove();
+          filterBar.querySelectorAll('[data-filter]').forEach(function (button) {
+            button.classList.toggle('chip--active', button.dataset.filter === currentFilter);
+          });
           renderPosts();
         })
         .catch(function () {

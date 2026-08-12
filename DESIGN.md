@@ -1,71 +1,74 @@
-# The Best Gel for 4C Type Natural Hair (In
+# Eira Journal — Design Direction
 
-## Mission
-Create implementation-ready, token-driven UI guidance for The Best Gel for 4C Type Natural Hair (In that is optimized for consistency, accessibility, and fast delivery across marketing site.
+## Intent
 
-## Brand
-- Product/brand: The Best Gel for 4C Type Natural Hair (In
-- URL: https://www.finefitbody.com/blog/the-best-gel-for-4c-type-natural-hair-in-depth-review
-- Audience: readers and knowledge seekers
-- Product surface: marketing site
+Build a warm, intelligent editorial home for stories about Self Discovery, Life and Beauty. The experience must feel like a beautifully made independent magazine, never a storefront.
 
-## Style Foundations
-- Visual style: clean, functional, implementation-oriented
-- Main font style: `font.family.primary=halyard-text`, `font.family.stack=halyard-text`, `font.size.base=18.0488px`, `font.weight.base=300`, `font.lineHeight.base=28.8781px`
-- Typography scale: `font.size.xs=11.9px`, `font.size.sm=13.95px`, `font.size.md=16px`, `font.size.lg=18.05px`, `font.size.xl=20.1px`, `font.size.2xl=26.24px`, `font.size.3xl=48.78px`, `font.size.4xl=56.98px`
-- Color palette: `color.text.primary=#310a31`, `color.text.secondary=#ffffff`, `color.border.strong=#ce4760`, `color.surface.base=#000000`, `color.surface.strong=#f7f8fd`
-- Spacing scale: `space.1=1.8px`, `space.2=8.33px`, `space.3=9.02px`, `space.4=13.91px`, `space.5=14.07px`, `space.6=16px`, `space.7=22.4px`, `space.8=23.49px`
-- Radius/shadow/motion tokens: `motion.duration.instant=100ms`, `motion.duration.fast=300ms`, `motion.duration.normal=400ms`
+## Reference
+
+Adapt Refero Styles' **Wispr Flow — cream broadsheet, dark velvet chambers** direction for Eira. Keep its editorial scale, warm paper surfaces, strong ink contrast and shadowless bordered cards. Do not copy its software/product patterns or palette literally.
+
+## Foundations
+
+- Canvas: warm cream (`--color-surface-base`)
+- Ink: espresso (`--color-text-primary`, `--color-surface-dark`)
+- Supporting surfaces: blush and warm sand
+- Display type: Fraunces, regular-to-medium weight, with authority coming from scale
+- UI/body type: Inter
+- Layout: generous editorial rhythm, 24px grid gaps, readable 760px article measure
+- Shape: pill controls; 32px Journal category cards; flat surfaces with ink borders instead of decorative shadows
+
+## Information Architecture
+
+- Primary navigation must contain only Home, Journal and About.
+- Journal is the single content archive.
+- Journal categories are fixed to Self Discovery, Life and Beauty.
+- Category controls live inside Journal rather than in the global navigation.
+- Products, shopping calls to action, prices and affiliate disclosures must not appear in the public experience.
+
+## Components
+
+### Editorial studio
+
+The private admin uses the same warm paper, blush, espresso and bordered-surface language as the public site, with denser controls suited to publishing work. Its primary sections are Overview, Journal, Subscribers and Newsletter. Products, affiliate links and hero-image controls must not appear in the studio. Post creation accepts only Self Discovery, Life or Beauty and includes a rich-text writer, standfirst, live writing metrics, featured-image alt text, SEO guidance, publish-readiness feedback, draft and preview actions, image upload and local recovery.
+
+### Primary navigation
+
+Use uppercase Inter labels with comfortable spacing. The active destination uses a quiet blush pill. Mobile navigation must remain keyboard accessible and expose `aria-expanded`.
+
+### Static editorial hero
+
+Home and About use centered typographic heroes without imagery.
+
+### Journal category cards
+
+Use three large, shadowless cards with 2px ink borders and 32px corners. Each card needs a short description, a distinct surface treatment and a clear full-card link. Stack cards on tablet and mobile.
+
+### Story cards and lists
+
+Lead with the title and category. Images are optional; empty media must never create a broken layout. Product metadata, pricing and retailer buttons are prohibited.
+
+### Article pages
+
+Keep body copy within the narrow reading container. Preserve generous line height, visible focus states and a clear route back to Journal. Retired legacy product blocks must not render.
 
 ## Accessibility
-- Target: WCAG 2.2 AA
-- Keyboard-first interactions required.
-- Focus-visible rules required.
-- Contrast constraints required.
 
-## Writing Tone
-Concise, confident, implementation-focused.
+- Meet WCAG 2.2 AA contrast for text and controls.
+- Every interactive element must have a visible focus state.
+- Category state must not rely on colour alone.
+- Keep tap targets at least 44px on mobile.
 
-## Rules: Do
-- Use semantic tokens, not raw hex values, in component guidance.
-- Every component must define states for default, hover, focus-visible, active, disabled, loading, and error.
-- Component behavior should specify responsive and edge-case handling.
-- Interactive components must document keyboard, pointer, and touch behavior.
-- Accessibility acceptance criteria must be testable in implementation.
+## Content Tone
 
-## Rules: Don't
-- Do not allow low-contrast text or hidden focus indicators.
-- Do not introduce one-off spacing or typography exceptions.
-- Do not use ambiguous labels or non-descriptive actions.
-- Do not ship component guidance without explicit state rules.
+Warm, observant and direct. Write for a reader, not a buyer. Avoid retail language such as “shop now,” “featured picks,” “worth your money,” and “best products.”
 
-## Guideline Authoring Workflow
-1. Restate design intent in one sentence.
-2. Define foundations and semantic tokens.
-3. Define component anatomy, variants, interactions, and state behavior.
-4. Add accessibility acceptance criteria with pass/fail checks.
-5. Add anti-patterns, migration notes, and edge-case handling.
-6. End with a QA checklist.
+## QA Checklist
 
-## Required Output Structure
-- Context and goals.
-- Design tokens and foundations.
-- Component-level rules (anatomy, variants, states, responsive behavior).
-- Accessibility requirements and testable acceptance criteria.
-- Content and tone standards with examples.
-- Anti-patterns and prohibited implementations.
-- QA checklist.
-
-## Component Rule Expectations
-- Include keyboard, pointer, and touch behavior.
-- Include spacing and typography token requirements.
-- Include long-content, overflow, and empty-state handling.
-- Include known page component density: links (54), lists (23), buttons (12), navigation (5), cards (3), inputs (2).
-
-- Extraction diagnostics: Audience and product surface inference confidence is low; verify generated brand context.
-
-## Quality Gates
-- Every non-negotiable rule must use "must".
-- Every recommendation should use "should".
-- Every accessibility rule must be testable in implementation.
-- Teams should prefer system consistency over local visual exceptions.
+- [ ] Header shows only Home, Journal and About at every public entry point.
+- [ ] Journal filters work for All, Self Discovery, Life and Beauty, including query-string links.
+- [ ] New posts can only be assigned to Self Discovery, Life or Beauty.
+- [ ] No product cards, prices, retailer buttons or affiliate disclosures render publicly.
+- [ ] Homepage, Journal, About and article pages work at mobile and desktop widths.
+- [ ] Home and About use centered text-only heroes with no image or text overlap.
+- [ ] Keyboard navigation, focus states and reduced motion are verified.

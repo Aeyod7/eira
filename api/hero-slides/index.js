@@ -72,13 +72,15 @@ export default async function handler(req, res) {
 
   // Collection operations
   if (req.method === "GET") {
-    // Public list: active slides in position order
+    // Public hero: expose one active image only. The admin can keep alternates,
+    // but the first image by position is the single static site hero.
     if (req.query?.public !== undefined) {
       const r = await db.execute(
         `SELECT id, image_url, position, is_active, focal_position
          FROM hero_slides
          WHERE is_active = 1
-         ORDER BY position ASC, id ASC`
+         ORDER BY position ASC, id ASC
+         LIMIT 1`
       );
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");

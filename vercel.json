@@ -1,5 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    { "source": "/shop", "destination": "/blog.html", "permanent": true },
+    { "source": "/shop.html", "destination": "/blog.html", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/go/:slug", "destination": "/api/go/:slug" },
     { "source": "/go/:slug/", "destination": "/api/go/:slug" },

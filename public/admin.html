@@ -3,1583 +3,664 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="robots" content="noindex" />
-  <title>Admin — Eira</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Studio — Eira</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/theme-warm.css" />
   <style>
-    body { background: var(--color-surface-base); color: var(--color-text-primary); }
-    .admin-shell { max-width: var(--container-max); margin: 0 auto; padding: var(--space-10) var(--space-6); }
-    .admin-header { display:flex; align-items:center; justify-content:space-between; margin-bottom: var(--space-10); flex-wrap:wrap; gap:var(--space-4); }
-    .admin-header h1 { margin:0; font-size: var(--font-size-2xl); font-family: var(--font-family-primary); }
-    .admin-tabs { display:flex; gap: var(--space-2); flex-wrap:wrap; margin-bottom: var(--space-10); border-bottom: 1px solid var(--color-border-subtle); padding-bottom: var(--space-4); }
-    .admin-tabs button {
-      font-family: var(--font-family-stack); font-size: var(--font-size-sm); font-weight: var(--font-weight-bold);
-      padding: var(--space-3) var(--space-5);
-      border: none; background: transparent; color: var(--color-text-muted);
-      cursor: pointer; border-radius: var(--radius-sm);
-    }
-    .admin-tabs button:hover { color: var(--color-text-primary); }
-    .admin-tabs button[aria-selected="true"] { color: var(--color-text-secondary); background: var(--color-surface-dark); }
+    :root { --studio-sidebar: 248px; }
+    body { min-width: 0; background: var(--color-surface-base); color: var(--color-text-primary); }
+    button, input, select, textarea { font: inherit; }
     [hidden] { display: none !important; }
-    .panel h2 { font-size: var(--font-size-xl); margin-bottom: var(--space-6); font-family: var(--font-family-primary); }
-
-    /* Admin is a tool, not editorial: keep the UI sans-serif even though the
-       site theme sets a display serif on headings. */
-    h1, h2, h3, h4 { font-family: var(--font-family-primary); letter-spacing: 0; }
-
-    /* Simple cards — override the site card, which is an editorial tile that
-       lifts and shadows on hover. Admin cards are static panels. */
-    .card { background: var(--color-surface-strong); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--space-6); margin-bottom: var(--space-6); box-shadow: none; transition: none; overflow: visible; }
-    .card:hover { transform: none; box-shadow: none; }
-    .card h3 { margin: 0 0 var(--space-4) 0; font-size: var(--font-size-md); font-weight: var(--font-weight-bold); letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-text-muted); }
-    .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
-    .stat-item { text-align: center; }
-    .stat-item .n { font-family: var(--font-family-primary); font-size: var(--font-size-2xl); display: block; }
-    .stat-item .l { font-size: var(--font-size-xs); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
-
-    /* Tables */
-    table { width: 100%; border-collapse: collapse; font-size: var(--font-size-sm); }
-    th, td { text-align: left; padding: var(--space-4); border-bottom: 1px solid var(--color-border-subtle); vertical-align: middle; }
-    th { font-size: var(--font-size-xs); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: var(--font-weight-bold); }
-    .muted { color: var(--color-text-muted); font-size: var(--font-size-sm); }
-
-    /* Forms */
-    .simple-form .field { margin-bottom: var(--space-5); }
-    .simple-form label { display: block; margin-bottom: var(--space-2); font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .simple-form input, .simple-form select, .simple-form textarea { width: 100%; }
-    .simple-form textarea { min-height: 120px; }
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); }
-    .actions { display: flex; gap: var(--space-4); margin-top: var(--space-8); }
-
-    /* Products */
-    .product-list { display: flex; flex-direction: column; gap: var(--space-4); }
-    .product-item { background: var(--color-surface-base); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--space-5); }
-    .product-item__head { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); }
-    .product-item__head span { font-family: var(--font-family-primary); color: var(--color-accent-strong); font-size: var(--font-size-lg); }
-    .product-item__head button { font-size: var(--font-size-xs); color: var(--color-text-muted); background: none; border: none; cursor: pointer; }
-    .product-item__head button:hover { color: var(--color-state-error); }
-    .add-btn { width: 100%; padding: var(--space-5); border: 2px dashed var(--color-border-strong); border-radius: var(--radius-md); background: transparent; color: var(--color-accent-strong); font-weight: var(--font-weight-bold); cursor: pointer; margin-top: var(--space-4); }
-    .add-btn:hover { background: var(--color-surface-strong); }
-    .product-item .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
-    .product-item .full { grid-column: 1 / -1; }
-    @media (max-width: 600px) {
-      .product-item .two-col { grid-template-columns: 1fr; }
+    .studio-login { width: min(440px, calc(100% - 40px)); margin: clamp(72px, 14vh, 140px) auto; padding: clamp(32px, 6vw, 56px); background: var(--color-surface-blush); border: 2px solid var(--color-border-strong); border-radius: 36px; }
+    .studio-login h1 { margin: 8px 0 12px; font-size: clamp(44px, 8vw, 68px); font-weight: 400; }
+    .studio-login form { display: grid; gap: 16px; margin-top: 28px; }
+    .studio { min-height: 100vh; display: grid; grid-template-columns: var(--studio-sidebar) minmax(0, 1fr); }
+    .studio-sidebar { position: sticky; top: 0; height: 100vh; padding: 32px 24px; display: flex; flex-direction: column; background: var(--color-surface-dark); color: var(--color-text-inverse); }
+    .studio-brand { color: inherit; font-family: var(--font-family-primary); font-size: 32px; line-height: 1; text-decoration: none; }
+    .studio-kicker { margin-top: 8px; color: rgba(255, 249, 244, .64); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+    .studio-nav { display: grid; gap: 8px; margin-top: 52px; }
+    .studio-nav button { min-height: 48px; padding: 0 16px; border: 0; border-radius: var(--radius-pill); background: transparent; color: rgba(255, 249, 244, .72); text-align: left; cursor: pointer; }
+    .studio-nav button:hover, .studio-nav button:focus-visible { color: var(--color-text-inverse); background: rgba(255, 249, 244, .08); }
+    .studio-nav button[aria-selected="true"] { background: var(--color-surface-blush); color: var(--color-text-primary); }
+    .studio-sidebar__foot { display: grid; gap: 12px; margin-top: auto; }
+    .studio-sidebar__foot a, .studio-sidebar__foot button { color: rgba(255, 249, 244, .72); font-size: 14px; }
+    .studio-sidebar__foot button { padding: 0; border: 0; background: none; text-align: left; cursor: pointer; }
+    .studio-main { min-width: 0; padding: clamp(28px, 5vw, 64px); }
+    .studio-topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 40px; }
+    .studio-topbar h1 { margin: 4px 0 0; font-size: clamp(38px, 5vw, 64px); font-weight: 400; }
+    .studio-topbar p { margin: 0; }
+    .studio-panel { max-width: 1180px; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
+    .panel-head h2 { margin: 0; font-size: clamp(30px, 4vw, 46px); font-weight: 400; }
+    .panel-head__actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .studio-card { padding: 28px; background: var(--color-surface-strong); border: 1.5px solid var(--color-border-strong); border-radius: 28px; }
+    .studio-card + .studio-card { margin-top: 20px; }
+    .studio-card h3 { margin: 0 0 18px; font-size: 14px; font-family: var(--font-family-stack); letter-spacing: .1em; text-transform: uppercase; }
+    .stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .stat-card { min-height: 150px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; border: 1.5px solid var(--color-border-strong); border-radius: 28px; background: var(--color-surface-blush); }
+    .stat-card:nth-child(2) { background: var(--color-surface-dark); color: var(--color-text-inverse); }
+    .stat-card:nth-child(3) { background: var(--color-surface-strong); }
+    .stat-card:nth-child(4) { background: var(--color-accent-soft); }
+    .stat-card span { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .stat-card strong { font: 400 clamp(42px, 5vw, 64px)/1 var(--font-family-primary); }
+    .overview-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, .6fr); gap: 20px; }
+    .category-list { display: grid; gap: 12px; }
+    .category-row { display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid var(--color-border-subtle); }
+    .category-row:last-child { border-bottom: 0; padding-bottom: 0; }
+    .toolbar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+    .toolbar .input { flex: 1 1 220px; }
+    .toolbar select { flex: 0 1 190px; }
+    .table-wrap { overflow-x: auto; border: 1.5px solid var(--color-border-strong); border-radius: 24px; background: var(--color-surface-strong); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 17px 18px; border-bottom: 1px solid var(--color-border-subtle); text-align: left; vertical-align: middle; }
+    th { color: var(--color-text-muted); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover { background: rgba(255,255,255,.34); }
+    .table-title { color: var(--color-text-primary); font-weight: 600; text-decoration: none; }
+    .table-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .empty-state { padding: 48px 24px; color: var(--color-text-muted); text-align: center; }
+    .badge { display: inline-flex; min-height: 28px; align-items: center; padding: 0 11px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 700; }
+    .badge--published { background: #dce9dc; color: #2f5b37; }
+    .badge--draft { background: var(--color-surface-base); color: var(--color-text-muted); border: 1px solid var(--color-border-subtle); }
+    .editor-shell { display: grid; gap: 20px; }
+    .editor-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, .6fr); gap: 20px; align-items: start; }
+    .editor-main, .editor-side { display: grid; gap: 20px; }
+    .field { display: grid; gap: 8px; }
+    .field + .field { margin-top: 20px; }
+    .field label { color: var(--color-text-muted); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .field-help { margin: 0; color: var(--color-text-muted); font-size: 12px; line-height: 1.55; }
+    .field-count { font-variant-numeric: tabular-nums; }
+    .writing-metrics { display: flex; gap: 8px 16px; flex-wrap: wrap; margin-top: 10px; color: var(--color-text-muted); font-size: 12px; }
+    .writing-metrics span { white-space: nowrap; }
+    .checklist { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+    .check-item { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start; color: var(--color-text-muted); font-size: 13px; line-height: 1.45; }
+    .check-item__icon { width: 22px; height: 22px; display: grid; place-items: center; border: 1px solid var(--color-border-subtle); border-radius: 50%; background: var(--color-surface-base); font-size: 11px; font-weight: 700; }
+    .check-item.is-ready { color: var(--color-text-primary); }
+    .check-item.is-ready .check-item__icon { border-color: #7f9b7f; background: #dce9dc; color: #2f5b37; }
+    .editor-guide { margin: 0; padding-left: 20px; color: var(--color-text-muted); font-size: 13px; line-height: 1.7; }
+    .editor-guide li + li { margin-top: 6px; }
+    .input { width: 100%; min-height: 48px; padding: 12px 14px; border: 1px solid var(--color-border-subtle); border-radius: 14px; background: var(--color-surface-base); color: var(--color-text-primary); }
+    textarea.input { min-height: 120px; resize: vertical; }
+    .input:focus { outline: 3px solid rgba(168, 87, 66, .2); border-color: var(--color-accent-strong); }
+    .upload-row { display: flex; gap: 10px; align-items: center; }
+    .upload-row .input { min-width: 0; }
+    .image-preview { width: 100%; aspect-ratio: 16 / 9; margin-top: 14px; display: none; object-fit: cover; border: 1px solid var(--color-border-subtle); border-radius: 18px; }
+    .editor-actions { position: sticky; bottom: 18px; z-index: 5; display: flex; gap: 10px; flex-wrap: wrap; padding: 14px; border: 1px solid var(--color-border-subtle); border-radius: 20px; background: rgba(251, 248, 244, .94); backdrop-filter: blur(12px); }
+    .editor-actions .danger { margin-left: auto; }
+    .content-editor { min-height: 520px; }
+    .tox-tinymce { height: clamp(520px, calc(100vh - 230px), 900px) !important; border: 1px solid var(--color-border-subtle) !important; border-radius: 18px !important; }
+    .newsletter-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+    .newsletter-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+    .notice { padding: 14px 16px; border-radius: 14px; background: var(--color-surface-blush); color: var(--color-text-muted); font-size: 14px; }
+    .toast { position: fixed; right: 24px; bottom: 24px; z-index: 100; max-width: min(420px, calc(100% - 48px)); padding: 14px 18px; border-radius: 14px; background: var(--color-surface-dark); color: var(--color-text-inverse); opacity: 0; transform: translateY(12px); pointer-events: none; transition: .2s ease; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .muted { color: var(--color-text-muted); }
+    .link { padding: 0; border: 0; background: none; cursor: pointer; text-align: left; }
+    .mobile-studio-head { display: none; }
+    @media (max-width: 900px) {
+      .studio { display: block; }
+      .studio-sidebar { position: static; width: auto; height: auto; padding: 18px 20px; display: block; }
+      .studio-sidebar > .studio-brand, .studio-sidebar > .studio-kicker, .studio-sidebar__foot { display: none; }
+      .mobile-studio-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+      .mobile-studio-head .studio-brand { display: block; }
+      .studio-nav { margin: 0; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+      .studio-nav button { flex: 0 0 auto; padding-inline: 16px; }
+      .studio-main { padding: 32px 20px 56px; }
+      .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .overview-grid, .editor-grid, .newsletter-grid { grid-template-columns: 1fr; }
+      .studio-topbar { margin-bottom: 30px; }
     }
-    /* The raw <textarea> is only visible for the split second before TinyMCE
-       swaps it out. Sizing it to the full editor height just makes the page
-       jump on load, so keep it modest. */
-    .content-editor { min-height: 220px; background: var(--color-surface-base); border-radius: var(--radius-lg); }
-    .content-editor-hint { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: var(--space-2); }
-
-    /* --- TinyMCE shell ---------------------------------------------------
-       TinyMCE writes a fixed pixel height inline on .tox-tinymce, which means
-       the canvas is either taller than the laptop screen (bottom unreachable)
-       or wastefully short on a large monitor. Size it to the viewport instead,
-       with a floor so it stays usable on short screens and a ceiling so the
-       toolbar and the caret never end up a screen apart. */
-    .tox-tinymce {
-      height: clamp(460px, calc(100vh - 210px), 1080px) !important;
-      border: 1px solid var(--color-border-subtle) !important;
-      border-radius: var(--radius-lg) !important;
-      overflow: hidden;
-    }
-    /* Fullscreen must fill the window, not the clamp. */
-    .tox-fullscreen .tox-tinymce, .tox-tinymce.tox-fullscreen {
-      height: 100% !important;
-      border-radius: 0 !important;
-    }
-    .tox .tox-editor-header { border-bottom: 1px solid var(--color-border-subtle) !important; }
-    .tox .tox-statusbar { border-top: 1px solid var(--color-border-subtle) !important; }
-
-    .login-box { max-width: 360px; margin: var(--space-20) auto; text-align: center; }
-    .login-box form { display: flex; flex-direction: column; gap: var(--space-5); margin-top: var(--space-6); }
-    .toast { position: fixed; bottom: var(--space-8); left: 50%; transform: translateX(-50%); background: var(--color-surface-dark); color: var(--color-text-secondary); padding: var(--space-4) var(--space-7); border-radius: var(--radius-pill); font-size: var(--font-size-sm); box-shadow: var(--shadow-lg); opacity: 0; transition: opacity var(--motion-duration-fast); pointer-events: none; }
-    .toast.show { opacity: 1; }
-    .link { color: var(--color-accent-strong); text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font-size: inherit; }
-    .link:hover { color: var(--color-accent-primary); }
-    .badge { display: inline-block; font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3); border-radius: var(--radius-pill); background: var(--color-surface-strong); color: var(--color-text-primary); font-weight: var(--font-weight-bold); }
-    .og-preview { width: 100%; max-width: 200px; aspect-ratio: 2/3; object-fit: cover; border-radius: var(--radius-md); border: 1px solid var(--color-border-subtle); background: var(--color-surface-base); margin-top: var(--space-4); display: none; }
-    .og-preview[src] { display: block; }
-    .og-preview-fallback { width: 100%; max-width: 200px; aspect-ratio: 2/3; border-radius: var(--radius-md); border: 1px dashed var(--color-border-subtle); background: var(--color-surface-base); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: var(--font-size-sm); margin-top: var(--space-4); }
-    .hero-actions { white-space: nowrap; }
-    .hero-actions .btn { margin-left: var(--space-2); }
-    #hero-slides-list td { vertical-align: middle; }
-    /* Hero preview mirrors the real hero: whole image contained, blurred fill
-       behind it. The wrapper carries the blur so the <img> stays sharp. */
-    #h-image-preview { max-width: 100%; width: 100%; aspect-ratio: 16 / 7; object-fit: cover; object-position: center; position: relative; z-index: 1; background: transparent; border: 0; }
-    .hero-preview-frame { position: relative; width: 100%; max-width: 420px; aspect-ratio: 16 / 7; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border-subtle); background: var(--color-surface-strong); margin-top: var(--space-4); }
-
-    @media (max-width: 600px) {
-      .two-col, .stat-row { grid-template-columns: 1fr; }
+    @media (max-width: 560px) {
+      .studio-topbar { display: block; }
+      .studio-topbar .btn { margin-top: 16px; }
+      .panel-head { align-items: flex-start; flex-direction: column; }
+      .stat-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .stat-card { min-height: 124px; padding: 18px; border-radius: 22px; }
+      .upload-row { align-items: stretch; flex-direction: column; }
+      .editor-actions { position: static; display: grid; grid-template-columns: 1fr; }
+      .editor-actions .danger { margin-left: 0; }
+      .table-actions { justify-content: flex-start; }
+      th:nth-child(3), td:nth-child(3) { display: none; }
     }
   </style>
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
-  <main id="main" class="admin-shell">
+  <a class="skip-link" href="#studio-content">Skip to content</a>
 
-    <section id="login-view" class="login-box">
-      <p class="eyebrow">Admin</p>
-      <h1>Eira CMS</h1>
-      <p class="muted">Sign in to manage posts, links, and subscribers.</p>
-      <form id="login-form">
-        <input class="input" type="password" id="login-password" placeholder="Admin password" required autocomplete="current-password" />
-        <span class="field__error" id="login-err" aria-live="polite"></span>
-        <button class="btn btn--primary" type="submit">Sign in</button>
-      </form>
-    </section>
+  <section class="studio-login" id="login-view">
+    <p class="eyebrow">Private studio</p>
+    <h1>Eira</h1>
+    <p class="muted">Sign in to write, publish and stay connected to your readers.</p>
+    <form id="login-form">
+      <label class="field" for="login-password">
+        <span>Admin password</span>
+        <input class="input" type="password" id="login-password" required autocomplete="current-password" />
+      </label>
+      <p class="field__error" id="login-error" aria-live="polite"></p>
+      <button class="btn btn--primary" type="submit">Enter the studio</button>
+    </form>
+  </section>
 
-    <section id="dash-view" hidden>
-      <header class="admin-header">
-        <h1>Eira CMS</h1>
-        <div style="display:flex; gap: var(--space-4); align-items:center;">
-          <a href="/" class="muted">View site →</a>
-          <button class="btn btn--secondary" id="logout-btn" type="button">Sign out</button>
-        </div>
-      </header>
-
-      <nav class="admin-tabs" role="tablist" aria-label="Admin sections">
-        <button role="tab" aria-selected="true" data-tab="stats">Stats</button>
-        <button role="tab" aria-selected="false" data-tab="posts">Posts</button>
-        <button role="tab" aria-selected="false" data-tab="products">Products</button>
-        <button role="tab" aria-selected="false" data-tab="hero">Hero</button>
-        <button role="tab" aria-selected="false" data-tab="links">Links</button>
+  <div class="studio" id="dashboard-view" hidden>
+    <aside class="studio-sidebar">
+      <div class="mobile-studio-head"><a class="studio-brand" href="/">Eira</a><a class="muted" href="/" target="_blank">View site ↗</a></div>
+      <a class="studio-brand" href="/">Eira</a>
+      <p class="studio-kicker">Editorial studio</p>
+      <nav class="studio-nav" role="tablist" aria-label="Studio sections">
+        <button role="tab" aria-selected="true" data-tab="overview">Overview</button>
+        <button role="tab" aria-selected="false" data-tab="journal">Journal</button>
         <button role="tab" aria-selected="false" data-tab="subscribers">Subscribers</button>
         <button role="tab" aria-selected="false" data-tab="newsletter">Newsletter</button>
       </nav>
-
-      <!-- STATS -->
-      <div class="panel" id="panel-stats">
-        <div class="card">
-          <div class="stat-row">
-            <div class="stat-item"><span class="n" id="stat-subs">—</span><span class="l">Subscribers</span></div>
-            <div class="stat-item"><span class="n" id="stat-clicks">—</span><span class="l">Clicks</span></div>
-            <div class="stat-item"><span class="n" id="stat-links">—</span><span class="l">Links</span></div>
-          </div>
-        </div>
-        <h2>Top links</h2>
-        <table id="top-links-table"><thead><tr><th>Link</th><th>Post</th><th>Clicks</th></tr></thead><tbody></tbody></table>
+      <div class="studio-sidebar__foot">
+        <a href="/" target="_blank">View live site ↗</a>
+        <button id="logout-button" type="button">Sign out</button>
       </div>
+    </aside>
 
-      <!-- POSTS -->
-      <div class="panel" id="panel-posts" hidden>
+    <main class="studio-main" id="studio-content">
+      <header class="studio-topbar">
+        <div><p class="eyebrow">Eira editorial studio</p><h1 id="page-title">Overview</h1></div>
+        <button class="btn btn--primary" id="quick-new-post" type="button">New story</button>
+      </header>
+
+      <section class="studio-panel" id="panel-overview" role="tabpanel">
+        <div class="stat-grid">
+          <article class="stat-card"><span>Total stories</span><strong id="stat-total">—</strong></article>
+          <article class="stat-card"><span>Published</span><strong id="stat-published">—</strong></article>
+          <article class="stat-card"><span>Drafts</span><strong id="stat-drafts">—</strong></article>
+          <article class="stat-card"><span>Subscribers</span><strong id="stat-subscribers">—</strong></article>
+        </div>
+        <div class="overview-grid">
+          <article class="studio-card">
+            <div class="panel-head"><h2>Recent stories</h2><button class="btn btn--secondary" type="button" data-open-tab="journal">View all</button></div>
+            <div id="recent-posts"></div>
+          </article>
+          <article class="studio-card">
+            <h3>Journal balance</h3>
+            <div class="category-list" id="category-counts"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="studio-panel" id="panel-journal" role="tabpanel" hidden>
         <div id="posts-list-view">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-6);">
-            <h2>Posts</h2>
-            <button class="btn btn--primary" id="new-post-btn" type="button">+ New post</button>
+          <div class="panel-head"><div><h2>Journal</h2><p class="muted">Stories across Self Discovery, Life and Beauty.</p></div><button class="btn btn--primary" id="new-post-button" type="button">New story</button></div>
+          <div class="toolbar">
+            <input class="input" id="post-search" type="search" placeholder="Search stories" aria-label="Search stories" />
+            <select class="input" id="post-category-filter" aria-label="Filter by category"><option value="">All categories</option><option>Self Discovery</option><option>Life</option><option>Beauty</option></select>
+            <select class="input" id="post-status-filter" aria-label="Filter by status"><option value="">All statuses</option><option value="published">Published</option><option value="draft">Draft</option></select>
           </div>
-          <table id="posts-table"><thead><tr><th>Title</th><th>Category</th><th>Status</th><th></th></tr></thead><tbody></tbody></table>
+          <div class="table-wrap"><table><thead><tr><th>Story</th><th>Category</th><th>Status</th><th>Updated</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody id="posts-table-body"></tbody></table><div class="empty-state" id="posts-empty" hidden>No stories match these filters.</div></div>
         </div>
 
-        <div id="posts-editor-view" hidden>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-6); flex-wrap:wrap; gap:var(--space-4);">
-            <h2 id="editor-title">New post</h2>
-            <a id="editor-preview-link" class="muted" href="#" target="_blank">Preview post →</a>
-          </div>
-
-          <form class="simple-form" id="post-form">
-            <div class="two-col">
-              <div class="field">
-                <label for="p-title">Post title</label>
-                <input class="input" id="p-title" placeholder="10 Best Amazon UK Skincare Finds for Dark Skin" required />
+        <div id="post-editor-view" hidden>
+          <div class="panel-head"><div><p class="eyebrow" id="editor-kicker">New story</p><h2 id="editor-title">Untitled story</h2></div><div class="panel-head__actions"><a class="btn btn--secondary" id="preview-post-link" href="#" target="_blank" hidden>Preview ↗</a><button class="btn btn--secondary" id="close-editor-button" type="button">Back to Journal</button></div></div>
+          <form id="post-form" class="editor-shell">
+            <div class="editor-grid">
+              <div class="editor-main">
+                <article class="studio-card">
+                  <div class="field">
+                    <label for="post-title">Story title</label>
+                    <input class="input" id="post-title" maxlength="120" required placeholder="Give your story a clear, memorable title" />
+                    <p class="field-help"><span class="field-count" id="title-count">0</span> / 120 characters</p>
+                  </div>
+                  <div class="field">
+                    <label for="post-summary">Standfirst</label>
+                    <textarea class="input" id="post-summary" maxlength="300" rows="3" placeholder="One or two sentences that tell the reader why this story matters"></textarea>
+                    <p class="field-help">Appears beneath the title on the article page. <span class="field-count" id="summary-count">0</span> / 300 characters</p>
+                  </div>
+                  <div class="field">
+                    <label for="post-body">Story</label>
+                    <textarea class="input content-editor" id="post-body" placeholder="Begin writing…"></textarea>
+                    <div class="writing-metrics" aria-live="polite">
+                      <span id="word-count">0 words</span>
+                      <span id="character-count">0 characters</span>
+                      <span id="paragraph-count">0 paragraphs</span>
+                      <span id="reading-estimate">0 min read</span>
+                      <span id="draft-backup-status">Local backup ready</span>
+                    </div>
+                  </div>
+                </article>
+                <article class="studio-card">
+                  <h3>Search and sharing</h3>
+                  <div class="field"><label for="post-meta">Meta description</label><textarea class="input" id="post-meta" maxlength="200" placeholder="A concise summary for search results and social sharing"></textarea><p class="field-help"><span class="field-count" id="meta-count">0</span> characters · Aim for 70–155.</p></div>
+                  <div class="field"><label for="post-image">Featured image</label><div class="upload-row"><input class="input" id="post-image" placeholder="Image URL or upload a file" /><button class="btn btn--secondary" type="button" id="upload-image-button">Upload</button><input type="file" id="upload-image-input" accept="image/jpeg,image/png,image/webp,image/gif" hidden /></div><p class="field-help">Shown on the article, story cards and social previews. JPG, PNG, WebP or GIF up to 4 MB.</p><img class="image-preview" id="story-image-preview" alt="Story image preview" /></div>
+                  <div class="field"><label for="post-image-alt">Image description</label><input class="input" id="post-image-alt" maxlength="180" placeholder="Describe what is visible for readers using screen readers" /><p class="field-help">Write the useful visual information, not “image of”.</p></div>
+                </article>
               </div>
-              <div class="field">
-                <label for="p-category">Category</label>
-                <select class="input" id="p-category" required>
-                  <option value="">Select category</option>
-                  <option value="Beauty">Beauty</option>
-                  <option value="Skincare">Skincare</option>
-                  <option value="Fashion">Fashion</option>
-                  <option value="Selfcare">Selfcare</option>
-                </select>
-              </div>
+              <aside class="editor-side">
+                <article class="studio-card">
+                  <h3>Story details</h3>
+                  <div class="field"><label for="post-category">Journal category</label><select class="input" id="post-category" required><option value="">Choose a category</option><option>Self Discovery</option><option>Life</option><option>Beauty</option></select></div>
+                  <div class="field"><label for="post-slug">URL slug</label><input class="input" id="post-slug" placeholder="story-url" /><p class="field-help" id="slug-help">Generated from the title. Locked after the first save.</p></div>
+                  <div class="field"><label for="post-eyebrow">Title label</label><input class="input" id="post-eyebrow" placeholder="Life · Journal" /></div>
+                  <div class="field"><label for="post-read-time">Read time</label><input class="input" id="post-read-time" placeholder="Calculated automatically" /><p class="field-help" id="read-time-help">Based on approximately 220 words per minute.</p></div>
+                  <div class="field"><label>Current status</label><span class="badge badge--draft" id="editor-status">New draft</span></div>
+                </article>
+                <article class="studio-card">
+                  <h3>Ready to publish</h3>
+                  <ul class="checklist" id="publish-checklist">
+                    <li class="check-item" data-check="title"><span class="check-item__icon">1</span><span>Add a clear story title.</span></li>
+                    <li class="check-item" data-check="category"><span class="check-item__icon">2</span><span>Choose a Journal category.</span></li>
+                    <li class="check-item" data-check="summary"><span class="check-item__icon">3</span><span>Add a standfirst for the article page.</span></li>
+                    <li class="check-item" data-check="body"><span class="check-item__icon">4</span><span>Build a useful story with clear sections.</span></li>
+                    <li class="check-item" data-check="meta"><span class="check-item__icon">5</span><span>Write a search description.</span></li>
+                    <li class="check-item" data-check="image"><span class="check-item__icon">6</span><span>Add an image and accessible description.</span></li>
+                  </ul>
+                </article>
+                <article class="studio-card">
+                  <h3>A strong Eira story</h3>
+                  <ol class="editor-guide">
+                    <li>Open with a specific truth, question or observation.</li>
+                    <li>Use H2 headings to make longer stories easy to follow.</li>
+                    <li>Support ideas with examples, details and lived context.</li>
+                    <li>End with something useful the reader can carry forward.</li>
+                  </ol>
+                </article>
+              </aside>
             </div>
-
-            <div class="two-col">
-              <div class="field">
-                <label for="p-slug">URL slug <span class="muted" id="p-slug-hint">auto-generated</span></label>
-                <input class="input" id="p-slug" placeholder="my-post-slug" />
-                <p class="muted" id="p-slug-edit-note" style="display:none; margin-top:var(--space-2);">Locked on edit. Changing it would break existing links.</p>
-              </div>
-              <div class="field">
-                <label>Current status</label>
-                <p class="muted" id="p-status-display" style="margin:0; padding:var(--space-5) 0; font-weight:var(--font-weight-bold);">New draft</p>
-              </div>
-            </div>
-
-            <div class="two-col">
-              <div class="field">
-                <label for="p-eyebrow">Eyebrow <span class="muted">small label above the title</span></label>
-                <input class="input" id="p-eyebrow" placeholder="Skincare edit" />
-              </div>
-              <div class="field">
-                <label for="p-readtime">Read time <span class="muted" id="p-readtime-hint">auto from word count</span></label>
-                <input class="input" id="p-readtime" placeholder="6 min read" />
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="p-meta">Meta description <span class="muted">the text Google shows under your title</span></label>
-              <textarea class="input" id="p-meta" rows="2" maxlength="200" placeholder="A specific, tempting one-line summary of the post."></textarea>
-              <p class="content-editor-hint"><span id="p-meta-count">0</span> / 155 ideal &middot; <span id="p-meta-warn"></span></p>
-            </div>
-
-            <div class="field">
-              <label for="p-ogimage">Pinterest / OG image URL <span class="muted">or upload from your computer</span></label>
-              <div style="display:flex; gap:var(--space-3); align-items:center; flex-wrap:wrap;">
-                <input class="input" id="p-ogimage" placeholder="https://pin.it/... or /uploads/image.jpg" style="flex:1; min-width:240px;" />
-                <button class="btn btn--secondary" type="button" data-upload-for="p-ogimage">Upload image</button>
-                <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-upload-input="p-ogimage" hidden />
-              </div>
-              <img class="og-preview" id="p-og-preview" alt="OG image preview" />
-              <div class="og-preview-fallback" id="p-og-fallback">No image preview</div>
-            </div>
-
-            <div class="field">
-              <label for="p-body">Blog post content</label>
-              <textarea id="p-body" class="content-editor"></textarea>
-              <p class="content-editor-hint">Write or paste your content. Images pasted from Word/Google Docs or uploaded via the toolbar are automatically saved to your uploads folder. <span id="draft-status"></span></p>
-            </div>
-
-            <div class="card" style="margin-top: var(--space-6);">
-              <h3>Products</h3>
-              <p class="muted" style="margin-bottom: var(--space-5);">Attach existing products from the Products tab. Reorder with up/down buttons.</p>
-              <div class="product-list" id="product-list"></div>
-              <div class="two-col" style="margin-top: var(--space-4);">
-                <div class="field">
-                  <select class="input" id="attach-product-select">
-                    <option value="">— Select a product to attach —</option>
-                  </select>
-                </div>
-                <div class="field" style="display:flex; align-items:flex-end;">
-                  <button class="btn btn--secondary" id="attach-product-btn" type="button">+ Attach product</button>
-                </div>
-              </div>
-              <p class="muted" style="margin-top: var(--space-3);"><a href="#" id="go-to-products-tab" class="link">Create a new product in the Products tab →</a></p>
-            </div>
-
-            <div class="actions">
-              <button class="btn btn--secondary" id="save-draft-btn" type="button">Save draft</button>
-              <button class="btn btn--primary" id="publish-post-btn" type="button">Publish</button>
-              <button class="btn btn--secondary" id="cancel-post-btn" type="button">Cancel</button>
-              <button class="btn btn--error" id="delete-post-btn" type="button" hidden>Delete</button>
+            <div class="editor-actions">
+              <button class="btn btn--secondary" id="save-draft-button" type="button">Save draft</button>
+              <button class="btn btn--primary" id="publish-button" type="button">Publish story</button>
+              <button class="btn btn--error danger" id="delete-post-button" type="button" hidden>Delete story</button>
             </div>
           </form>
         </div>
-      </div>
+      </section>
 
-      <!-- PRODUCTS -->
-      <div class="panel" id="panel-products" hidden>
-        <div id="products-list-view">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-6);">
-            <h2>Products</h2>
-            <button class="btn btn--primary" id="new-product-btn" type="button">+ New product</button>
-          </div>
-          <table id="products-table"><thead><tr><th></th><th>Name</th><th>Category</th><th>Link</th><th>Status</th><th></th></tr></thead><tbody></tbody></table>
+      <section class="studio-panel" id="panel-subscribers" role="tabpanel" hidden>
+        <div class="panel-head"><div><h2>Subscribers</h2><p class="muted">People who asked to hear from Eira.</p></div><button class="btn btn--secondary" id="export-subscribers-button" type="button">Export CSV</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Email</th><th>Source</th><th>Joined</th></tr></thead><tbody id="subscribers-table-body"></tbody></table><div class="empty-state" id="subscribers-empty" hidden>No subscribers yet.</div></div>
+      </section>
+
+      <section class="studio-panel" id="panel-newsletter" role="tabpanel" hidden>
+        <div class="panel-head"><div><h2>Newsletter</h2><p class="muted">Write directly to your readers.</p></div></div>
+        <div class="newsletter-grid">
+          <article class="studio-card">
+            <div class="field"><label for="newsletter-subject">Subject line</label><input class="input" id="newsletter-subject" placeholder="A note from Eira" /></div>
+            <div class="field"><label for="newsletter-body">Message</label><textarea class="input" id="newsletter-body" rows="14" placeholder="<p>Write your message here…</p>"></textarea><p class="field-help">Simple HTML is supported. The Eira header and footer are added automatically.</p></div>
+            <div class="newsletter-actions"><button class="btn btn--primary" id="send-newsletter-button" type="button">Send newsletter</button></div>
+          </article>
+          <aside class="studio-card">
+            <h3>Before you send</h3>
+            <p class="notice" id="newsletter-status">Checking email connection…</p>
+            <div class="field"><label for="newsletter-test-email">Test email</label><input class="input" id="newsletter-test-email" type="email" placeholder="you@example.com" /></div>
+            <button class="btn btn--secondary" id="send-test-button" type="button">Send test</button>
+          </aside>
         </div>
+      </section>
+    </main>
+  </div>
 
-        <div id="products-editor-view" hidden>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-6); flex-wrap:wrap; gap:var(--space-4);">
-            <h2 id="product-editor-title">New product</h2>
-          </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-          <form class="simple-form" id="product-form">
-            <div class="two-col">
-              <div class="field">
-                <label for="pr-name">Product name</label>
-                <input class="input" id="pr-name" placeholder="e.g. Blush cropped cardigan" required />
-              </div>
-              <div class="field">
-                <label for="pr-category">Product category</label>
-                <select class="input" id="pr-category">
-                  <option value="">Select category</option>
-                  <option value="Beauty">Beauty</option>
-                  <option value="Skincare">Skincare</option>
-                  <option value="Fashion">Fashion</option>
-                  <option value="Selfcare">Selfcare</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="pr-image">Product image URL <span class="muted">or upload from your computer</span></label>
-              <div style="display:flex; gap:var(--space-3); align-items:center; flex-wrap:wrap;">
-                <input class="input" id="pr-image" placeholder="https://m.media-amazon.com/images/... or /uploads/image.jpg" style="flex:1; min-width:240px;" />
-                <button class="btn btn--secondary" type="button" data-upload-for="pr-image">Upload image</button>
-                <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-upload-input="pr-image" hidden />
-              </div>
-              <img class="og-preview" id="pr-image-preview" alt="Product image preview" />
-              <div class="og-preview-fallback" id="pr-image-fallback">No image preview</div>
-            </div>
-
-            <div class="field">
-              <label for="pr-price">Price <span class="muted">e.g. £12.99</span></label>
-              <input class="input" id="pr-price" placeholder="£12.99" />
-            </div>
-
-            <div class="two-col">
-              <div class="field">
-                <label for="pr-linkurl">Affiliate URL</label>
-                <input class="input" id="pr-linkurl" placeholder="https://www.amazon.co.uk/dp/...?tag=eira-21" />
-                <p class="content-editor-hint">Paste the affiliate URL. A cloaked /go/:slug link will be created automatically.</p>
-                <p class="content-editor-hint" id="pr-created-link" hidden style="color:var(--color-accent-strong);"></p>
-              </div>
-              <div class="field">
-                <label for="pr-linklabel">Link label</label>
-                <input class="input" id="pr-linklabel" placeholder="Shop now" />
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="pr-published">Status</label>
-              <select class="input" id="pr-published">
-                <option value="1">Published</option>
-                <option value="0">Draft</option>
-              </select>
-            </div>
-
-            <div class="actions">
-              <button class="btn btn--primary" id="save-product-btn" type="submit">Save product</button>
-              <button class="btn btn--secondary" id="cancel-product-btn" type="button">Cancel</button>
-              <button class="btn btn--error" id="delete-product-btn" type="button" hidden>Delete</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- HERO -->
-      <div class="panel" id="panel-hero" hidden>
-        <div id="hero-list-view">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-6); flex-wrap:wrap; gap:var(--space-4);">
-            <h2>Hero slideshow</h2>
-            <button class="btn btn--primary" id="new-hero-btn" type="button">+ Add slide</button>
-          </div>
-          <p class="muted" id="hero-loading">Loading slides…</p>
-          <div id="hero-slides-list"></div>
-          <p class="muted" id="hero-empty" hidden>No slides. Add images to show a rotating background on the homepage.</p>
-        </div>
-
-        <div id="hero-editor-view" hidden>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-6); flex-wrap:wrap; gap:var(--space-4);">
-            <h2 id="hero-editor-title">Add hero slide</h2>
-          </div>
-          <form class="simple-form" id="hero-form">
-            <div class="field">
-              <label for="h-image-url">Image URL <span class="muted">or upload from your computer</span></label>
-              <div style="display:flex; gap:var(--space-3); align-items:center; flex-wrap:wrap;">
-                <input class="input" id="h-image-url" placeholder="https://images.unsplash.com/photo-... or /uploads/image.jpg" style="flex:1; min-width:240px;" required />
-                <button class="btn btn--secondary" type="button" data-upload-for="h-image-url">Upload image</button>
-                <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-upload-input="h-image-url" hidden />
-              </div>
-              <div class="hero-preview-frame" id="h-preview-frame" hidden>
-                <img class="og-preview" id="h-image-preview" alt="Hero image preview" />
-              </div>
-              <div class="og-preview-fallback" id="h-image-fallback">No image preview</div>
-            </div>
-            <div class="two-col">
-              <div class="field">
-                <label for="h-focal">Focus point</label>
-                <select class="input" id="h-focal">
-                  <option value="center">Center</option>
-                  <option value="top">Top</option>
-                  <option value="bottom">Bottom</option>
-                  <option value="left">Left</option>
-                  <option value="right">Right</option>
-                  <option value="top left">Top left</option>
-                  <option value="top right">Top right</option>
-                  <option value="bottom left">Bottom left</option>
-                  <option value="bottom right">Bottom right</option>
-                </select>
-                <p class="content-editor-hint">The whole image is always shown, so nothing gets cut off. This only decides where it sits when its shape differs from the slot &mdash; "Center" suits almost everything.</p>
-              </div>
-              <div class="field">
-                <label for="h-active">Status</label>
-                <select class="input" id="h-active">
-                  <option value="1">Active</option>
-                  <option value="0">Hidden</option>
-                </select>
-              </div>
-            </div>
-            <div class="field">
-              <label for="h-position">Position</label>
-              <input class="input" id="h-position" type="number" min="0" placeholder="0" />
-              <p class="content-editor-hint">Lower numbers appear first. Leave blank for next position.</p>
-            </div>
-            <div class="actions">
-              <button class="btn btn--primary" id="save-hero-btn" type="submit">Save slide</button>
-              <button class="btn btn--secondary" id="cancel-hero-btn" type="button">Cancel</button>
-              <button class="btn btn--error" id="delete-hero-btn" type="button" hidden>Delete</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- LINKS -->
-      <div class="panel" id="panel-links" hidden>
-        <h2>Affiliate links</h2>
-        <div class="card">
-          <h3>Add link</h3>
-          <div class="two-col">
-            <div class="field">
-              <label for="l-slug">Short slug</label>
-              <input class="input" id="l-slug" placeholder="vitamin-c-serum" />
-            </div>
-            <div class="field">
-              <label for="l-network">Network</label>
-              <select class="input" id="l-network">
-                <option value="amazon">Amazon</option>
-                <option value="awin">AWIN</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-          </div>
-          <div class="field">
-            <label for="l-dest">Destination URL</label>
-            <input class="input" id="l-dest" placeholder="https://www.amazon.co.uk/dp/...?tag=eira-21" />
-          </div>
-          <div class="field">
-            <label for="l-post">Post slug (optional)</label>
-            <input class="input" id="l-post" placeholder="post-slug" />
-          </div>
-          <button class="btn btn--primary" id="add-link-btn" type="button">Add link</button>
-        </div>
-
-        <table id="links-table"><thead><tr><th>Slug</th><th>Destination</th><th>Network</th><th>Clicks</th><th></th></tr></thead><tbody></tbody></table>
-      </div>
-
-      <!-- SUBSCRIBERS -->
-      <div class="panel" id="panel-subscribers" hidden>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-6);">
-          <h2>Subscribers</h2>
-          <button class="btn btn--secondary" id="export-subs-btn" type="button">Export CSV</button>
-        </div>
-        <table id="subs-table"><thead><tr><th>Email</th><th>Source</th><th>Date</th></tr></thead><tbody></tbody></table>
-      </div>
-
-      <!-- NEWSLETTER -->
-      <div class="panel" id="panel-newsletter" hidden>
-        <h2>Send a newsletter</h2>
-        <p class="muted" id="nl-status" style="margin-bottom: var(--space-6);">Checking email status…</p>
-        <div class="field">
-          <label for="nl-subject">Subject line</label>
-          <input class="input" id="nl-subject" placeholder="This week's Amazon UK beauty finds" />
-        </div>
-        <div class="field">
-          <label for="nl-body">Body (HTML allowed — paragraphs, links, headings)</label>
-          <textarea class="input" id="nl-body" rows="12" placeholder="&lt;p&gt;Here's what we're loving this week…&lt;/p&gt;&#10;&#10;&lt;p&gt;&lt;a href=&quot;https://yourdomain.com/post/...&quot;&gt;Read the full roundup →&lt;/a&gt;&lt;/p&gt;"></textarea>
-        </div>
-        <p class="muted" style="margin-bottom: var(--space-5);">Your content is wrapped in the branded Eira email layout (logo header + footer) automatically.</p>
-        <div class="two-col">
-          <div class="field">
-            <label for="nl-test">Send a test to yourself first</label>
-            <input class="input" id="nl-test" type="email" placeholder="you@example.com" />
-          </div>
-          <div class="field" style="align-self:end;">
-            <button class="btn btn--secondary" id="nl-test-btn" type="button">Send test</button>
-          </div>
-        </div>
-        <button class="btn btn--primary" id="nl-send-btn" type="button">Send to all subscribers</button>
-      </div>
-    </section>
-
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  </main>
-
+  <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.4/tinymce.min.js"></script>
   <script>
   (function () {
-    var $ = function (s) { return document.querySelector(s); };
-    var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
-    var toastEl = $("#toast");
-    function toast(msg) { toastEl.textContent = msg; toastEl.classList.add("show"); setTimeout(function(){ toastEl.classList.remove("show"); }, 2400); }
-    function api(path, opts) {
-      opts = opts || {};
-      opts.headers = Object.assign({ "Content-Type": "application/json" }, opts.headers || {});
-      if (opts.body && typeof opts.body !== "string") opts.body = JSON.stringify(opts.body);
-      return fetch(path, opts).then(function (r) {
-        if (r.status === 401) { showLogin(); throw new Error("Unauthorized"); }
-        return r.json().catch(function () { return {}; });
+    'use strict';
+    var CATEGORIES = ['Self Discovery', 'Life', 'Beauty'];
+    var state = { posts: [], stats: null, editingSlug: null, dirty: false, editorReady: false, pendingBody: '', draftChecked: false };
+    var $ = function (selector) { return document.querySelector(selector); };
+    var $$ = function (selector) { return Array.prototype.slice.call(document.querySelectorAll(selector)); };
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function (char) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char];
       });
     }
-    function esc(s) { return String(s||"").replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
-    function uploadImage(input) {
-      var file = input.files && input.files[0];
-      if (!file) return;
-      if (file.size > 4 * 1024 * 1024) { toast("Images must be 4 MB or smaller"); input.value = ""; return; }
-      toast("Uploading image…");
-      var reader = new FileReader();
-      reader.onload = function () {
-        var base64 = reader.result.split(",")[1];
-        fetch("/api/uploads", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ filename: file.name, contentType: file.type, data: base64 })
-        }).then(function (r) {
-          return r.json().then(function (data) { if (!r.ok) throw new Error(data.error || "Upload failed"); return data; });
-        }).then(function (data) {
-          var target = $("#" + input.dataset.uploadInput);
-          target.value = data.url;
-          target.dispatchEvent(new Event("input"));
-          toast("Image uploaded");
-        }).catch(function (err) { toast(err.message || "Upload failed"); }).finally(function () { input.value = ""; });
-      };
-      reader.onerror = function () { toast("Could not read file"); input.value = ""; };
-      reader.readAsDataURL(file);
-    }
-    $$('[data-upload-for]').forEach(function (button) {
-      button.addEventListener("click", function () { $("[data-upload-input='" + button.dataset.uploadFor + "']").click(); });
-    });
-    $$('[data-upload-input]').forEach(function (input) { input.addEventListener("change", function () { uploadImage(input); }); });
 
-    // ---- Auth ----
-    function showLogin() { $("#login-view").hidden = false; $("#dash-view").hidden = true; }
-    function showDash() {
-      $("#login-view").hidden = true;
-      $("#dash-view").hidden = false;
-      $$(".admin-tabs button").forEach(function (b) { b.setAttribute("aria-selected", "false"); });
-      $$(".admin-tabs button[data-tab=stats]")[0].setAttribute("aria-selected", "true");
-      $$(".panel").forEach(function (p) { p.hidden = true; });
-      $("#panel-stats").hidden = false;
-      loadStats(); loadPosts(); loadLinks(); loadProducts(); loadHeroSlides(); loadSubs(); loadNewsletter();
-      maybeOfferDraftRecovery();
-    }
-    $("#login-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      api("/api/admin/login", { method: "POST", body: { password: $("#login-password").value } })
-        .then(function (r) { if (r.ok) { toast("Signed in"); showDash(); } else { $("#login-err").textContent = r.error || "Wrong password"; } })
-        .catch(function () { $("#login-err").textContent = "Sign in failed"; });
-    });
-    $("#logout-btn").addEventListener("click", function () { api("/api/admin/logout", { method: "POST" }).then(function () { toast("Signed out"); showLogin(); }); });
-    api("/api/admin/me").then(function (r) { if (r.authenticated) showDash(); else showLogin(); });
-
-    // ---- Tabs ----
-    $$(".admin-tabs button").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        $$(".admin-tabs button").forEach(function (b) { b.setAttribute("aria-selected", "false"); });
-        btn.setAttribute("aria-selected", "true");
-        $$(".panel").forEach(function (p) { p.hidden = true; });
-        $("#panel-" + btn.dataset.tab).hidden = false;
-      });
-    });
-
-    // ---- Stats ----
-    function loadStats() {
-      api("/api/stats").then(function (s) {
-        $("#stat-subs").textContent = s.subscribers;
-        $("#stat-clicks").textContent = s.total_clicks;
-        $("#stat-links").textContent = s.top_links ? s.top_links.length : 0;
-        var tb = $("#top-links-table tbody"); tb.innerHTML = "";
-        (s.top_links || []).forEach(function (l) {
-          var tr = document.createElement("tr");
-          tr.innerHTML = "<td><code>/go/" + esc(l.slug) + "</code></td><td>" + esc(l.post_slug || "—") + "</td><td>" + l.clicks + "</td>";
-          tb.appendChild(tr);
-        });
-      }).catch(function () {});
+    function toast(message) {
+      var el = $('#toast');
+      el.textContent = message;
+      el.classList.add('show');
+      clearTimeout(toast.timer);
+      toast.timer = setTimeout(function () { el.classList.remove('show'); }, 2800);
     }
 
-    // ---- Links ----
-    var linksCache = [];
-    function loadLinks() {
-      return api("/api/links").then(function (r) {
-        linksCache = r.links || [];
-        var tb = $("#links-table tbody"); tb.innerHTML = "";
-        linksCache.forEach(function (l) {
-          var tr = document.createElement("tr");
-          var dest = l.destination || "";
-          var destShort = dest.length > 45 ? dest.slice(0, 45) + "…" : dest;
-          tr.innerHTML = "<td><code>/go/" + esc(l.slug) + "</code></td>"
-            + "<td><a href='" + esc(dest) + "' target='_blank' rel='noopener'>" + esc(destShort) + "</a></td>"
-            + "<td>" + esc(l.network || "—") + "</td>"
-            + "<td>" + (l.clicks || 0) + "</td>"
-            + "<td><button class='link' data-del-link='" + esc(l.slug) + "'>Delete</button></td>";
-          tb.appendChild(tr);
-        });
-        $$("[data-del-link]").forEach(function (b) {
-          b.addEventListener("click", function () {
-            if (!confirm("Delete /go/" + b.dataset.delLink + "?")) return;
-            api("/api/links/" + encodeURIComponent(b.dataset.delLink), { method: "DELETE" }).then(function () {
-              toast("Link deleted"); loadLinks(); loadStats();
-            });
-          });
+    function api(path, options) {
+      options = options || {};
+      options.headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
+      if (options.body && typeof options.body !== 'string') options.body = JSON.stringify(options.body);
+      return fetch(path, options).then(function (response) {
+        return response.json().catch(function () { return {}; }).then(function (data) {
+          if (response.status === 401) { showLogin(); throw new Error('Your session expired. Please sign in again.'); }
+          if (!response.ok) throw new Error(data.error || 'Request failed');
+          return data;
         });
       });
     }
-    $("#add-link-btn").addEventListener("click", function () {
-      var slug = $("#l-slug").value.trim();
-      var dest = $("#l-dest").value.trim();
-      if (!slug || !dest) { toast("Slug and destination required"); return; }
-      api("/api/links", { method: "POST", body: { slug: slug, destination: dest, network: $("#l-network").value, post_slug: $("#l-post").value } })
-        .then(function (r) {
-          if (r.ok) {
-            toast("Link saved");
-            $("#l-slug").value = ""; $("#l-dest").value = ""; $("#l-post").value = "";
-            loadLinks(); loadStats();
-          } else { toast(r.error || "Failed"); }
-        });
+
+    function showLogin() {
+      $('#login-view').hidden = false;
+      $('#dashboard-view').hidden = true;
+    }
+
+    function showDashboard() {
+      $('#login-view').hidden = true;
+      $('#dashboard-view').hidden = false;
+      loadOverview();
+      loadPosts();
+      maybeRestoreDraft();
+    }
+
+    function switchTab(name) {
+      if (state.dirty && !$('#post-editor-view').hidden && name !== 'journal' && !confirm('You have unsaved changes. Leave the editor?')) return;
+      $$('.studio-nav [role="tab"]').forEach(function (button) { button.setAttribute('aria-selected', String(button.dataset.tab === name)); });
+      $$('.studio-panel').forEach(function (panel) { panel.hidden = panel.id !== 'panel-' + name; });
+      var titles = { overview: 'Overview', journal: 'Journal', subscribers: 'Subscribers', newsletter: 'Newsletter' };
+      $('#page-title').textContent = titles[name] || 'Studio';
+      if (name === 'overview') loadOverview();
+      if (name === 'journal') loadPosts();
+      if (name === 'subscribers') loadSubscribers();
+      if (name === 'newsletter') loadNewsletterStatus();
+    }
+
+    $$('.studio-nav [role="tab"]').forEach(function (button) { button.addEventListener('click', function () { switchTab(button.dataset.tab); }); });
+    $$('[data-open-tab]').forEach(function (button) { button.addEventListener('click', function () { switchTab(button.dataset.openTab); }); });
+
+    $('#login-form').addEventListener('submit', function (event) {
+      event.preventDefault();
+      var button = event.currentTarget.querySelector('button');
+      button.disabled = true;
+      $('#login-error').textContent = '';
+      api('/api/admin/login', { method: 'POST', body: { password: $('#login-password').value } })
+        .then(function () { $('#login-password').value = ''; showDashboard(); })
+        .catch(function (error) { $('#login-error').textContent = error.message; })
+        .finally(function () { button.disabled = false; });
     });
 
-    // ---- Posts ----
-    var editingSlug = null;
-    var attachedProducts = [];   // array of { id, name, image_url, why_html, link_slug, link_label, section_heading, image_text }
-    var slugManuallyEdited = false;
+    $('#logout-button').addEventListener('click', function () { api('/api/admin/logout', { method: 'POST' }).finally(showLogin); });
 
-    function isPublished(value) { return value === true || value === 1 || value === "1"; }
+    function isPublished(value) { return value === true || value === 1 || value === '1'; }
+    function formatDate(value) { if (!value) return '—'; var d = new Date(String(value).replace(' ', 'T') + (String(value).includes('Z') ? '' : 'Z')); return isNaN(d.getTime()) ? value : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); }
+
+    function loadOverview() {
+      api('/api/stats').then(function (data) {
+        state.stats = data;
+        $('#stat-total').textContent = data.total_posts || 0;
+        $('#stat-published').textContent = data.published_posts || 0;
+        $('#stat-drafts').textContent = data.draft_posts || 0;
+        $('#stat-subscribers').textContent = data.subscribers || 0;
+        var recent = data.recent_posts || [];
+        $('#recent-posts').innerHTML = recent.length ? '<div class="table-wrap"><table><tbody>' + recent.map(function (post) {
+          return '<tr><td><button class="link table-title" type="button" data-overview-edit="' + escapeHtml(post.slug) + '">' + escapeHtml(post.title) + '</button><div class="muted">' + escapeHtml(post.category) + '</div></td><td><span class="badge ' + (isPublished(post.published) ? 'badge--published' : 'badge--draft') + '">' + (isPublished(post.published) ? 'Published' : 'Draft') + '</span></td></tr>';
+        }).join('') + '</tbody></table></div>' : '<p class="empty-state">No stories yet. Start with your first Journal entry.</p>';
+        $$('[data-overview-edit]').forEach(function (button) { button.addEventListener('click', function () { switchTab('journal'); openEditor(button.dataset.overviewEdit); }); });
+        var counts = data.category_counts || {};
+        $('#category-counts').innerHTML = CATEGORIES.map(function (category) { return '<div class="category-row"><span>' + escapeHtml(category) + '</span><strong>' + Number(counts[category] || 0) + '</strong></div>'; }).join('');
+      }).catch(function (error) { toast(error.message); });
+    }
 
     function loadPosts() {
-      api("/api/posts").then(function (r) {
-        var tb = $("#posts-table tbody"); tb.innerHTML = "";
-        (r.posts || []).forEach(function (p) {
-          var tr = document.createElement("tr");
-          tr.innerHTML = "<td><a href='/post/" + esc(p.slug) + "/' target='_blank'>" + esc(p.title) + "</a></td><td>" + esc(p.category) + "</td><td>" + (isPublished(p.published) ? "<span class='badge'>Published</span>" : "<span class='badge' style='background:var(--color-surface-base);'>Draft</span>") + "</td><td><button class='btn btn--secondary' data-edit='" + esc(p.slug) + "'>Edit</button> <button class='btn btn--error' data-delete-post='" + esc(p.slug) + "'>Delete</button></td>";
-          tb.appendChild(tr);
-        });
-        $$("[data-edit]").forEach(function (b) { b.addEventListener("click", function () { openEditor(b.dataset.edit); }); });
-        $$("[data-delete-post]").forEach(function (b) { b.addEventListener("click", function () {
-          if (!confirm("Delete this post?")) return;
-          api("/api/posts/" + encodeURIComponent(b.dataset.deletePost), { method: "DELETE" }).then(function (r) {
-            if (r.ok) { toast("Post deleted"); loadPosts(); } else { toast(r.error || "Delete failed"); }
-          });
-        }); });
+      return api('/api/posts').then(function (data) { state.posts = data.posts || []; renderPosts(); }).catch(function (error) { toast(error.message); });
+    }
+
+    function renderPosts() {
+      var query = $('#post-search').value.trim().toLowerCase();
+      var category = $('#post-category-filter').value;
+      var status = $('#post-status-filter').value;
+      var posts = state.posts.filter(function (post) {
+        if (query && String(post.title).toLowerCase().indexOf(query) === -1) return false;
+        if (category && post.category !== category) return false;
+        if (status === 'published' && !isPublished(post.published)) return false;
+        if (status === 'draft' && isPublished(post.published)) return false;
+        return true;
       });
+      $('#posts-table-body').innerHTML = posts.map(function (post) {
+        return '<tr><td><button class="link table-title" type="button" data-edit-post="' + escapeHtml(post.slug) + '">' + escapeHtml(post.title) + '</button></td><td>' + escapeHtml(post.category) + '</td><td><span class="badge ' + (isPublished(post.published) ? 'badge--published' : 'badge--draft') + '">' + (isPublished(post.published) ? 'Published' : 'Draft') + '</span></td><td>' + escapeHtml(formatDate(post.updated_at)) + '</td><td><div class="table-actions"><a class="btn btn--secondary" href="/post/' + encodeURIComponent(post.slug) + '/" target="_blank">View</a><button class="btn btn--secondary" type="button" data-edit-post="' + escapeHtml(post.slug) + '">Edit</button></div></td></tr>';
+      }).join('');
+      $('#posts-empty').hidden = posts.length !== 0;
+      $$('[data-edit-post]').forEach(function (button) { button.addEventListener('click', function () { openEditor(button.dataset.editPost); }); });
     }
 
-    $("#new-post-btn").addEventListener("click", function () { openEditor(null); });
+    ['post-search', 'post-category-filter', 'post-status-filter'].forEach(function (id) { $('#' + id).addEventListener('input', renderPosts); });
 
-    // Unsaved-changes tracking for the post editor
-    var postFormDirty = false;
-    $("#post-form").addEventListener("input", function () { postFormDirty = true; });
-    window.addEventListener("beforeunload", function (e) {
-      if (postFormDirty && !$("#posts-editor-view").hidden) { e.preventDefault(); e.returnValue = ""; }
-    });
-
-    $("#cancel-post-btn").addEventListener("click", function () {
-      if (postFormDirty && !confirm("You have unsaved changes. Discard them?")) return;
-      postFormDirty = false;
-      $("#posts-list-view").hidden = false; $("#posts-editor-view").hidden = true;
-    });
-
-    function slugify(s) {
-      return s.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").substring(0, 80);
+    function slugify(value) { return String(value || '').toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').slice(0, 80); }
+    function getBody() { return state.editorReady && window.tinymce && tinymce.get('post-body') ? tinymce.get('post-body').getContent() : $('#post-body').value; }
+    function setBody(html) { state.pendingBody = html || ''; if (state.editorReady && window.tinymce && tinymce.get('post-body')) tinymce.get('post-body').setContent(state.pendingBody); else $('#post-body').value = state.pendingBody; updateWordCount(); }
+    function plainText(html) { var node = document.createElement('div'); node.innerHTML = String(html || ''); return (node.textContent || '').replace(/\s+/g, ' ').trim(); }
+    function wordCount(html) { var text = plainText(html); return text ? text.split(/\s+/).length : 0; }
+    function estimatedReadTime(html) { var count = wordCount(html); return count ? Math.max(1, Math.round(count / 220)) + ' min read' : ''; }
+    function updateWordCount() {
+      var html = getBody();
+      var text = plainText(html);
+      var count = wordCount(html);
+      var paragraphs = (String(html).match(/<(p|h2|h3|blockquote|li)\b/gi) || []).length;
+      var estimate = estimatedReadTime(html) || '0 min read';
+      $('#word-count').textContent = count.toLocaleString() + (count === 1 ? ' word' : ' words');
+      $('#character-count').textContent = text.length.toLocaleString() + (text.length === 1 ? ' character' : ' characters');
+      $('#paragraph-count').textContent = paragraphs.toLocaleString() + (paragraphs === 1 ? ' paragraph' : ' paragraphs');
+      $('#reading-estimate').textContent = estimate;
+      $('#read-time-help').textContent = count ? 'Estimated at ' + estimate + '.' : 'Based on approximately 220 words per minute.';
+      updateReadiness();
     }
 
-    // Convert plain text with blank lines into HTML paragraphs.
-    function plainTextToHtml(text) {
-      if (!text) return "";
-      var blocks = text.split(/\n\s*\n/);
-      var html = "";
-      for (var i = 0; i < blocks.length; i++) {
-        var block = blocks[i].trim();
-        if (!block) continue;
-        // Preserve single line breaks within a paragraph as <br>
-        block = block.replace(/\n/g, "<br>");
-        html += "<p>" + block + "</p>\n";
-      }
-      return html;
+    function updateFieldCounts() {
+      $('#title-count').textContent = $('#post-title').value.trim().length;
+      $('#summary-count').textContent = $('#post-summary').value.trim().length;
+      $('#meta-count').textContent = $('#post-meta').value.trim().length;
+    }
+
+    function setChecklistItem(name, ready, message) {
+      var item = $('[data-check="' + name + '"]');
+      if (!item) return;
+      item.classList.toggle('is-ready', ready);
+      item.querySelector('.check-item__icon').textContent = ready ? '✓' : item.dataset.check === 'title' ? '1' : item.dataset.check === 'category' ? '2' : item.dataset.check === 'summary' ? '3' : item.dataset.check === 'body' ? '4' : item.dataset.check === 'meta' ? '5' : '6';
+      item.querySelector('span:last-child').textContent = message;
+    }
+
+    function updateReadiness() {
+      var titleLength = $('#post-title').value.trim().length;
+      var summaryLength = $('#post-summary').value.trim().length;
+      var metaLength = $('#post-meta').value.trim().length;
+      var words = wordCount(getBody());
+      var hasImage = !!$('#post-image').value.trim();
+      var hasImageAlt = !!$('#post-image-alt').value.trim();
+      setChecklistItem('title', titleLength >= 10 && titleLength <= 100, titleLength ? (titleLength <= 100 ? 'Title is clear and within a strong length.' : 'Shorten the title to about 100 characters.') : 'Add a clear story title.');
+      setChecklistItem('category', CATEGORIES.indexOf($('#post-category').value) !== -1, $('#post-category').value ? 'Journal category selected.' : 'Choose a Journal category.');
+      setChecklistItem('summary', summaryLength >= 40 && summaryLength <= 220, summaryLength ? (summaryLength <= 220 ? 'Standfirst is ready.' : 'Tighten the standfirst to about 220 characters.') : 'Add a standfirst for the article page.');
+      setChecklistItem('body', words >= 300, words ? (words >= 300 ? 'Story has a substantial first draft.' : 'Keep developing the story; 300+ words is a useful baseline.') : 'Build a useful story with clear sections.');
+      setChecklistItem('meta', metaLength >= 70 && metaLength <= 155, metaLength ? (metaLength <= 155 ? 'Search description is a good length.' : 'Shorten the search description to 155 characters.') : 'Write a search description.');
+      setChecklistItem('image', hasImage && hasImageAlt, hasImage ? (hasImageAlt ? 'Featured image and description are ready.' : 'Describe the featured image for accessibility.') : 'Add an image and accessible description.');
+    }
+
+    function resetEditor() {
+      $('#post-form').reset();
+      setBody('');
+      $('#story-image-preview').style.display = 'none';
+      $('#story-image-preview').removeAttribute('src');
+      $('#post-slug').disabled = false;
+      $('#slug-help').textContent = 'Generated from the title. Locked after the first save.';
+      $('#preview-post-link').hidden = true;
+      $('#delete-post-button').hidden = true;
+      $('#editor-status').className = 'badge badge--draft';
+      $('#editor-status').textContent = 'New draft';
+      updateFieldCounts();
+      updateReadiness();
+      state.editingSlug = null;
+      state.dirty = false;
     }
 
     function openEditor(slug) {
-      editingSlug = slug;
-      $("#post-form").reset();
-      $("#p-category").value = "";
-      $("#p-status-display").textContent = "New draft";
-      $("#publish-post-btn").textContent = "Publish";
-      $("#save-draft-btn").textContent = "Save draft";
-      $("#p-body").value = "";
-      setEditorContent("");
-      $("#p-slug").disabled = false;
-      $("#p-slug-hint").textContent = "auto-generated";
-      $("#p-slug-edit-note").style.display = "none";
-      $("#p-og-preview").src = ""; $("#p-og-preview").style.display = "none"; $("#p-og-fallback").style.display = "flex";
-      $("#p-eyebrow").value = ""; $("#p-readtime").value = ""; $("#p-meta").value = "";
-      updateMetaCount();
-      $("#delete-post-btn").hidden = true;
-      $("#editor-preview-link").hidden = true;
-      slugManuallyEdited = false;
-      attachedProducts = [];
-      renderAttachedProducts();
-      refreshAttachSelect();
-
-      loadLinks().then(function () {
-        if (slug) {
-          api("/api/posts/" + encodeURIComponent(slug)).then(function (r) {
-            var p = r.post; if (!p) { toast("Could not load post content"); return; }
-            $("#p-slug").value = p.slug; $("#p-title").value = p.title; $("#p-category").value = p.category;
-            $("#p-ogimage").value = p.og_image || "";
-            $("#p-eyebrow").value = p.eyebrow || "";
-            $("#p-readtime").value = p.read_time || "";
-            $("#p-meta").value = p.meta_description || "";
-            updateMetaCount();
-            if (p.og_image) { $("#p-ogimage").dispatchEvent(new Event("input")); }
-            $("#p-body").value = p.intro_html || p.body_html || "";
-            setEditorContent(p.intro_html || p.body_html || "");
-            $("#p-status-display").textContent = isPublished(p.published) ? "Published" : "Draft";
-            $("#publish-post-btn").textContent = isPublished(p.published) ? "Update post" : "Publish";
-            $("#save-draft-btn").textContent = isPublished(p.published) ? "Unpublish & save" : "Save draft";
-            $("#p-slug").disabled = true;
-            $("#p-slug-hint").textContent = "locked on edit";
-            $("#p-slug-edit-note").style.display = "block";
-            $("#editor-title").textContent = "Edit post";
-            $("#delete-post-btn").hidden = false;
-            $("#editor-preview-link").href = "/post/" + esc(p.slug) + "/";
-            $("#editor-preview-link").hidden = false;
-            // Load attached standalone products
-            attachedProducts = (p.attached_products || []).map(function (ap) {
-              return {
-                id: ap.id, name: ap.name, image_url: ap.image_url, why_html: ap.why_html,
-                link_slug: ap.link_slug, link_label: ap.link_label,
-                section_heading: ap.section_heading || "", image_text: ap.image_text || ""
-              };
-            });
-            renderAttachedProducts();
-            postFormDirty = false;
-          });
-        } else {
-          $("#editor-title").textContent = "New post";
-        }
-      });
-      postFormDirty = false;
-      $("#posts-list-view").hidden = true; $("#posts-editor-view").hidden = false;
+      resetEditor();
+      $('#posts-list-view').hidden = true;
+      $('#post-editor-view').hidden = false;
+      if (!slug) { $('#editor-kicker').textContent = 'New story'; $('#editor-title').textContent = 'Untitled story'; return; }
+      state.editingSlug = slug;
+      $('#editor-kicker').textContent = 'Edit story';
+      $('#editor-title').textContent = 'Loading…';
+      api('/api/posts/' + encodeURIComponent(slug)).then(function (data) {
+        var post = data.post;
+        $('#post-title').value = post.title || '';
+        $('#post-summary').value = post.summary || '';
+        $('#post-category').value = post.category || '';
+        $('#post-slug').value = post.slug || '';
+        $('#post-slug').disabled = true;
+        $('#slug-help').textContent = 'Locked to protect existing links.';
+        $('#post-eyebrow').value = post.eyebrow || '';
+        $('#post-read-time').value = post.read_time || '';
+        $('#post-meta').value = post.meta_description || '';
+        $('#post-image').value = post.og_image || '';
+        $('#post-image-alt').value = post.image_alt || '';
+        setBody(post.intro_html || post.body_html || '');
+        updateFieldCounts(); updateImagePreview(); updateReadiness();
+        $('#editor-title').textContent = post.title || 'Untitled story';
+        $('#editor-status').className = 'badge ' + (isPublished(post.published) ? 'badge--published' : 'badge--draft');
+        $('#editor-status').textContent = isPublished(post.published) ? 'Published' : 'Draft';
+        $('#publish-button').textContent = isPublished(post.published) ? 'Update published story' : 'Publish story';
+        $('#save-draft-button').textContent = isPublished(post.published) ? 'Move to drafts' : 'Save draft';
+        $('#preview-post-link').href = '/post/' + encodeURIComponent(post.slug) + '/';
+        $('#preview-post-link').hidden = false;
+        $('#delete-post-button').hidden = false;
+        state.dirty = false;
+      }).catch(function (error) { toast(error.message); closeEditor(true); });
     }
 
-    // ---- Local draft backup ----
-    // beforeunload only catches deliberate navigation. A crash, a dead battery,
-    // or a killed tab loses everything, so mirror the form to localStorage and
-    // offer it back on next open. Cleared on successful save.
-    var DRAFT_KEY = "eira:post-draft";
-    var draftTimer = null;
-
-    function draftSnapshot() {
-      return {
-        slug: $("#p-slug").value, title: $("#p-title").value,
-        category: $("#p-category").value, eyebrow: $("#p-eyebrow").value,
-        readtime: $("#p-readtime").value, meta: $("#p-meta").value,
-        ogimage: $("#p-ogimage").value,
-        body: tinymceReady ? getEditorContent() : "",
-        editingSlug: editingSlug, savedAt: new Date().toISOString()
-      };
-    }
-    function saveLocalDraft() {
-      if ($("#posts-editor-view").hidden) return;
-      if (!postFormDirty) return;
-      try {
-        localStorage.setItem(DRAFT_KEY, JSON.stringify(draftSnapshot()));
-        var el = $("#draft-status");
-        if (el) el.textContent = "Backed up locally " + new Date().toLocaleTimeString();
-      } catch (e) { /* quota or private mode — backup is best-effort */ }
-    }
-    function clearLocalDraft() {
-      try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
-      var el = $("#draft-status"); if (el) el.textContent = "";
-    }
-    function offerDraftRecovery() {
-      var raw = null;
-      try { raw = localStorage.getItem(DRAFT_KEY); } catch (e) { return; }
-      if (!raw) return;
-      var d; try { d = JSON.parse(raw); } catch (e) { clearLocalDraft(); return; }
-      if (!d || (!d.title && !d.body)) { clearLocalDraft(); return; }
-      var when = d.savedAt ? new Date(d.savedAt).toLocaleString() : "earlier";
-      var what = d.title ? '"' + d.title + '"' : "an untitled post";
-      if (!confirm("Unsaved work found for " + what + " from " + when + ".\n\nRestore it?")) { clearLocalDraft(); return; }
-      editingSlug = d.editingSlug || null;
-      $("#p-slug").value = d.slug || ""; $("#p-title").value = d.title || "";
-      $("#p-category").value = d.category || ""; $("#p-eyebrow").value = d.eyebrow || "";
-      $("#p-readtime").value = d.readtime || ""; $("#p-meta").value = d.meta || "";
-      $("#p-ogimage").value = d.ogimage || "";
-      setEditorContent(d.body || "");
-      updateMetaCount(); refreshWordStats();
-      postFormDirty = true;
-      // showDash() leaves the Stats tab active, so the restored editor would be
-      // inside a hidden panel. Bring the Posts tab forward too.
-      $$(".admin-tabs button").forEach(function (b) { b.setAttribute("aria-selected", "false"); });
-      $$(".admin-tabs button[data-tab=posts]")[0].setAttribute("aria-selected", "true");
-      $$(".panel").forEach(function (p) { p.hidden = true; });
-      $("#panel-posts").hidden = false;
-      $("#posts-list-view").hidden = true; $("#posts-editor-view").hidden = false;
-      toast("Draft restored — not saved to the server yet");
-    }
-    draftTimer = setInterval(saveLocalDraft, 8000);
-
-    // Recovery needs two things that finish in a nondeterministic order: the
-    // auth check (so we know the dashboard is up) and TinyMCE init (so the body
-    // can be restored). Call this from both; whichever lands second wins, and
-    // the flag keeps the prompt to once per page load.
-    var draftRecoveryOffered = false;
-    function maybeOfferDraftRecovery() {
-      if (draftRecoveryOffered) return;
-      if (!tinymceReady) return;
-      if ($("#dash-view").hidden) return;
-      draftRecoveryOffered = true;
-      offerDraftRecovery();
+    function closeEditor(force) {
+      if (!force && state.dirty && !confirm('Discard your unsaved changes?')) return;
+      state.dirty = false;
+      $('#posts-list-view').hidden = false;
+      $('#post-editor-view').hidden = true;
+      loadPosts();
     }
 
-    // ---- Affiliate link insertion ----
-    // Cloaked /go/ links are the core of this blog. Typing them by hand means
-    // leaving the editor to look up a slug, and risks missing the rel
-    // attributes that keep the site compliant with Google + ASA rules.
-    function insertAffiliateLink(editor) {
-      if (!linksCache || !linksCache.length) {
-        toast("No links yet — add one in the Links tab first");
-        return;
-      }
-      var selection = editor.selection.getContent({ format: "text" });
-      var items = linksCache.map(function (l) {
-        var label = "/go/" + l.slug + (l.network ? "  (" + l.network + ")" : "");
-        return { type: "listitem", text: label, value: l.slug };
-      });
-      editor.windowManager.open({
-        title: "Insert affiliate link",
-        body: {
-          type: "panel",
-          items: [
-            { type: "selectbox", name: "slug", label: "Cloaked link", items: items.map(function (i) { return { text: i.text, value: i.value }; }) },
-            { type: "input", name: "text", label: "Link text", placeholder: "Shop this pick" }
-          ]
-        },
-        initialData: { slug: linksCache[0].slug, text: selection || "" },
-        buttons: [
-          { type: "cancel", text: "Cancel" },
-          { type: "submit", text: "Insert", primary: true }
-        ],
-        onSubmit: function (api) {
-          var data = api.getData();
-          var text = (data.text || "").trim() || "Shop this pick";
-          var href = "/go/" + data.slug;
-          var html = '<a href="' + href + '" rel="sponsored nofollow noopener" target="_blank">' + esc(text) + "</a>";
-          editor.insertContent(html);
-          api.close();
-        }
-      });
-    }
-
-    // ---- SEO helpers ----
-    // Google truncates around 155 chars, so warn rather than hard-block.
-    function updateMetaCount() {
-      var el = $("#p-meta"); if (!el) return;
-      var n = el.value.trim().length;
-      $("#p-meta-count").textContent = n;
-      var warn = $("#p-meta-warn");
-      if (n === 0) { warn.textContent = "empty — Google will invent one from the page"; warn.style.color = "var(--color-state-error)"; }
-      else if (n < 70) { warn.textContent = "a bit short"; warn.style.color = "var(--color-text-muted)"; }
-      else if (n > 165) { warn.textContent = "will be cut off in results"; warn.style.color = "var(--color-state-error)"; }
-      else { warn.textContent = "good length"; warn.style.color = "var(--color-state-success)"; }
-    }
-    $("#p-meta").addEventListener("input", updateMetaCount);
-
-    function countWords(html) {
-      var text = String(html || "").replace(/<[^>]*>/g, " ").replace(/&[a-z]+;/gi, " ");
-      var words = text.trim().split(/\s+/).filter(Boolean);
-      return words.length;
-    }
-    // 220 wpm is a common estimate for casual editorial reading.
-    function estimateReadTime(html) {
-      var w = countWords(html);
-      if (!w) return null;
-      return Math.max(1, Math.round(w / 220)) + " min read";
-    }
-    function refreshWordStats() {
-      var html = tinymceReady ? getEditorContent() : ($("#p-body") ? $("#p-body").value : "");
-      var w = countWords(html);
-      var hint = $("#p-readtime-hint");
-      if (hint) hint.textContent = w ? w.toLocaleString() + " words · ~" + estimateReadTime(html) : "auto from word count";
-    }
-
-    $("#p-title").addEventListener("input", function () {
-      if (!slugManuallyEdited && !editingSlug) {
-        $("#p-slug").value = slugify(this.value);
-      }
-    });
-    $("#p-slug").addEventListener("input", function () { slugManuallyEdited = true; });
-
-    // OG / Pinterest image preview
-    $("#p-ogimage").addEventListener("input", function () {
-      var src = this.value.trim();
-      var img = $("#p-og-preview");
-      var fallback = $("#p-og-fallback");
-      if (!src) { img.src = ""; img.style.display = "none"; fallback.style.display = "flex"; return; }
-      img.src = src.startsWith("http") || src.startsWith("/") ? src : "/" + src;
-      img.style.display = "block";
-      fallback.style.display = "none";
-      img.onerror = function () { img.style.display = "none"; fallback.style.display = "flex"; };
-    });
-
-    // Refresh the attach-product dropdown from productsCache
-    function refreshAttachSelect() {
-      var sel = $("#attach-product-select");
-      sel.innerHTML = '<option value="">— Select a product to attach —</option>';
-      productsCache.forEach(function (p) {
-        // Skip already-attached
-        if (attachedProducts.some(function (a) { return String(a.id) === String(p.id); })) return;
-        var opt = document.createElement("option");
-        opt.value = p.id; opt.textContent = p.name;
-        sel.appendChild(opt);
-      });
-    }
-
-    function renderAttachedProducts() {
-      var container = $("#product-list");
-      container.innerHTML = "";
-      if (attachedProducts.length === 0) {
-        container.innerHTML = '<p class="muted" style="text-align:center;">No products attached. Select one below to add.</p>';
-        refreshAttachSelect();
-        return;
-      }
-      attachedProducts.forEach(function (prod, idx) {
-        var div = document.createElement("div");
-        div.className = "product-item";
-        var thumb = prod.image_url
-          ? '<img src="' + esc(prod.image_url) + '" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:var(--radius-sm);flex-shrink:0;" />'
-          : '<div style="width:56px;height:56px;border-radius:var(--radius-sm);background:var(--color-surface-strong);flex-shrink:0;"></div>';
-        div.innerHTML = ''
-          + '<div class="product-item__head"><span>' + esc(prod.name || "Product") + '</span>'
-          +   '<div style="display:flex;gap:var(--space-3);">'
-          +     '<button type="button" data-up="' + idx + '" ' + (idx === 0 ? 'disabled' : '') + '>↑</button>'
-          +     '<button type="button" data-down="' + idx + '" ' + (idx === attachedProducts.length - 1 ? 'disabled' : '') + '>↓</button>'
-          +     '<button type="button" data-detach="' + idx + '">Remove</button>'
-          +   '</div>'
-          + '</div>'
-          + '<div style="display:flex;gap:var(--space-4);align-items:flex-start;margin-top:var(--space-3);">'
-          +   thumb
-          +   '<div style="flex:1;">'
-          +     '<p class="muted" style="margin-bottom:var(--space-2);">Link: <code>/go/' + esc(prod.link_slug || "—") + '</code></p>'
-          +     '<div class="two-col">'
-          +       '<div class="field"><label>Section heading</label><input class="input" data-ovr="section_heading" data-idx="' + idx + '" value="' + esc(prod.section_heading || "") + '" placeholder="The shortlist" /></div>'
-          +       '<div class="field"><label>Image text (override)</label><input class="input" data-ovr="image_text" data-idx="' + idx + '" value="' + esc(prod.image_text || "") + '" placeholder="01" /></div>'
-          +     '</div>'
-          +   '</div>'
-          + '</div>';
-        div.querySelectorAll("[data-ovr]").forEach(function (el) {
-          el.addEventListener("input", function () {
-            attachedProducts[parseInt(el.dataset.idx, 10)][el.dataset.ovr] = el.value;
-          });
-        });
-        div.querySelector("[data-detach]").addEventListener("click", function () {
-          attachedProducts.splice(idx, 1);
-          renderAttachedProducts();
-        });
-        div.querySelector("[data-up]").addEventListener("click", function () {
-          if (idx === 0) return;
-          var tmp = attachedProducts[idx - 1];
-          attachedProducts[idx - 1] = attachedProducts[idx];
-          attachedProducts[idx] = tmp;
-          renderAttachedProducts();
-        });
-        div.querySelector("[data-down]").addEventListener("click", function () {
-          if (idx === attachedProducts.length - 1) return;
-          var tmp = attachedProducts[idx + 1];
-          attachedProducts[idx + 1] = attachedProducts[idx];
-          attachedProducts[idx] = tmp;
-          renderAttachedProducts();
-        });
-        container.appendChild(div);
-      });
-      refreshAttachSelect();
-    }
-
-    $("#attach-product-btn").addEventListener("click", function () {
-      var sel = $("#attach-product-select");
-      var pid = sel.value;
-      if (!pid) { toast("Select a product first"); return; }
-      var prod = productsCache.find(function (p) { return String(p.id) === String(pid); });
-      if (!prod) return;
-      attachedProducts.push({
-        id: prod.id, name: prod.name, image_url: prod.image_url, why_html: prod.why_html,
-        link_slug: prod.link_slug, link_label: prod.link_label,
-        section_heading: "", image_text: ""
-      });
-      renderAttachedProducts();
-    });
-
-    $("#go-to-products-tab").addEventListener("click", function (e) {
-      e.preventDefault();
-      $$(".admin-tabs button").forEach(function (b) { b.setAttribute("aria-selected", "false"); });
-      $$(".admin-tabs button[data-tab=products]")[0].setAttribute("aria-selected", "true");
-      $$(".panel").forEach(function (p) { p.hidden = true; });
-      $("#panel-products").hidden = false;
-    });
+    $('#new-post-button').addEventListener('click', function () { openEditor(null); });
+    $('#quick-new-post').addEventListener('click', function () { switchTab('journal'); openEditor(null); });
+    $('#close-editor-button').addEventListener('click', function () { closeEditor(false); });
+    $('#post-form').addEventListener('input', function () { state.dirty = true; updateFieldCounts(); updateReadiness(); saveLocalDraftSoon(); });
+    $('#post-title').addEventListener('input', function () { if (!state.editingSlug) $('#post-slug').value = slugify(this.value); $('#editor-title').textContent = this.value.trim() || 'Untitled story'; });
+    $('#post-image').addEventListener('input', updateImagePreview);
+    function updateImagePreview() { var value = $('#post-image').value.trim(); var image = $('#story-image-preview'); if (!value) { image.style.display = 'none'; image.removeAttribute('src'); return; } image.src = value.indexOf('http') === 0 || value.indexOf('/') === 0 ? value : '/' + value; image.style.display = 'block'; image.onerror = function () { image.style.display = 'none'; }; }
 
     function savePost(published) {
-      var slug = $("#p-slug").value.trim();
-      if (!slug) { toast("Slug is required — add a title first"); return; }
-      if (!$("#p-title").value.trim()) { toast("Title is required"); return; }
-      if (!$("#p-category").value) { toast("Category is required"); return; }
-      var htmlContent = getEditorContent();
-      var attachedIds = attachedProducts.map(function (a) {
-        return { product_id: a.id, section_heading: a.section_heading || null, image_text: a.image_text || null };
-      });
-      var payload = {
-        slug: slug,
-        title: $("#p-title").value,
-        category: $("#p-category").value,
-        meta_description: $("#p-meta").value.trim() || null,
-        eyebrow: $("#p-eyebrow").value.trim() || null,
-        read_time: $("#p-readtime").value.trim() || estimateReadTime(htmlContent),
-        intro_html: htmlContent,
-        og_image: $("#p-ogimage").value || null,
-        body_html: "",
-        products_json: "[]",
-        attached_product_ids: attachedIds,
-        published: published
-      };
-      var path = editingSlug ? "/api/posts/" + encodeURIComponent(editingSlug) : "/api/posts";
-      api(path, { method: editingSlug ? "PUT" : "POST", body: payload }).then(function (r) {
-        if (r.ok || r.slug) {
-          postFormDirty = false;
-          clearLocalDraft();
-          toast(published ? "Post published" : "Draft saved");
-          loadPosts();
-          $("#posts-list-view").hidden = false;
-          $("#posts-editor-view").hidden = true;
-        } else { toast(r.error || "Save failed"); }
-      }).catch(function () { toast("Save failed — check your connection"); });
+      var title = $('#post-title').value.trim();
+      var category = $('#post-category').value;
+      var slug = $('#post-slug').value.trim();
+      if (!title) { toast('Add a story title.'); $('#post-title').focus(); return; }
+      if (CATEGORIES.indexOf(category) === -1) { toast('Choose Self Discovery, Life or Beauty.'); $('#post-category').focus(); return; }
+      if (!slug) { toast('Add a URL slug.'); $('#post-slug').focus(); return; }
+      var body = getBody();
+      if (!body.trim()) { toast('Write the story before saving.'); return; }
+      var payload = { slug: slug, title: title, category: category, summary: $('#post-summary').value.trim() || null, meta_description: $('#post-meta').value.trim() || null, eyebrow: $('#post-eyebrow').value.trim() || category + ' · Journal', read_time: $('#post-read-time').value.trim() || estimatedReadTime(body), intro_html: body, body_html: '', og_image: $('#post-image').value.trim() || null, image_alt: $('#post-image-alt').value.trim() || null, published: published };
+      var path = state.editingSlug ? '/api/posts/' + encodeURIComponent(state.editingSlug) : '/api/posts';
+      var buttons = [$('#save-draft-button'), $('#publish-button')]; buttons.forEach(function (button) { button.disabled = true; });
+      api(path, { method: state.editingSlug ? 'PUT' : 'POST', body: payload }).then(function (data) {
+        state.dirty = false; clearLocalDraft(); toast(published ? 'Story published.' : 'Draft saved.'); closeEditor(true); loadOverview();
+      }).catch(function (error) { toast(error.message); }).finally(function () { buttons.forEach(function (button) { button.disabled = false; }); });
     }
 
-    $("#save-draft-btn").addEventListener("click", function () { savePost(false); });
-    $("#publish-post-btn").addEventListener("click", function () { savePost(true); });
+    $('#save-draft-button').addEventListener('click', function () { savePost(false); });
+    $('#publish-button').addEventListener('click', function () { savePost(true); });
+    $('#delete-post-button').addEventListener('click', function () { if (!state.editingSlug || !confirm('Delete this story permanently?')) return; api('/api/posts/' + encodeURIComponent(state.editingSlug), { method: 'DELETE' }).then(function () { state.dirty = false; clearLocalDraft(); toast('Story deleted.'); closeEditor(true); loadOverview(); }).catch(function (error) { toast(error.message); }); });
 
-    $("#delete-post-btn").addEventListener("click", function () {
-      if (!editingSlug || !confirm("Delete this post?")) return;
-      api("/api/posts/" + encodeURIComponent(editingSlug), { method: "DELETE" }).then(function () {
-        toast("Post deleted");
-        loadPosts();
-        $("#posts-list-view").hidden = false;
-        $("#posts-editor-view").hidden = true;
-      });
+    $('#upload-image-button').addEventListener('click', function () { $('#upload-image-input').click(); });
+    $('#upload-image-input').addEventListener('change', function () {
+      var file = this.files && this.files[0]; if (!file) return;
+      if (file.size > 4 * 1024 * 1024) { toast('Images must be 4 MB or smaller.'); this.value = ''; return; }
+      var button = $('#upload-image-button'); button.disabled = true; button.textContent = 'Uploading…';
+      var reader = new FileReader(); reader.onload = function () { api('/api/uploads', { method: 'POST', body: { filename: file.name, contentType: file.type, data: String(reader.result).split(',')[1] } }).then(function (data) { $('#post-image').value = data.url; updateImagePreview(); state.dirty = true; toast('Image uploaded.'); }).catch(function (error) { toast(error.message); }).finally(function () { button.disabled = false; button.textContent = 'Upload'; $('#upload-image-input').value = ''; }); }; reader.readAsDataURL(file);
     });
 
-    // ---- Products ----
-    var editingProductId = null;
-    var productsCache = [];
+    var DRAFT_KEY = 'eira:editorial-draft'; var draftTimer;
+    function draftSnapshot() { return { editingSlug: state.editingSlug, title: $('#post-title').value, summary: $('#post-summary').value, category: $('#post-category').value, slug: $('#post-slug').value, eyebrow: $('#post-eyebrow').value, readTime: $('#post-read-time').value, meta: $('#post-meta').value, image: $('#post-image').value, imageAlt: $('#post-image-alt').value, body: getBody(), savedAt: new Date().toISOString() }; }
+    function saveLocalDraftSoon() { clearTimeout(draftTimer); draftTimer = setTimeout(function () { if (!state.dirty || $('#post-editor-view').hidden) return; try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draftSnapshot())); $('#draft-backup-status').textContent = 'Backed up locally at ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); } catch (error) {} }, 900); }
+    function clearLocalDraft() { try { localStorage.removeItem(DRAFT_KEY); } catch (error) {} }
+    function maybeRestoreDraft() {
+      if (state.draftChecked || !state.editorReady || $('#dashboard-view').hidden) return;
+      state.draftChecked = true;
+      var raw;
+      try { raw = localStorage.getItem(DRAFT_KEY); } catch (error) { return; }
+      if (!raw) return;
+      var draft;
+      try { draft = JSON.parse(raw); } catch (error) { clearLocalDraft(); return; }
+      if (!draft || (!draft.title && !draft.body)) return;
+      if (!confirm('Restore your unsaved story from ' + formatDate(draft.savedAt) + '?')) { clearLocalDraft(); return; }
+      switchTab('journal');
+      openEditor(null);
+      state.editingSlug = draft.editingSlug || null;
+      $('#post-title').value = draft.title || '';
+      $('#post-summary').value = draft.summary || '';
+      $('#post-category').value = draft.category || '';
+      $('#post-slug').value = draft.slug || '';
+      $('#post-eyebrow').value = draft.eyebrow || '';
+      $('#post-read-time').value = draft.readTime || '';
+      $('#post-meta').value = draft.meta || '';
+      $('#post-image').value = draft.image || '';
+      $('#post-image-alt').value = draft.imageAlt || '';
+      setBody(draft.body || '');
+      updateFieldCounts(); updateImagePreview(); updateReadiness();
+      $('#editor-title').textContent = draft.title || 'Untitled story';
+      state.dirty = true;
+      toast('Unsaved story restored.');
+    }
 
-    function loadProducts() {
-      return api("/api/products").then(function (r) {
-        productsCache = r.products || [];
-        var tb = $("#products-table tbody"); tb.innerHTML = "";
-        productsCache.forEach(function (p) {
-          var tr = document.createElement("tr");
-          var thumb = p.image_url
-            ? '<img src="' + esc(p.image_url) + '" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:var(--radius-sm);" />'
-            : '<div style="width:48px;height:48px;border-radius:var(--radius-sm);background:var(--color-surface-strong);"></div>';
-          tr.innerHTML = "<td>" + thumb + "</td>"
-            + "<td>" + esc(p.name) + "</td>"
-            + "<td>" + esc(p.category || "—") + "</td>"
-            + "<td><code>/go/" + esc(p.link_slug || "—") + "</code></td>"
-            + "<td>" + (isPublished(p.published) ? "<span class='badge'>Published</span>" : "<span class='badge' style='background:var(--color-surface-base);'>Draft</span>") + "</td>"
-            + "<td><button class='btn btn--secondary' data-edit-product='" + p.id + "'>Edit</button> <button class='btn btn--error' data-delete-product='" + p.id + "'>Delete</button></td>";
-          tb.appendChild(tr);
-        });
-        $$("[data-edit-product]").forEach(function (b) {
-          b.addEventListener("click", function () { openProductEditor(b.dataset.editProduct); });
-        });
-        $$("[data-delete-product]").forEach(function (b) {
-          b.addEventListener("click", function () {
-            if (!confirm("Delete this product?")) return;
-            api("/api/products/" + encodeURIComponent(b.dataset.deleteProduct), { method: "DELETE" }).then(function (r) {
-              if (r.ok) { toast("Product deleted"); loadProducts(); } else { toast(r.error || "Delete failed"); }
-            });
+    window.addEventListener('beforeunload', function (event) { if (state.dirty && !$('#post-editor-view').hidden) { event.preventDefault(); event.returnValue = ''; } });
+
+    function loadSubscribers() {
+      api('/api/stats').then(function (data) {
+        var subscribers = data.recent_subscribers || [];
+        $('#subscribers-table-body').innerHTML = subscribers.map(function (subscriber) { return '<tr><td>' + escapeHtml(subscriber.email) + '</td><td>' + escapeHtml(subscriber.source || 'Website') + '</td><td>' + escapeHtml(formatDate(subscriber.subscribed_at)) + '</td></tr>'; }).join('');
+        $('#subscribers-empty').hidden = subscribers.length !== 0;
+      }).catch(function (error) { toast(error.message); });
+    }
+
+    $('#export-subscribers-button').addEventListener('click', function () { api('/api/stats').then(function (data) { var rows = [['Email', 'Source', 'Joined']].concat((data.recent_subscribers || []).map(function (item) { return [item.email, item.source || '', item.subscribed_at || '']; })); var csv = rows.map(function (row) { return row.map(function (cell) { return '"' + String(cell).replace(/"/g, '""') + '"'; }).join(','); }).join('\n'); var link = document.createElement('a'); link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); link.download = 'eira-subscribers.csv'; link.click(); URL.revokeObjectURL(link.href); }).catch(function (error) { toast(error.message); }); });
+
+    function loadNewsletterStatus() { api('/api/newsletter').then(function (data) { $('#newsletter-status').textContent = data.configured ? 'Email is connected. ' + data.subscribers + ' subscriber' + (data.subscribers === 1 ? '' : 's') + ' will receive a full send.' : 'Email is not connected. Add RESEND_API_KEY and FROM_EMAIL before sending.'; $('#send-newsletter-button').disabled = !data.configured; $('#send-test-button').disabled = !data.configured; }).catch(function (error) { toast(error.message); }); }
+    function newsletterPayload() { return { subject: $('#newsletter-subject').value.trim(), body_html: $('#newsletter-body').value.trim() }; }
+    $('#send-test-button').addEventListener('click', function () { var payload = newsletterPayload(); payload.test_email = $('#newsletter-test-email').value.trim(); if (!payload.subject || !payload.body_html || !payload.test_email) { toast('Add a subject, message and test email.'); return; } var button = this; button.disabled = true; api('/api/newsletter', { method: 'POST', body: payload }).then(function () { toast('Test email sent.'); }).catch(function (error) { toast(error.message); }).finally(function () { button.disabled = false; }); });
+    $('#send-newsletter-button').addEventListener('click', function () { var payload = newsletterPayload(); if (!payload.subject || !payload.body_html) { toast('Add a subject and message.'); return; } if (!confirm('Send this newsletter to every subscriber?')) return; var button = this; button.disabled = true; button.textContent = 'Sending…'; api('/api/newsletter', { method: 'POST', body: payload }).then(function (data) { toast('Newsletter sent to ' + (data.sent || 0) + ' readers.'); }).catch(function (error) { toast(error.message); }).finally(function () { button.disabled = false; button.textContent = 'Send newsletter'; }); });
+
+    if (window.tinymce) {
+      tinymce.init({
+        selector: '#post-body',
+        menubar: 'edit insert view format table tools',
+        branding: false,
+        promotion: false,
+        browser_spellcheck: true,
+        contextmenu: 'link image table',
+        plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table wordcount quickbars',
+        toolbar: 'undo redo | blocks fontsize | bold italic underline strikethrough forecolor | alignleft aligncenter alignright | bullist numlist blockquote | link image media table | hr charmap | removeformat searchreplace visualblocks code fullscreen',
+        toolbar_mode: 'wrap',
+        quickbars_selection_toolbar: 'bold italic | quicklink blockquote',
+        quickbars_insert_toolbar: 'quickimage quicktable',
+        image_advtab: true,
+        image_caption: true,
+        object_resizing: true,
+        content_style: 'body{font-family:Inter,sans-serif;font-size:17px;line-height:1.75;color:#302b27;padding:28px;max-width:760px;margin:0 auto}h2,h3{font-family:Georgia,serif;line-height:1.2;margin-top:1.8em}blockquote{border-left:3px solid #a85742;margin:1.5rem 0;padding-left:1rem;color:#6f655d}img{max-width:100%;height:auto}a{color:#a85742}',
+        paste_data_images: true,
+        images_upload_handler: function (blobInfo) {
+          return new Promise(function (resolve, reject) {
+            var file = blobInfo.blob();
+            if (file.size > 4 * 1024 * 1024) { reject('Images must be 4 MB or smaller.'); return; }
+            var reader = new FileReader();
+            reader.onload = function () {
+              api('/api/uploads', { method: 'POST', body: { filename: blobInfo.filename(), contentType: file.type, data: String(reader.result).split(',')[1] } })
+                .then(function (data) { resolve(data.url); })
+                .catch(function (error) { reject(error.message); });
+            };
+            reader.readAsDataURL(file);
           });
-        });
-      });
-    }
-
-    $("#new-product-btn").addEventListener("click", function () { openProductEditor(null); });
-    $("#cancel-product-btn").addEventListener("click", function () {
-      $("#products-list-view").hidden = false; $("#products-editor-view").hidden = true;
-    });
-
-    function openProductEditor(id) {
-      editingProductId = id;
-      $("#product-form").reset();
-      $("#pr-image-preview").src = ""; $("#pr-image-preview").style.display = "none"; $("#pr-image-fallback").style.display = "flex";
-      $("#pr-created-link").hidden = true;
-      $("#delete-product-btn").hidden = true;
-
-      if (id) {
-        api("/api/products/" + encodeURIComponent(id)).then(function (r) {
-          var p = r.product; if (!p) return;
-          $("#pr-name").value = p.name || "";
-          $("#pr-category").value = p.category || "";
-          $("#pr-image").value = p.image_url || "";
-          if (p.image_url) { $("#pr-image").dispatchEvent(new Event("input")); }
-          $("#pr-price").value = p.price || "";
-
-          $("#pr-linkurl").value = "";
-          $("#pr-linklabel").value = p.link_label || "";
-          $("#pr-published").value = p.published ? "1" : "0";
-          $("#product-editor-title").textContent = "Edit product";
-          $("#delete-product-btn").hidden = false;
-          $("#pr-created-link").textContent = "Cloaked link: /go/" + (p.link_slug || "—");
-          $("#pr-created-link").hidden = !p.link_slug;
-        });
-      } else {
-        $("#product-editor-title").textContent = "New product";
-      }
-      $("#products-list-view").hidden = true; $("#products-editor-view").hidden = false;
-    }
-
-    // Product image preview
-    $("#pr-image").addEventListener("input", function () {
-      var src = this.value.trim();
-      var img = $("#pr-image-preview");
-      var fallback = $("#pr-image-fallback");
-      if (!src) { img.src = ""; img.style.display = "none"; fallback.style.display = "flex"; return; }
-      img.src = src; img.style.display = "block"; fallback.style.display = "none";
-      img.onerror = function () { img.style.display = "none"; fallback.style.display = "flex"; };
-    });
-
-    $("#product-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      var name = $("#pr-name").value.trim();
-      if (!name) { toast("Product name is required"); return; }
-      var payload = {
-        name: name,
-        image_url: $("#pr-image").value || null,
-        category: $("#pr-category").value || null,
-        price: $("#pr-price").value.trim() || null,
-        link_url: $("#pr-linkurl").value || null,
-        link_label: $("#pr-linklabel").value || null,
-        published: $("#pr-published").value === "1"
-      };
-      var path = editingProductId ? "/api/products/" + encodeURIComponent(editingProductId) : "/api/products";
-      api(path, { method: editingProductId ? "PUT" : "POST", body: payload }).then(function (r) {
-        if (r.ok || r.id) {
-          toast(editingProductId ? "Product updated" : "Product created");
-          loadProducts();
-          $("#products-list-view").hidden = false;
-          $("#products-editor-view").hidden = true;
-        } else { toast(r.error || "Save failed"); }
-      });
-    });
-
-    $("#delete-product-btn").addEventListener("click", function () {
-      if (!editingProductId || !confirm("Delete this product?")) return;
-      api("/api/products/" + encodeURIComponent(editingProductId), { method: "DELETE" }).then(function (r) {
-        if (r.ok) {
-          toast("Product deleted");
-          loadProducts();
-          $("#products-list-view").hidden = false;
-          $("#products-editor-view").hidden = true;
-        } else { toast(r.error || "Delete failed"); }
-      });
-    });
-
-    // ---- Hero slides ----
-    var editingHeroId = null;
-
-    // Hero image preview
-    $("#h-image-url").addEventListener("input", function () {
-      var src = this.value.trim();
-      var img = $("#h-image-preview");
-      var frame = $("#h-preview-frame");
-      var fallback = $("#h-image-fallback");
-      if (!src) { img.src = ""; frame.hidden = true; fallback.style.display = "flex"; return; }
-      img.src = src; frame.hidden = false; fallback.style.display = "none";
-      img.style.objectPosition = $("#h-focal").value || "center";
-      img.onerror = function () { frame.hidden = true; fallback.style.display = "flex"; };
-    });
-    // Update preview crop when focus point changes
-    document.addEventListener("change", function (e) {
-      if (e.target && e.target.id === "h-focal") {
-        $("#h-image-preview").style.objectPosition = e.target.value || "center";
-      }
-    });
-
-    function loadHeroSlides() {
-      api("/api/hero-slides").then(function (r) {
-        var slides = r.slides || [];
-        $("#hero-loading").hidden = true;
-        $("#hero-empty").hidden = slides.length > 0;
-        var container = $("#hero-slides-list"); container.innerHTML = "";
-        if (slides.length === 0) return;
-        var table = document.createElement("table");
-        table.innerHTML = "<thead><tr><th>Preview</th><th>Image URL</th><th>Position</th><th>Status</th><th></th></tr></thead><tbody></tbody>";
-        var tb = table.querySelector("tbody");
-        slides.forEach(function (s, index) {
-          var tr = document.createElement("tr");
-          tr.innerHTML = "<td><img src='" + esc(s.image_url) + "' alt='' style='width:80px; height:50px; object-fit:cover; border-radius:var(--radius-sm); border:1px solid var(--color-border-subtle);' /></td>"
-            + "<td style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'>" + esc(s.image_url) + "</td>"
-            + "<td>" + esc(s.position) + "</td>"
-            + "<td>" + (s.is_active ? "<span class='badge'>Active</span>" : "Hidden") + "</td>"
-            + "<td class='hero-actions'>"
-            + (index > 0 ? "<button class='btn btn--secondary' data-move-hero='" + s.id + "' data-dir='up'>↑</button> " : "")
-            + (index < slides.length - 1 ? "<button class='btn btn--secondary' data-move-hero='" + s.id + "' data-dir='down'>↓</button> " : "")
-            + "<button class='btn btn--secondary' data-edit-hero='" + s.id + "'>Edit</button> "
-            + "<button class='btn btn--error' data-delete-hero='" + s.id + "'>Delete</button>"
-            + "</td>";
-          tb.appendChild(tr);
-        });
-        container.appendChild(table);
-
-        $$("[data-edit-hero]").forEach(function (b) { b.addEventListener("click", function () { openHeroEditor(b.dataset.editHero); }); });
-        $$("[data-delete-hero]").forEach(function (b) { b.addEventListener("click", function () {
-          if (!confirm("Delete this hero slide?")) return;
-          api("/api/hero-slides/" + encodeURIComponent(b.dataset.deleteHero), { method: "DELETE" }).then(function (r) {
-            if (r.ok) { toast("Slide deleted"); loadHeroSlides(); } else { toast(r.error || "Delete failed"); }
+        },
+        setup: function (editor) {
+          editor.on('init', function () {
+            state.editorReady = true;
+            if (state.pendingBody) editor.setContent(state.pendingBody);
+            updateWordCount(); maybeRestoreDraft();
           });
-        }); });
-        $$("[data-move-hero]").forEach(function (b) { b.addEventListener("click", function () {
-          var id = b.dataset.moveHero;
-          var dir = b.dataset.dir;
-          var idx = slides.findIndex(function (s) { return String(s.id) === id; });
-          if (idx < 0) return;
-          var swapIdx = dir === "up" ? idx - 1 : idx + 1;
-          if (swapIdx < 0 || swapIdx >= slides.length) return;
-          var newPos = slides[swapIdx].position;
-          api("/api/hero-slides/" + encodeURIComponent(id), { method: "PUT", body: { image_url: slides[idx].image_url, position: newPos, is_active: slides[idx].is_active } })
-            .then(function () { toast("Moved"); loadHeroSlides(); });
-        }); });
-      });
-    }
-
-    $("#new-hero-btn").addEventListener("click", function () { openHeroEditor(null); });
-    $("#cancel-hero-btn").addEventListener("click", function () {
-      $("#hero-list-view").hidden = false; $("#hero-editor-view").hidden = true;
-    });
-
-    function openHeroEditor(id) {
-      editingHeroId = id;
-      $("#hero-form").reset();
-      $("#h-image-url").value = "";
-      $("#h-image-preview").src = "";
-      $("#h-preview-frame").hidden = true;
-      $("#h-image-fallback").style.display = "flex";
-      $("#h-position").value = "";
-      $("#h-active").value = "1";
-      $("#h-focal").value = "center";
-      $("#delete-hero-btn").hidden = true;
-      $("#hero-editor-title").textContent = id ? "Edit hero slide" : "Add hero slide";
-      $("#hero-list-view").hidden = true; $("#hero-editor-view").hidden = false;
-      if (id) {
-        api("/api/hero-slides/" + encodeURIComponent(id)).then(function (r) {
-          var s = r.slide; if (!s) return;
-          $("#h-image-url").value = s.image_url || "";
-          // Focal must be set before the dispatch below — the input handler
-          // reads #h-focal to position the preview, so setting it afterwards
-          // left every saved slide previewing at "center".
-          $("#h-focal").value = s.focal_position || "center";
-          $("#h-image-url").dispatchEvent(new Event("input"));
-          $("#h-position").value = s.position;
-          $("#h-active").value = s.is_active ? "1" : "0";
-          $("#delete-hero-btn").hidden = false;
-        });
-      }
-    }
-
-    $("#hero-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      var url = $("#h-image-url").value.trim();
-      if (!url) { toast("Image URL is required"); return; }
-      var payload = {
-        image_url: url,
-        position: parseInt($("#h-position").value, 10) || 0,
-        is_active: $("#h-active").value === "1",
-        focal_position: $("#h-focal").value || "center"
-      };
-      var method = editingHeroId ? "PUT" : "POST";
-      var endpoint = editingHeroId ? "/api/hero-slides/" + encodeURIComponent(editingHeroId) : "/api/hero-slides";
-      api(endpoint, { method: method, body: payload }).then(function (r) {
-        if (r.ok || r.slide) {
-          toast(editingHeroId ? "Slide updated" : "Slide added");
-          loadHeroSlides();
-          $("#hero-list-view").hidden = false;
-          $("#hero-editor-view").hidden = true;
-        } else { toast(r.error || "Failed"); }
-      });
-    });
-
-    $("#delete-hero-btn").addEventListener("click", function () {
-      if (!editingHeroId || !confirm("Delete this hero slide?")) return;
-      api("/api/hero-slides/" + encodeURIComponent(editingHeroId), { method: "DELETE" }).then(function (r) {
-        if (r.ok) {
-          toast("Slide deleted");
-          loadHeroSlides();
-          $("#hero-list-view").hidden = false;
-          $("#hero-editor-view").hidden = true;
-        } else { toast(r.error || "Delete failed"); }
-      });
-    });
-
-    // ---- Subscribers ----
-    function loadSubs() {
-      api("/api/stats").then(function (s) {
-        var tb = $("#subs-table tbody"); tb.innerHTML = "";
-        (s.recent_subscribers || []).forEach(function (sub) {
-          var tr = document.createElement("tr");
-          tr.innerHTML = "<td>" + esc(sub.email) + "</td><td>" + esc(sub.source || "—") + "</td><td class='muted'>" + esc(sub.subscribed_at || "") + "</td>";
-          tb.appendChild(tr);
-        });
-      });
-    }
-    $("#export-subs-btn").addEventListener("click", function () {
-      api("/api/stats").then(function (s) {
-        var rows = (s.recent_subscribers || []).map(function (r) { return [r.email, r.source || "", r.subscribed_at || ""]; });
-        var csv = "email,source,subscribed_at\n" + rows.map(function (r) { return r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(","); }).join("\n");
-        var blob = new Blob([csv], { type: "text/csv" });
-        var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "eira-subscribers.csv"; a.click();
-      });
-    });
-
-    // ---- Newsletter ----
-    function loadNewsletter() {
-      api("/api/newsletter").then(function (r) {
-        var el = $("#nl-status");
-        if (!r || r.configured === undefined) { el.textContent = "Couldn't check email status."; return; }
-        if (r.configured) {
-          el.innerHTML = "Email is <strong style='color:var(--color-accent-strong)'>connected</strong> · " + r.subscribers + " subscriber" + (r.subscribers === 1 ? "" : "s") + " will receive your newsletter.";
-          $("#nl-send-btn").disabled = false; $("#nl-test-btn").disabled = false;
-        } else {
-          el.innerHTML = "Email is <strong style='color:#b4462f'>not configured</strong>. Set <code>RESEND_API_KEY</code> and <code>FROM_EMAIL</code> in your environment, then redeploy.";
-          $("#nl-send-btn").disabled = true; $("#nl-test-btn").disabled = true;
+          editor.on('input change SetContent ExecCommand', function () {
+            state.dirty = true; updateWordCount(); saveLocalDraftSoon();
+          });
         }
       });
-    }
-    $("#nl-test-btn").addEventListener("click", function () {
-      var subject = $("#nl-subject").value.trim();
-      var body_html = $("#nl-body").value.trim();
-      var test_email = $("#nl-test").value.trim();
-      if (!subject || !body_html) { toast("Add a subject and body first"); return; }
-      if (!test_email) { toast("Enter a test email address"); return; }
-      var btn = $("#nl-test-btn"); btn.disabled = true; btn.textContent = "Sending…";
-      api("/api/newsletter", { method: "POST", body: { subject: subject, body_html: body_html, test_email: test_email } })
-        .then(function (r) { toast(r.ok ? "Test sent to " + test_email : (r.error || "Test failed")); })
-        .finally(function () { btn.disabled = false; btn.textContent = "Send test"; });
-    });
-    $("#nl-send-btn").addEventListener("click", function () {
-      var subject = $("#nl-subject").value.trim();
-      var body_html = $("#nl-body").value.trim();
-      if (!subject || !body_html) { toast("Add a subject and body first"); return; }
-      if (!confirm("Send this newsletter to ALL subscribers? This can't be undone.")) return;
-      var btn = $("#nl-send-btn"); btn.disabled = true; btn.textContent = "Sending…";
-      api("/api/newsletter", { method: "POST", body: { subject: subject, body_html: body_html } })
-        .then(function (r) {
-          if (r.sent !== undefined) {
-            toast("Sent to " + r.sent + (r.failed ? " · " + r.failed + " failed" : ""));
-            if (r.ok) { $("#nl-subject").value = ""; $("#nl-body").value = ""; }
-          } else { toast(r.error || "Send failed"); }
-        })
-        .finally(function () { btn.disabled = false; btn.textContent = "Send to all subscribers"; });
-    });
+    } else { state.editorReady = true; $('#post-body').addEventListener('input', updateWordCount); }
 
-    // TinyMCE is configured in a separate <script> below, because it has to run
-    // after the CDN bundle loads. That block sits outside this closure and so
-    // cannot see anything declared in here. Expose the handful of hooks it needs
-    // instead of moving the whole admin into global scope.
-    window.eiraAdmin = {
-      insertAffiliateLink: insertAffiliateLink,
-      refreshWordStats: refreshWordStats,
-      maybeOfferDraftRecovery: maybeOfferDraftRecovery,
-      markPostDirty: function () { postFormDirty = true; }
-    };
+    api('/api/admin/me').then(function (data) { if (data.authenticated) showDashboard(); else showLogin(); }).catch(showLogin);
   })();
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.4/tinymce.min.js"></script>
-  <script>
-    // ==========================================
-    // TinyMCE rich text editor (what WordPress uses)
-    // Handles paste from Word/Google Docs natively, auto-uploads pasted/dropped
-    // images via /api/uploads, and produces clean HTML.
-    // ==========================================
-    var tinymceReady = false;
-    var pendingContent = null;
-
-    tinymce.init({
-      selector: '#p-body',
-      // Fallback only — the .tox-tinymce rule in <style> overrides this with a
-      // viewport-relative clamp. Manual drag-resize is off because the editor
-      // now sizes itself.
-      height: 700,
-      resize: false,
-      menubar: false,
-      plugins: 'lists link image code table autolink searchreplace wordcount fullscreen charmap visualblocks media nonbreaking quickbars',
-      toolbar: 'undo redo | blocks fontfamily customfontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | linespacing blockquote hr | affiliatelink link image media table | charmap removeformat | searchreplace visualblocks code fullscreen',
-      toolbar_sticky: true,
-      toolbar_mode: 'sliding',
-      block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Preformatted=pre',
-      font_family_formats: 'Fraunces (headings)=Fraunces,Iowan Old Style,Georgia,serif; Inter (body)=Inter,-apple-system,Segoe UI,sans-serif; Cormorant Garamond=Cormorant Garamond,Georgia,serif; Georgia=georgia,palatino,serif; Times New Roman=times new roman,times,serif; Arial=arial,helvetica,sans-serif; Helvetica=helvetica,arial,sans-serif; Tahoma=tahoma,arial,helvetica,sans-serif; Trebuchet MS=trebuchet ms,geneva,sans-serif; Verdana=verdana,geneva,sans-serif; Courier New=courier new,courier,monospace',
-      quickbars_selection_toolbar: 'bold italic | blocks | affiliatelink link blockquote',
-      quickbars_insert_toolbar: false,
-      link_default_target: '_blank',
-      link_default_protocol: 'https',
-      link_assume_external_targets: true,
-      link_rel_list: [
-        { title: 'Affiliate / paid (sponsored)', value: 'sponsored nofollow noopener' },
-        { title: 'Normal external link', value: 'noopener' },
-        { title: 'Internal link', value: '' }
-      ],
-      content_css: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&display=swap',
-      // The canvas is as wide as the admin shell (~1190px) but a published post
-      // renders inside .container--narrow (760px). Typing at 110+ characters a
-      // line meant paragraphs broke in completely different places once live.
-      // Constrain the writing column to the published measure and set the area
-      // around it in warm sand so it reads as a page.
-      content_style: 'html { background: #F4EDE4; } body { font-family: "Inter", -apple-system, "Segoe UI", sans-serif; font-size: 17px; line-height: 1.7; box-sizing: border-box; max-width: 808px; min-height: calc(100vh - 8px); margin: 0 auto; padding: 32px 24px 96px; color: #2E2A27; background: #FBF8F4; border-left: 1px solid #E9DFD4; border-right: 1px solid #E9DFD4; } h1, h2, h3 { font-family: "Fraunces", "Iowan Old Style", Georgia, serif; font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; color: #2E2A27; } h1 { font-size: 2rem; margin: 1.5rem 0 1rem; } h2 { font-size: 1.5rem; margin: 1.25rem 0 0.75rem; } h3 { font-size: 1.25rem; margin: 1rem 0 0.5rem; } p { margin-bottom: 0.75rem; } img { max-width: 100%; height: auto; border-radius: 16px; margin: 1rem 0; } ul, ol { padding-left: 1.5rem; margin-bottom: 0.75rem; } blockquote { border-left: 4px solid #C4715A; padding-left: 1rem; margin: 1rem 0; font-style: italic; color: #7A6E64; } a { color: #A85742; } table { border-collapse: collapse; } td, th { border: 1px solid #E9DFD4; padding: 8px; }',
-      paste_data_images: true,
-      image_advtab: true,
-      image_caption: true,
-      images_upload_handler: function (blobInfo, progress) {
-        return new Promise(function (resolve, reject) {
-          var file = blobInfo.blob();
-          if (file.size > 4 * 1024 * 1024) { reject('Images must be 4 MB or smaller'); return; }
-          var reader = new FileReader();
-          reader.onload = function () {
-            var base64 = reader.result.split(',')[1];
-            fetch('/api/uploads', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ filename: blobInfo.filename(), contentType: file.type, data: base64 })
-            }).then(function (r) {
-              return r.json().then(function (data) {
-                if (!r.ok) reject(data.error || 'Upload failed');
-                else resolve(data.url);
-              });
-            }).catch(function (err) { reject(err.message || 'Upload failed'); });
-          };
-          reader.onerror = function () { reject('Could not read file'); };
-          reader.readAsDataURL(file);
-        });
-      },
-      setup: function (editor) {
-        editor.ui.registry.addButton('affiliatelink', {
-          icon: 'bookmark',
-          tooltip: 'Insert affiliate link (cloaked /go/ link)',
-          onAction: function () { eiraAdmin.insertAffiliateLink(editor); }
-        });
-
-        // Ctrl/Cmd+Shift+A — same action from the keyboard while writing.
-        editor.addShortcut('meta+shift+65', 'Insert affiliate link', function () {
-          eiraAdmin.insertAffiliateLink(editor);
-        });
-
-        editor.ui.registry.addButton('blockquote', {
-          icon: 'quote',
-          tooltip: 'Blockquote',
-          onAction: function () { editor.execCommand('mceBlockQuote'); }
-        });
-
-        editor.ui.registry.addButton('hr', {
-          icon: 'horizontal-rule',
-          tooltip: 'Horizontal rule',
-          onAction: function () { editor.execCommand('InsertHorizontalRule'); }
-        });
-
-        editor.ui.registry.addSplitButton('customfontsize', {
-          text: '16px',
-          tooltip: 'Font size (click to type a value)',
-          onAction: function () {
-            // Click on the button body: prompt for a custom size
-            var current = editor.queryCommandValue('FontSize') || '16px';
-            var input = window.prompt('Enter font size (e.g. 16, 20px, 1.5em, 120%):', current);
-            if (input !== null && input !== '') {
-              var val = input.trim();
-              // Allow plain numbers (treat as px) or values with units
-              if (/^\d+(\.\d+)?$/.test(val)) { val = val + 'px'; }
-              editor.execCommand('FontSize', false, val);
-              // Update the button label
-              var btn = editor.container.querySelectorAll('.tox-tbtn[data-mce-name="customfontsize"] .tox-tbtn__select-label')[0];
-              if (btn) { btn.textContent = val; }
-            }
-          },
-          onItemAction: function (api, value) {
-            editor.execCommand('FontSize', false, value);
-            var btn = editor.container.querySelectorAll('.tox-tbtn[data-mce-name="customfontsize"] .tox-tbtn__select-label')[0];
-            if (btn) { btn.textContent = value; }
-          },
-          fetch: function (callback) {
-            callback([
-              { type: 'choiceitem', text: '8px', value: '8px' },
-              { type: 'choiceitem', text: '10px', value: '10px' },
-              { type: 'choiceitem', text: '12px', value: '12px' },
-              { type: 'choiceitem', text: '14px', value: '14px' },
-              { type: 'choiceitem', text: '16px', value: '16px' },
-              { type: 'choiceitem', text: '18px', value: '18px' },
-              { type: 'choiceitem', text: '20px', value: '20px' },
-              { type: 'choiceitem', text: '24px', value: '24px' },
-              { type: 'choiceitem', text: '28px', value: '28px' },
-              { type: 'choiceitem', text: '32px', value: '32px' },
-              { type: 'choiceitem', text: '36px', value: '36px' },
-              { type: 'choiceitem', text: '40px', value: '40px' },
-              { type: 'choiceitem', text: '48px', value: '48px' },
-              { type: 'choiceitem', text: '56px', value: '56px' },
-              { type: 'choiceitem', text: '64px', value: '64px' },
-              { type: 'choiceitem', text: '72px', value: '72px' },
-              { type: 'choiceitem', text: '96px', value: '96px' }
-            ]);
-          }
-        });
-
-        editor.ui.registry.addMenuButton('linespacing', {
-          text: 'Line spacing',
-          tooltip: 'Line spacing',
-          fetch: function (callback) {
-            callback([
-              { type: 'menuitem', text: '1.0', onAction: function () { editor.formatter.apply('linespacing', { value: '1.0' }); } },
-              { type: 'menuitem', text: '1.15', onAction: function () { editor.formatter.apply('linespacing', { value: '1.15' }); } },
-              { type: 'menuitem', text: '1.5', onAction: function () { editor.formatter.apply('linespacing', { value: '1.5' }); } },
-              { type: 'menuitem', text: '2.0', onAction: function () { editor.formatter.apply('linespacing', { value: '2.0' }); } },
-              { type: 'menuitem', text: '2.5', onAction: function () { editor.formatter.apply('linespacing', { value: '2.5' }); } },
-              { type: 'menuitem', text: '3.0', onAction: function () { editor.formatter.apply('linespacing', { value: '3.0' }); } },
-              { type: 'separator' },
-              { type: 'menuitem', text: 'Custom...', onAction: function () {
-                var input = window.prompt('Enter line spacing (e.g. 1.4, 1.75, 2.25):', '1.5');
-                if (input !== null && input !== '' && !isNaN(parseFloat(input))) {
-                  editor.formatter.apply('linespacing', { value: input.trim() });
-                }
-              } }
-            ]);
-          }
-        });
-
-        editor.on('init', function () {
-          // Register the line spacing format that wraps selected text in a span
-          // with an inline line-height. Using a span keeps it scoped to the
-          // selection so different paragraphs can have different spacing.
-          editor.formatter.register('linespacing', {
-            inline: 'span',
-            styles: { 'line-height': '%value' },
-            clear_child_styles: true,
-            remove: 'all',
-            split: true,
-            deep: true
-          });
-          tinymceReady = true;
-          // If openEditor was called before TinyMCE finished initializing,
-          // apply the pending content now.
-          if (pendingContent !== null) {
-            editor.setContent(pendingContent);
-            pendingContent = null;
-          }
-          eiraAdmin.refreshWordStats();
-          eiraAdmin.maybeOfferDraftRecovery();
-        });
-
-        // The #post-form 'input' listener cannot see inside the editor iframe,
-        // so body edits alone never marked the form dirty and the
-        // unsaved-changes guard stayed silent. Bridge it here.
-        editor.on('input change keyup SetContent ExecCommand', function () {
-          eiraAdmin.markPostDirty();
-          eiraAdmin.refreshWordStats();
-        });
-      }
-    });
-
-    // Helper: set editor content (waits for TinyMCE to be ready if needed)
-    function setEditorContent(html) {
-      if (tinymceReady && tinymce.get('p-body')) {
-        tinymce.get('p-body').setContent(html || '');
-      } else {
-        pendingContent = html || '';
-      }
-    }
-
-    // Helper: get editor content
-    function getEditorContent() {
-      if (tinymceReady && tinymce.get('p-body')) {
-        return tinymce.get('p-body').getContent();
-      }
-      return '';
-    }
-  </script>
 </body>
-</html>
 </html>

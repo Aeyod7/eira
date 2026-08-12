@@ -44,7 +44,7 @@ export default async function handler(req, res) {
       heading: "Welcome to Eira",
       bodyHtml: `
         <p>Thanks for joining — you're in.</p>
-        <p>Eira is curated feminine lifestyle: beauty, skincare, fashion and self-care finds worth your time. Expect a weekly roundup of the pieces we're loving (and the ones worth skipping).</p>
+        <p>Eira is an independent journal about self discovery, life and beauty. Expect a thoughtful weekly note with new stories worth your time.</p>
         <p>Nothing to do right now — the good stuff lands in your inbox soon.</p>
         <p style="margin-top:24px;">— The Eira team</p>`
     });

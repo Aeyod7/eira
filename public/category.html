@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Categories — Eira</title>
   <link rel="canonical" href="https://eira.example/category.html" />
-  <meta name="description" content="Browse Eira posts by category — beauty, skincare, fashion, selfcare, and more." />
+  <meta name="description" content="Browse Eira Journal stories about self discovery, life and beauty." />
 
   <!-- Open Graph / Pinterest Rich Pins -->
   <meta property="og:site_name" content="Eira" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Categories — Eira" />
-  <meta property="og:description" content="Browse Eira posts by category — beauty, skincare, fashion, selfcare, and more." />
+  <meta property="og:description" content="Browse Eira Journal stories about self discovery, life and beauty." />
   <meta property="og:url" content="https://eira.example/category/" />
   <meta property="og:image" content="https://eira.example/pins/home-pin.svg" />
   <meta property="og:image:width" content="1000" />
@@ -19,7 +19,7 @@
   <meta property="og:image:alt" content="Eira — category hub" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Categories — Eira" />
-  <meta name="twitter:description" content="Browse Eira posts by category — beauty, skincare, fashion, selfcare, and more." />
+  <meta name="twitter:description" content="Browse Eira Journal stories about self discovery, life and beauty." />
   <meta name="twitter:image" content="https://eira.example/pins/home-pin.svg" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -36,11 +36,7 @@
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
       <nav id="primary-nav" class="nav" aria-label="Primary">
         <a href="index.html">Home</a>
-        <a href="category.html?category=Beauty">Beauty</a>
-        <a href="category.html?category=Skincare">Skincare</a>
-        <a href="category.html?category=Fashion">Fashion</a>
-        <a href="category.html?category=Selfcare">Selfcare</a>
-        <a href="blog.html">Blog</a>
+        <a href="blog.html">Journal</a>
         <a href="about.html">About</a>
       </nav>
     </div>
@@ -65,29 +61,14 @@
       <div class="footer-grid">
         <div>
           <p class="footer-brand">Eira</p>
-          <p style="color: var(--color-accent-soft); max-width: 38ch;">A faceless beauty, fashion and self-care affiliate hub. Curated picks, with the context Pinterest can&rsquo;t hold.</p>
-          <p style="font-size: var(--font-size-xs); color: var(--color-accent-soft); margin-top: var(--space-6);">
-            As an Amazon Associate I earn from qualifying purchases. This site contains affiliate links &mdash; see full disclosure on each post.
-          </p>
+          <p style="color: var(--color-accent-soft); max-width: 38ch;">An independent journal about self discovery, life and beauty — made for readers, not algorithms.</p>
         </div>
         <div class="footer-col">
           <h4>Categories</h4>
           <ul>
-            <li><a href="category.html?category=Beauty">Beauty</a></li>
-            <li><a href="category.html?category=Skincare">Skincare</a></li>
-            <li><a href="category.html?category=Fashion">Fashion</a></li>
-            <li><a href="category.html?category=Selfcare">Selfcare</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Site</h4>
-          <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="blog.html">Blog</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="privacy.html">Privacy</a></li>
-            <li><a href="terms.html">Terms</a></li>
-            <li><a href="contact.html">Contact</a></li>
+            <li><a href="blog.html?category=Self%20Discovery">Self Discovery</a></li>
+            <li><a href="blog.html?category=Life">Life</a></li>
+            <li><a href="blog.html?category=Beauty">Beauty</a></li>
           </ul>
         </div>
       </div>
@@ -122,7 +103,7 @@
         var meta = esc(p.read_time || '');
         var imgSrc = p.og_image ? esc(p.og_image) : '';
         var media = imgSrc
-          ? '<a href="/post/' + esc(p.slug) + '/" style="text-decoration:none" class="card__media"><img src="' + imgSrc + '" alt="' + esc(p.title) + '" loading="lazy" /></a>'
+          ? '<a href="/post/' + esc(p.slug) + '/" style="text-decoration:none" class="card__media"><img src="' + imgSrc + '" alt="' + esc(p.image_alt || p.title) + '" loading="lazy" /></a>'
           : '<a href="/post/' + esc(p.slug) + '/" style="text-decoration:none" class="card__media">' + esc(p.category || 'Post') + '</a>';
         return '<article class="card">' + media +
           '<div class="card__body">' +
@@ -131,39 +112,18 @@
           '</div>' +
         '</article>';
       }
-      function renderProductCard(p) {
-        var imgSrc = p.image_url ? esc(p.image_url) : '';
-        var media = imgSrc
-          ? '<a href="/go/' + esc(p.link_slug) + '" rel="sponsored nofollow noopener" target="_blank" class="card__media"><img src="' + imgSrc + '" alt="' + esc(p.name) + '" loading="lazy" /></a>'
-          : '<a href="/go/' + esc(p.link_slug) + '" rel="sponsored nofollow noopener" target="_blank" class="card__media">' + esc(p.name) + '</a>';
-        var linkLabel = esc(p.link_label || 'Shop now');
-        var priceHtml = p.price ? '<p class="card__price">' + esc(p.price) + '</p>' : '';
-        return '<article class="card">' + media +
-          '<div class="card__body">' +
-            '<p class="card__meta">Product</p>' +
-            '<h3 class="card__title">' + esc(p.name) + '</h3>' +
-            priceHtml +
-            '<a class="affiliate-link" href="/go/' + esc(p.link_slug) + '" rel="sponsored nofollow noopener" target="_blank">' + linkLabel + '</a>' +
-          '</div>' +
-        '</article>';
-      }
-      function renderCategoryPosts(posts, products) {
+      function renderCategoryPosts(posts) {
         if (filterCategory) {
           // Single category view
           var filteredPosts = posts.filter(function (p) { return p.category === filterCategory; });
-          var filteredProducts = products.filter(function (p) { return p.category === filterCategory; });
           if (heading) heading.textContent = esc(filterCategory);
           var html = '';
-          if (filteredPosts.length === 0 && filteredProducts.length === 0) {
-            container.innerHTML = '<p class="muted">No posts or products in ' + esc(filterCategory) + ' yet.</p>';
+          if (filteredPosts.length === 0) {
+            container.innerHTML = '<p class="muted">No stories in ' + esc(filterCategory) + ' yet.</p>';
             return;
           }
           if (filteredPosts.length > 0) {
             html += '<div class="grid grid--posts">' + filteredPosts.map(renderPostCard).join('') + '</div>';
-          }
-          if (filteredProducts.length > 0) {
-            html += '<h2 style="margin-top: var(--space-12); margin-bottom: var(--space-6);">Products</h2>' +
-              '<div class="grid grid--posts">' + filteredProducts.map(renderProductCard).join('') + '</div>';
           }
           container.innerHTML = html;
           return;
@@ -176,41 +136,26 @@
           if (!groupedPosts[cat]) { groupedPosts[cat] = []; postOrder.push(cat); }
           groupedPosts[cat].push(p);
         });
-        var groupedProducts = {};
-        products.forEach(function (p) {
-          var cat = p.category || 'Uncategorized';
-          if (!groupedProducts[cat]) groupedProducts[cat] = [];
-          groupedProducts[cat].push(p);
-        });
         container.innerHTML = postOrder.map(function (cat) {
-          var html = '<h2 style="margin-top: var(--space-12);">' + esc(cat) + '</h2>' +
+          return '<h2 style="margin-top: var(--space-12);">' + esc(cat) + '</h2>' +
             '<div class="grid grid--posts">' + groupedPosts[cat].map(renderPostCard).join('') + '</div>';
-          if (groupedProducts[cat] && groupedProducts[cat].length > 0) {
-            html += '<h3 style="margin-top: var(--space-10); margin-bottom: var(--space-4);">Products</h3>' +
-              '<div class="grid grid--posts">' + groupedProducts[cat].map(renderProductCard).join('') + '</div>';
-          }
-          return html;
         }).join('');
       }
-      Promise.all([fetch('/api/posts?published=1').then(function (r) { return r.json(); }), fetch('/api/products?public=1').then(function (r) { return r.json(); })])
-        .then(function (results) {
-          var posts = results[0].posts || [];
-          var products = results[1].products || [];
+      fetch('/api/posts?published=1').then(function (r) { return r.json(); })
+        .then(function (result) {
+          var posts = (result.posts || []).filter(function (p) { return ['Self Discovery', 'Life', 'Beauty'].indexOf(p.category) !== -1; });
           if (loading) loading.remove();
-          if (posts.length === 0 && products.length === 0) {
-            container.innerHTML = '<p class="muted">No posts or products yet.</p>';
+          if (posts.length === 0) {
+            container.innerHTML = '<p class="muted">No stories yet.</p>';
             return;
           }
-          renderCategoryPosts(posts, products);
+          renderCategoryPosts(posts);
         })
         .catch(function () {
           if (loading) loading.remove();
-          container.innerHTML = '<p class="muted">Unable to load posts or products.</p>';
+          container.innerHTML = '<p class="muted">Unable to load stories.</p>';
         });
     })();
   </script>
-</body>
-</html>
-</html>
 </body>
 </html>

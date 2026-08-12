@@ -12,41 +12,22 @@ function escapeHtml(s) {
   }[c]));
 }
 
-// Generate body HTML from structured product data (the products_json column).
-// Each product: { name, image_text, why, link_slug, section_heading }
-// Products with the same section_heading are grouped under an <h2>.
-function renderProductsHtml(products) {
-  if (!Array.isArray(products) || products.length === 0) return "";
-  const sections = {};
-  const sectionOrder = [];
-  for (const p of products) {
-    const heading = p.section_heading || "The shortlist";
-    if (!sections[heading]) { sections[heading] = []; sectionOrder.push(heading); }
-    sections[heading].push(p);
-  }
-  let html = "";
-  for (const heading of sectionOrder) {
-    html += `<h2>${escapeHtml(heading)}</h2>\n`;
-    for (const p of sections[heading]) {
-      const num = String(sections[heading].indexOf(p) + 1).padStart(2, "0");
-      const link = p.link_slug ? `/go/${encodeURIComponent(p.link_slug)}` : "#";
-      const linkAttr = p.link_slug ? 'rel="sponsored nofollow noopener" target="_blank"' : '';
-      const linkText = p.link_label || "Check price on Amazon UK";
-      const priceHtml = p.price ? `<p class="product-block__price">${escapeHtml(p.price)}</p>` : "";
-      const media = p.image_url
-        ? `<img class="product-block__media" src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.name || "Product image")}" loading="lazy" />`
-        : `<div class="product-block__media" role="img" aria-label="Product image">${escapeHtml(p.image_text || num)}</div>`;
-      html += `<section class="product-block">
-  ${media}
-  <div>
-    <h3>${escapeHtml(p.name || "Untitled product")}</h3>
-    ${priceHtml}
-    <a class="affiliate-link" href="${link}" ${linkAttr}>${escapeHtml(linkText)}</a>
-  </div>
-</section>\n`;
-    }
-  }
-  return html;
+function imageUrl(value, absolute = false) {
+  const url = String(value || "").trim();
+  if (!url) return "";
+  if (/^https?:\/\//i.test(url)) return url;
+  if (!/^[a-z0-9_./-]+$/i.test(url)) return "";
+  const path = `/${url.replace(/^\/+/, "")}`;
+  return absolute ? `${SITE}${path}` : path;
+}
+
+// Legacy posts may still contain product cards in body_html. Keep their prose
+// available while ensuring retired commerce blocks never reach the public page.
+function stripLegacyProductSections(html) {
+  return String(html || "").replace(
+    /<section\b[^>]*class=["'][^"']*\bproduct-block\b[^"']*["'][^>]*>[\s\S]*?<\/section>/gi,
+    ""
+  );
 }
 
 export default async function handler(req, res) {
@@ -79,7 +60,7 @@ export default async function handler(req, res) {
         <p class="eyebrow">404</p>
         <h1>Post not found</h1>
         <p>This post may have been moved or unpublished.</p>
-        <p style="margin-top: var(--space-8);"><a class="btn btn--primary" href="/blog.html">Browse all posts</a></p>
+        <p style="margin-top: var(--space-8);"><a class="btn btn--primary" href="/blog.html">Browse the Journal</a></p>
       </div>
     </section>
   </main>
@@ -99,49 +80,19 @@ export default async function handler(req, res) {
     return res.end(notFoundHtml);
   }
 
-  const ogImage = p.og_image ? `${SITE}/${p.og_image.replace(/^\/+/, "")}` : `${SITE}/pins/home-pin.svg`;
+  const displayImage = imageUrl(p.og_image);
+  const ogImage = imageUrl(p.og_image, true) || `${SITE}/pins/home-pin.svg`;
   const title = escapeHtml(p.title);
-  const desc = escapeHtml(p.meta_description || p.title);
+  const descriptionText = p.meta_description || p.summary || p.title;
+  const desc = escapeHtml(descriptionText);
+  const summary = escapeHtml(p.summary || "");
+  const imageAlt = escapeHtml(p.image_alt || p.title);
   const eyebrow = escapeHtml(p.eyebrow || "");
   const readTime = escapeHtml(p.read_time || "");
   const intro = p.intro_html || "";
 
-  // If products_json exists, generate body_html from it (structured editor source of truth).
-  // Otherwise fall back to the stored body_html (legacy/seeded posts).
-  let body = p.body_html || "";
-  if (p.products_json) {
-    try {
-      const products = JSON.parse(p.products_json);
-      body = renderProductsHtml(products);
-    } catch (e) { /* keep stored body_html */ }
-  }
-
-  // Also render attached standalone products (post_products join).
-  const attached = await db.execute({
-    sql: `SELECT p.id, p.slug, p.name, p.image_url, p.price, p.why_html, p.link_slug, p.link_label,
-                 pp.position, pp.section_heading, pp.image_text
-          FROM post_products pp
-          JOIN products p ON p.id = pp.product_id
-          WHERE pp.post_slug = ?
-          ORDER BY pp.position ASC`,
-    args: [slug]
-  });
-  if (attached.rows.length > 0) {
-    // Convert attached rows to the same shape renderProductsHtml expects.
-    const attachedProducts = attached.rows.map(r => ({
-      name: r.name,
-      image_url: r.image_url,
-      image_text: r.image_text,
-      why: r.why_html,
-      price: r.price,
-      link_slug: r.link_slug,
-      link_label: r.link_label,
-      section_heading: r.section_heading || "The shortlist"
-    }));
-    body += "\n" + renderProductsHtml(attachedProducts);
-  }
-
-  if (p.extra_sections_html) body += "\n" + p.extra_sections_html;
+  let body = stripLegacyProductSections(p.body_html);
+  if (p.extra_sections_html) body += "\n" + stripLegacyProductSections(p.extra_sections_html);
 
   const html = `<!DOCTYPE html>
 <html lang="en-GB">
@@ -156,7 +107,7 @@ export default async function handler(req, res) {
     "@context": "https://schema.org",
     "@type": "Article",
     "headline": ${JSON.stringify(p.title)},
-    "description": ${JSON.stringify(p.meta_description || p.title)},
+    "description": ${JSON.stringify(descriptionText)},
     "image": ${JSON.stringify(ogImage)},
     "datePublished": ${JSON.stringify(String(p.created_at || "").replace(" ", "T"))},
     "dateModified": ${JSON.stringify(String(p.updated_at || "").replace(" ", "T"))},
@@ -171,6 +122,7 @@ export default async function handler(req, res) {
   <meta property="og:description" content="${desc}" />
   <meta property="og:url" content="${SITE}/post/${encodeURIComponent(slug)}/" />
   <meta property="og:image" content="${ogImage}" />
+  <meta property="og:image:alt" content="${imageAlt}" />
   <meta property="og:image:width" content="1000" />
   <meta property="og:image:height" content="1500" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -190,11 +142,7 @@ export default async function handler(req, res) {
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
       <nav id="primary-nav" class="nav" aria-label="Primary">
         <a href="/">Home</a>
-        <a href="/category.html?category=Beauty">Beauty</a>
-        <a href="/category.html?category=Skincare">Skincare</a>
-        <a href="/category.html?category=Fashion">Fashion</a>
-        <a href="/category.html?category=Selfcare">Selfcare</a>
-        <a href="/blog.html">Blog</a>
+        <a href="/blog.html">Journal</a>
         <a href="/about.html">About</a>
       </nav>
     </div>
@@ -206,12 +154,11 @@ export default async function handler(req, res) {
         <header class="post-header">
           <p class="eyebrow">${eyebrow}</p>
           <h1>${title}</h1>
+          ${summary ? `<p class="post-dek">${summary}</p>` : ""}
           <p class="post-meta">${readTime}</p>
         </header>
 
-        <p class="disclosure">
-          <strong>Affiliate disclosure:</strong> As an Amazon Associate I earn from qualifying purchases. This post contains affiliate links and AWIN links &mdash; if you click through and buy, Eira may earn a commission at no extra cost to you.
-        </p>
+        ${displayImage ? `<figure class="post-featured-image"><img src="${escapeHtml(displayImage)}" alt="${imageAlt}" /></figure>` : ""}
 
         ${intro}
 
@@ -240,29 +187,14 @@ export default async function handler(req, res) {
       <div class="footer-grid">
         <div>
           <p class="footer-brand">Eira</p>
-          <p style="color: var(--color-accent-soft); max-width: 38ch;">A beauty, skincare, fashion and selfcare affiliate hub. Curated product picks and blog posts, with direct links to the retailers we trust.</p>
-          <p style="font-size: var(--font-size-xs); color: var(--color-accent-soft); margin-top: var(--space-6);">
-            As an Amazon Associate I earn from qualifying purchases. This site contains affiliate links &mdash; see full disclosure on each post.
-          </p>
+          <p style="color: var(--color-accent-soft); max-width: 38ch;">An independent journal about self discovery, life and beauty — made for readers, not algorithms.</p>
         </div>
         <div class="footer-col">
           <h4>Categories</h4>
           <ul>
-            <li><a href="/category.html?category=Beauty">Beauty</a></li>
-            <li><a href="/category.html?category=Skincare">Skincare</a></li>
-            <li><a href="/category.html?category=Fashion">Fashion</a></li>
-            <li><a href="/category.html?category=Selfcare">Selfcare</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Site</h4>
-          <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/blog.html">Blog</a></li>
-            <li><a href="/about.html">About</a></li>
-            <li><a href="/privacy.html">Privacy</a></li>
-            <li><a href="/terms.html">Terms</a></li>
-            <li><a href="/contact.html">Contact</a></li>
+            <li><a href="/blog.html?category=Self%20Discovery">Self Discovery</a></li>
+            <li><a href="/blog.html?category=Life">Life</a></li>
+            <li><a href="/blog.html?category=Beauty">Beauty</a></li>
           </ul>
         </div>
       </div>

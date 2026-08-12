@@ -2,11 +2,10 @@
   "name": "eira",
   "version": "1.0.0",
   "private": true,
-  "description": "Eira — faceless beauty/fashion affiliate blog with link cloaking, click tracking, email capture, and light CMS.",
+  "description": "Eira — an independent editorial journal about self discovery, life and beauty.",
   "type": "module",
   "scripts": {
     "dev": "node scripts/dev.js",
-    "seed": "node scripts/seed.js",
     "migrate": "node scripts/migrate.js"
   },
   "dependencies": {
