@@ -7,7 +7,7 @@
    Variants: [data-variant="fraunces"] (default) | [data-variant="cormorant"]
 
    Contrast (verified against --color-surface-base #FBF8F4):
-     text-primary #2E2A27 ~13:1   AA/AAA body + headings
+     text-primary #302F2B ~13:1   AA/AAA body + headings
      text-muted   #7A6E64  4.7:1  AA body
      link-accent  #A85742  4.8:1  AA body
      accent-warm  #C4715A  3.4:1  large text / borders / fills ONLY
@@ -19,10 +19,10 @@
   --color-surface-raised: #FFFFFF;  /* cards, inputs */
   --color-surface-strong: #F4EDE4;  /* warm sand band */
   --color-surface-blush:  #F7E9E3;  /* blush band */
-  --color-surface-dark:   #2E2A27;  /* espresso — buttons, footer */
+  --color-surface-dark:   #302F2B;  /* espresso — buttons, footer */
 
   /* Text */
-  --color-text-primary:   #2E2A27;
+  --color-text-primary:   #302F2B;
   --color-text-secondary: #FFF9F4;  /* on dark surfaces */
   --color-text-inverse:   #FFF9F4;
   --color-text-muted:     #7A6E64;  /* warm taupe */
@@ -36,7 +36,7 @@
 
   /* Borders */
   --color-border-subtle:  #E9DFD4;
-  --color-border-strong:  #2E2A27;
+  --color-border-strong:  #302F2B;
   --color-focus:          #A85742;
 
   /* State */
@@ -655,7 +655,7 @@ img { max-width: 100%; display: block; }
 
 /* About introduction: bold poster typography paired with a portrait. */
 .about-hero {
-  --about-ink: #312F2B;
+  --about-ink: #302F2B;
   --about-yellow: #F8EB7E;
   padding: 0;
   background: var(--about-ink);
@@ -813,6 +813,278 @@ img { max-width: 100%; display: block; }
   height: 100%;
   object-fit: contain;
   object-position: right bottom;
+}
+
+/* About page: alternating editorial story sections. */
+.about-page-hero {
+  padding-block: clamp(40px, 5vw, 64px);
+  background: #FFF;
+  color: var(--color-text-primary);
+}
+
+.about-page-hero__inner {
+  max-width: 860px;
+  margin-left: clamp(0px, 7vw, 120px);
+}
+
+.about-page-hero h1,
+.about-page-hero h2 {
+  max-width: 16ch;
+  margin-bottom: var(--space-6);
+  color: var(--color-text-primary);
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(70px, 6vw, 80px);
+  font-weight: 700;
+  line-height: 0.98;
+}
+
+.about-page-hero__inner > p:last-child {
+  max-width: 66ch;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  font-size: clamp(20px, 1.4vw, 24px);
+  line-height: 1.65;
+}
+
+.about-section-label {
+  margin: 0 0 var(--space-5);
+  color: var(--color-accent-strong);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.16em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.about-section-label--playfair {
+  font-family: "Playfair Display", Georgia, serif;
+   font-size: 25px;
+  font-weight: 700;
+}
+
+.about-page-hero .about-section-label,
+.about-world .about-section-label,
+.about-join .about-section-label {
+  color: var(--about-yellow, #F8EB7E);
+}
+
+.about-page-hero .about-section-label {
+  color: var(--color-accent-strong);
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.about-purpose {
+  background: #302F2B;
+}
+
+.about-purpose__grid {
+  max-width: 1080px;
+  margin-inline: auto;
+}
+
+.about-purpose__card {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.about-purpose__card p:last-child {
+  max-width: 52ch;
+  margin: 0;
+  color: #FFF;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  font-size: var(--font-size-md);
+  line-height: 1.65;
+}
+
+.about-purpose .about-section-label {
+  color: #FFF;
+}
+
+.about-purpose__card--dark {
+  border-color: var(--color-surface-dark);
+  background: var(--color-surface-dark);
+  color: var(--color-text-inverse);
+}
+
+.about-purpose__card--dark .about-section-label {
+  color: var(--about-yellow, #F8EB7E);
+}
+
+.about-world {
+  background: #FFF;
+  color: var(--color-text-primary);
+}
+
+.about-world h2,
+.about-join h2 {
+  color: var(--color-text-inverse);
+}
+
+.about-world h2 {
+  max-width: 18ch;
+  color: var(--color-text-primary);
+  font-size: clamp(34px, 4vw, 54px);
+}
+
+.about-page-hero .about-section-label,
+.about-world .about-section-label {
+  color: #302F2B;
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 700;
+}
+
+.about-section-dek {
+  margin-top: calc(var(--space-6) * -1);
+  color: var(--color-accent-soft);
+}
+
+.about-world__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(28px, 3.5vw, 50px);
+  margin-top: var(--space-10);
+}
+
+.about-world__card {
+  min-height: 150px;
+  padding: var(--space-8);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-lg);
+  background: #302F2B;
+}
+
+.about-card-number {
+  display: inline-grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  margin-bottom: var(--space-10);
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  color: var(--color-accent-warm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.about-world__card h3 {
+  color: #FFF;
+}
+
+.about-world__card p {
+  margin: 0;
+  color: #FFF;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  font-size: clamp(20px, 1.5vw, 24px);
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.about-founder {
+  background: var(--color-surface-base);
+}
+
+.about-founder__grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.15fr);
+  align-items: center;
+  gap: clamp(var(--space-10), 7vw, var(--space-20));
+  max-width: 1120px;
+}
+
+.about-founder__image {
+  align-self: stretch;
+  min-height: 560px;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: var(--color-surface-strong);
+}
+
+.about-founder__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.about-founder__copy h1,
+.about-founder__copy h2 {
+  margin-bottom: var(--space-3);
+  font-size: clamp(38px, 5vw, 64px);
+}
+
+.about-founder__role {
+  margin-bottom: var(--space-8);
+  color: var(--color-accent-strong);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.about-founder__copy > p:not(.about-section-label):not(.about-founder__role) {
+  max-width: 58ch;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-md);
+  line-height: 1.75;
+}
+
+.about-join {
+  background: #302F2B;
+  color: var(--color-text-inverse);
+}
+
+.about-join__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 0.85fr);
+  align-items: end;
+  gap: var(--space-12);
+}
+
+.about-join h2 {
+  max-width: 18ch;
+  margin-bottom: var(--space-4);
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(34px, 4vw, 52px);
+  font-weight: 700;
+}
+
+.about-join .about-section-label {
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 700;
+}
+
+.about-join__inner > div > p:last-child {
+  margin: 0;
+  color: var(--color-accent-soft);
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  font-size: var(--font-size-md);
+}
+
+.about-page .site-footer p,
+.about-page .site-footer a {
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+}
+
+.about-page .site-footer .footer-brand,
+.about-page .site-footer .footer-col h4 {
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 700;
+}
+
+.about-join__form {
+  align-items: end;
+}
+
+.about-join__form .field {
+  flex: 1;
+}
+
+.about-join__form label {
+  color: var(--color-text-inverse);
 }
 
 /* ---------- Post header (article pages) ---------- */
@@ -1250,6 +1522,33 @@ img { max-width: 100%; display: block; }
     min-height: 260px;
   }
 
+  .about-page-hero__inner {
+    margin-left: 0;
+  }
+
+  .about-purpose__grid,
+  .about-founder__grid,
+  .about-join__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .about-world__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .about-founder__grid {
+    max-width: 720px;
+  }
+
+  .about-founder__image {
+    min-height: 0;
+    aspect-ratio: 4 / 5;
+  }
+
+  .about-join__inner {
+    align-items: start;
+  }
+
   .about-hero__inner {
     grid-template-columns: 1fr;
     gap: 0;
@@ -1309,6 +1608,42 @@ img { max-width: 100%; display: block; }
     align-items: flex-start;
     flex-direction: column;
     margin-bottom: var(--space-8);
+  }
+
+  .about-page-hero {
+    padding-block: var(--space-16);
+  }
+
+  .about-page-hero h1,
+  .about-page-hero h2 {
+    font-size: clamp(42px, 13vw, 60px);
+  }
+
+  .about-purpose__grid,
+  .about-world__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-purpose__card,
+  .about-world__card {
+    min-height: 0;
+    padding: var(--space-7);
+  }
+
+  .about-card-number {
+    margin-bottom: var(--space-6);
+  }
+
+  .about-founder__grid {
+    gap: var(--space-10);
+  }
+
+  .about-founder__image {
+    aspect-ratio: 3 / 4;
+  }
+
+  .about-join__form {
+    width: 100%;
   }
 
   .about-hero__copy {
@@ -1371,6 +1706,20 @@ img { max-width: 100%; display: block; }
 
   .nav-toggle {
     display: block;
+  }
+
+  .about-page .brand,
+  .about-page .nav-toggle,
+  .about-page .nav a,
+  .about-page .footer-col a {
+    min-height: 44px;
+  }
+
+  .about-page .brand,
+  .about-page .nav a,
+  .about-page .footer-col a {
+    display: inline-flex;
+    align-items: center;
   }
 
   .footer-grid {
