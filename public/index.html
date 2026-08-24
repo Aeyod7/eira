@@ -22,10 +22,13 @@
   <meta name="twitter:description" content="An independent journal with thoughtful stories about self discovery, life and beauty." />
   <meta name="twitter:image" content="https://eira.example/pins/home-pin.svg" />
 
-  <!-- Fonts: Inter (headings + body/UI) -->
+  <!-- Fonts: editorial display, handwritten accent and body/UI -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bodoni+Moda:opsz,wght@6..96,500&family=Caveat:wght@600;700&family=Comic+Neue:wght@400;700&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/fontawesome.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/brands.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/solid.min.css" />
 
   <link rel="stylesheet" href="theme-warm.css" />
 </head>
@@ -48,11 +51,12 @@
   <main id="main">
     <!-- Hero -->
     <section class="hero home-hero">
-      <div class="container container--narrow">
-        <p class="eyebrow">Self Discovery · Life · Beauty</p>
-        <h1>Eira</h1>
-        <p>Thoughtful notes on self discovery, life and beauty. You are the standard.</p>
+      <div class="container home-hero__inner">
+        <p class="home-hero__topics">Self discovery <span aria-hidden="true">✦</span> Life <span aria-hidden="true">✦</span> Beauty</p>
+        <h1>Figure out who you are, become who you want to be.</h1>
+        <p class="home-hero__intro">Eira began with a simple commitment: curating skincare, style, and beauty routines that honor dark skin without compromise. But true radiance doesn't stop at your skin barrier. Eira exists to care for your entire life your mind, your ambition, your identity, and the person you are becoming when nobody is watching.</p>
       </div>
+      <img class="home-hero__portrait" src="images/eira-home-hero-portrait.png" alt="Woman wearing a deep blue feather wrap" />
     </section>
 
     <!-- Journal categories -->
@@ -97,41 +101,76 @@
 
     <!-- Newsletter signup -->
     <section class="section section--tight">
-      <div class="container container--narrow">
-        <div class="newsletter-strip">
-          <div class="newsletter-strip__text">
-            <p class="eyebrow" style="color: var(--color-accent-strong); margin-bottom: var(--space-2);">The weekly shortlist</p>
-            <p class="newsletter-strip__title">Weekly finds, straight to your inbox.</p>
-          </div>
-          <form class="newsletter-strip__form" novalidate>
-            <div class="newsletter-strip__inputwrap">
-              <label for="email-home" class="sr-only">Email address</label>
-              <input class="input" id="email-home" name="email" type="email" placeholder="you@example.com" required autocomplete="email" />
-              <button class="btn btn--primary" type="submit">Subscribe</button>
+      <div class="container">
+        <div class="home-signup-layout">
+          <aside class="social-tag" aria-labelledby="social-tag-title">
+            <p class="social-tag__kicker">Stay close</p>
+            <h2 id="social-tag-title">Follow our socials</h2>
+            <div class="social-tag__links">
+              <a href="https://www.instagram.com/cera.eira/" target="_blank" rel="noopener noreferrer" aria-label="Follow Eira on Instagram at cera.eira">
+                <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+                <span>@cera.eira</span>
+              </a>
+              <a href="https://www.pinterest.com/eiracerise/" target="_blank" rel="noopener noreferrer" aria-label="Follow Eira on Pinterest at eiracerise">
+                <i class="fa-brands fa-pinterest" aria-hidden="true"></i>
+                <span>@eiracerise</span>
+              </a>
+              <a href="https://www.tiktok.com/@eiracerise" target="_blank" rel="noopener noreferrer" aria-label="Follow Eira on TikTok at eiracerise">
+                <i class="fa-brands fa-tiktok" aria-hidden="true"></i>
+                <span>@eiracerise</span>
+              </a>
             </div>
-            <span class="field__error" id="email-home-err" aria-live="polite"></span>
-          </form>
+          </aside>
+
+          <div class="newsletter-strip newsletter-reset">
+            <div class="newsletter-reset__content">
+              <h2>WE TALK ABOUT<br />THINGS.<br />YOU ARE SCARED<br />TO CONFRONT ALONE.</h2>
+              <p class="newsletter-reset__intro">Get our 7-page pdf,<strong>“ The Identity & Routine Reset Guide for Ambitious Women”</strong> + our sunday letter on dark-skin beauty and self trust.</p>
+              <form class="newsletter-strip__form" novalidate>
+                <div class="newsletter-strip__inputwrap">
+                  <label for="email-home" class="sr-only">Email address</label>
+                  <div class="newsletter-reset__field">
+                    <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+                    <input class="input" id="email-home" name="email" type="email" placeholder="Enter your best email…" required autocomplete="email" />
+                  </div>
+                  <button class="btn newsletter-reset__button" type="submit" data-idle-label="Get the free reset guide" data-pending-label="Sending your guide…">Get the free reset guide</button>
+                </div>
+                <span class="field__error" id="email-home-err" aria-live="polite"></span>
+              </form>
+              <p class="newsletter-reset__note"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Join 500+ Ambitious Growing women. 3minutes sunday beauty guide boost. 100% free</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
   </main>
 
   <!-- Footer -->
-  <footer class="site-footer">
+  <footer class="site-footer home-footer">
     <div class="container">
       <div class="footer-grid">
-        <div>
-          <p class="footer-brand">Eira</p>
-          <p style="color: var(--color-accent-soft); max-width: 38ch;">An independent journal about self discovery, life and beauty — made for readers, not algorithms.</p>
+        <div class="footer-connect">
+          <p class="footer-signature">EIRA</p>
+          <p class="footer-connect__label">Connect with us</p>
+          <div class="footer-socials" aria-label="Eira social media">
+            <a href="https://www.instagram.com/cera.eira/" target="_blank" rel="noopener noreferrer" aria-label="Instagram — cera.eira">
+              <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+            </a>
+            <a href="https://www.pinterest.com/eiracerise/" target="_blank" rel="noopener noreferrer" aria-label="Pinterest — eiracerise">
+              <i class="fa-brands fa-pinterest-p" aria-hidden="true"></i>
+            </a>
+            <a href="https://www.tiktok.com/@eiracerise" target="_blank" rel="noopener noreferrer" aria-label="TikTok — eiracerise">
+              <i class="fa-brands fa-tiktok" aria-hidden="true"></i>
+            </a>
+          </div>
         </div>
-        <div class="footer-col">
-          <h4>Categories</h4>
+        <nav class="footer-col footer-journals" aria-label="Journal categories">
           <ul>
             <li><a href="blog.html?category=Self%20Discovery">Self Discovery</a></li>
             <li><a href="blog.html?category=Life">Life</a></li>
             <li><a href="blog.html?category=Beauty">Beauty</a></li>
           </ul>
-        </div>
+        </nav>
       </div>
       <div class="footer-bottom">
         <span>&copy; 2026 Eira. All rights reserved.</span>
@@ -163,6 +202,8 @@
         var input = form.querySelector('input[type="email"]');
         var err = form.querySelector('.field__error');
         var btn = form.querySelector('button[type="submit"]');
+        var idleLabel = btn ? (btn.getAttribute('data-idle-label') || 'Subscribe') : 'Subscribe';
+        var pendingLabel = btn ? (btn.getAttribute('data-pending-label') || 'Subscribing…') : 'Subscribing…';
         if (!input) return;
         var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value);
         if (!valid) {
@@ -172,15 +213,15 @@
         }
         input.setAttribute('aria-invalid', 'false');
         if (err) err.textContent = '';
-        if (btn) { btn.setAttribute('aria-busy', 'true'); btn.textContent = 'Subscribing…'; btn.disabled = true; }
+        if (btn) { btn.setAttribute('aria-busy', 'true'); btn.textContent = pendingLabel; btn.disabled = true; }
         fetch('/api/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: input.value, source: 'home' })
         }).then(function (r) { return r.json(); }).then(function (data) {
-          if (data.ok) { if (btn) { btn.textContent = 'Subscribed ✓'; } }
-          else { if (btn) { btn.textContent = 'Subscribe'; btn.disabled = false; } if (err) err.textContent = data.error || 'Something went wrong.'; }
-        }).catch(function () { if (btn) { btn.textContent = 'Try again'; btn.disabled = false; } });
+          if (data.ok) { if (btn) { btn.textContent = 'Guide sent ✓'; } }
+          else { if (btn) { btn.textContent = idleLabel; btn.disabled = false; btn.removeAttribute('aria-busy'); } if (err) err.textContent = data.error || 'Something went wrong.'; }
+        }).catch(function () { if (btn) { btn.textContent = 'Try again'; btn.disabled = false; btn.removeAttribute('aria-busy'); } });
       });
     });
 

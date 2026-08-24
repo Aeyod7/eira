@@ -6,13 +6,18 @@ Build a warm, intelligent editorial home for stories about Self Discovery, Life 
 
 ## Reference
 
-Adapt Refero Styles' **Wispr Flow — cream broadsheet, dark velvet chambers** direction for Eira. Keep its editorial scale, warm paper surfaces, strong ink contrast and shadowless bordered cards. Do not copy its software/product patterns or palette literally.
+Use [Inspora](https://www.inspora.design/) as Eira's primary source for editorial composition, colour relationships, typography rhythm and image treatment. The saved **Super Visuals: Backgrounds Library** may support atmospheric backgrounds and transitions only when an exact accessible Figma node or supplied screenshot is available. Do not use Refero Styles.
+
+The approved colour direction is **Plum Noir**, selected from the applied Eira homepage studies. Preserve Eira's existing layout, typography, content and portrait treatment while applying this palette consistently across public pages and the editorial studio.
 
 ## Foundations
 
-- Canvas: warm cream (`--color-surface-base`)
-- Ink: espresso (`--color-text-primary`, `--color-surface-dark`)
-- Supporting surfaces: blush and warm sand
+- Canvas: warm parchment `#F7F1E8` (`--color-surface-base`)
+- Ink: near-black aubergine `#241A1F` (`--color-text-primary`)
+- Dark anchor surfaces: plum noir `#6B223B` (`--color-surface-dark`)
+- Supporting surfaces: dusty blush `#D8B7C3` and pale rose `#EFE3DE`
+- Decorative accent: antique gold `#C59A4A`; use for marks and sufficiently large display details, never small body copy
+- Inverse text: warm white `#FFF9F4`
 - Display type: Fraunces, regular-to-medium weight, with authority coming from scale
 - UI/body type: Inter
 - Layout: generous editorial rhythm, 24px grid gaps, readable 760px article measure
@@ -30,7 +35,7 @@ Adapt Refero Styles' **Wispr Flow — cream broadsheet, dark velvet chambers** d
 
 ### Editorial studio
 
-The private admin uses the same warm paper, blush, espresso and bordered-surface language as the public site, with denser controls suited to publishing work. Its primary sections are Overview, Journal, Subscribers and Newsletter. Products, affiliate links and hero-image controls must not appear in the studio. Post creation accepts only Self Discovery, Life or Beauty and includes a rich-text writer, standfirst, live writing metrics, featured-image alt text, SEO guidance, publish-readiness feedback, draft and preview actions, image upload and local recovery.
+The private admin uses the same parchment, plum, blush and bordered-surface language as the public site, with denser controls suited to publishing work. Its primary sections are Overview, Journal, Subscribers and Newsletter. Products, affiliate links and hero-image controls must not appear in the studio. Post creation accepts only Self Discovery, Life or Beauty and includes a rich-text writer, standfirst, live writing metrics, featured-image alt text, SEO guidance, publish-readiness feedback, draft and preview actions, image upload and local recovery.
 
 ### Primary navigation
 
