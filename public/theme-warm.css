@@ -725,12 +725,14 @@ img { max-width: 100%; display: block; }
   position: absolute;
   z-index: 0;
   top: 0;
-  right: 0;
+  right: -50px;
   width: clamp(320px, 29vw, 440px);
   height: 100%;
   max-width: none;
   object-fit: contain;
   object-position: right bottom;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 100%);
   pointer-events: none;
   user-select: none;
 }
@@ -1410,9 +1412,9 @@ img { max-width: 100%; display: block; }
   max-width: none;
   margin: 0 0 var(--space-5);
   color: var(--color-text-primary);
-  font-family: "Bodoni Moda", Didot, "Times New Roman", serif;
+  font-family: "Playfair Display", Georgia, serif;
   font-size: clamp(44px, 4.05vw, 54px);
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: -0.035em;
   line-height: 0.98;
   text-transform: uppercase;
