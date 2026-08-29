@@ -18,6 +18,7 @@ The approved colour direction is **Plum Noir**, selected from the applied Eira h
 - Supporting surfaces: dusty blush `#D8B7C3` and pale rose `#EFE3DE`
 - Decorative accent: antique gold `#C59A4A`; use for marks and sufficiently large display details, never small body copy
 - Inverse text: warm white `#FFF9F4`
+- Plum Noir atmosphere: use `public/images/eira-plum-ribbon-background.jpg` across heroes, footers, the North Star band, and Notes We Live By cards. Preserve a calm dark area behind copy, vary card crops for visual rhythm, and crop from the edges on mobile.
 - Display type: Fraunces, regular-to-medium weight, with authority coming from scale
 - UI/body type: Inter
 - Layout: generous editorial rhythm, 24px grid gaps, readable 760px article measure

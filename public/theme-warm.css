@@ -20,6 +20,7 @@
   --color-surface-strong: #EFE3DE;  /* pale rose band */
   --color-surface-blush:  #D8B7C3;  /* supporting blush surface */
   --color-surface-dark:   #6B223B;  /* plum noir — hero, buttons, footer */
+  --image-plum-ribbon:    url("images/eira-plum-ribbon-background.jpg");
 
   /* Text */
   --color-text-primary:   #241A1F;
@@ -584,7 +585,12 @@ img { max-width: 100%; display: block; }
 
 /* ---------- Hero ---------- */
 .hero {
-  background: var(--color-surface-blush);
+  background-color: var(--color-surface-dark);
+  background-image: var(--image-plum-ribbon);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: var(--color-text-inverse);
   padding-block: var(--space-20);
   text-align: center;
   position: relative;
@@ -595,12 +601,13 @@ img { max-width: 100%; display: block; }
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 100% 60% at 50% 40%, rgba(247, 241, 232, 0.6) 0%, transparent 60%);
+  background: rgba(36, 26, 31, 0.14);
   pointer-events: none;
   z-index: 0;
 }
 
 .hero h1 {
+  color: var(--color-text-inverse);
   font-size: var(--font-size-4xl);
   letter-spacing: 0.01em;
   margin-bottom: var(--space-6);
@@ -612,7 +619,7 @@ img { max-width: 100%; display: block; }
   font-size: var(--font-size-xl);
   max-width: 48ch;
   margin-inline: auto;
-  color: var(--color-text-muted);
+  color: var(--color-accent-soft);
   position: relative;
   z-index: 1;
 }
@@ -624,6 +631,7 @@ img { max-width: 100%; display: block; }
 }
 
 .hero .eyebrow {
+  color: var(--color-accent-gold);
   margin-bottom: var(--space-5);
   position: relative;
   z-index: 1;
@@ -649,7 +657,11 @@ img { max-width: 100%; display: block; }
   min-height: clamp(450px, 31vw, 500px);
   padding-block: 0;
   color: #FFF;
-  background: var(--home-hero-blue);
+  background-color: var(--home-hero-blue);
+  background-image: var(--image-plum-ribbon);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   text-align: left;
 }
 
@@ -728,7 +740,11 @@ img { max-width: 100%; display: block; }
   --about-ink: var(--color-surface-dark);
   --about-yellow: var(--color-accent-soft);
   padding: 0;
-  background: var(--about-ink);
+  background-color: var(--about-ink);
+  background-image: var(--image-plum-ribbon);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   text-align: left;
 }
 
@@ -946,7 +962,11 @@ img { max-width: 100%; display: block; }
 }
 
 .about-purpose {
-  background: var(--color-surface-dark);
+  background-color: var(--color-surface-dark);
+  background-image: var(--image-plum-ribbon);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .about-purpose__grid {
@@ -1024,7 +1044,19 @@ img { max-width: 100%; display: block; }
   padding: var(--space-8);
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: var(--radius-lg);
-  background: var(--color-surface-dark);
+  background-color: var(--color-surface-dark);
+  background-image: var(--image-plum-ribbon);
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.about-world__card:nth-child(3n + 2) {
+  background-position: center;
+}
+
+.about-world__card:nth-child(3n) {
+  background-position: right center;
 }
 
 .about-card-number {
@@ -1355,7 +1387,7 @@ img { max-width: 100%; display: block; }
   overflow: hidden;
   border: 1px solid rgba(107, 34, 59, 0.16);
   background-color: var(--color-surface-base);
-  background-image: url("images/eira-reset-guide-still-life.png");
+  background-image: url("images/eira-reset-guide-still-life-lettered.png");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -1555,7 +1587,11 @@ img { max-width: 100%; display: block; }
 
 /* ---------- Footer — dark, warm ---------- */
 .site-footer {
-  background: var(--color-surface-dark);
+  background-color: var(--color-surface-dark);
+  background-image: var(--image-plum-ribbon);
+  background-position: center 72%;
+  background-repeat: no-repeat;
+  background-size: cover;
   color: var(--color-text-secondary);
   padding-block: var(--space-10) var(--space-7);
 }
@@ -1890,6 +1926,17 @@ img { max-width: 100%; display: block; }
 
   .home-hero {
     min-height: 880px;
+    background-position: left center;
+    background-size: auto 100%;
+  }
+
+  .about-hero {
+    background-position: left center;
+    background-size: auto 100%;
+  }
+
+  .site-footer {
+    background-position: center bottom;
   }
 
   .home-hero__inner {
