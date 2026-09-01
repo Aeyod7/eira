@@ -137,8 +137,10 @@ export default async function handler(req, res) {
   <meta name="twitter:image" content="${ogImage}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/theme-warm.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/fontawesome.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/solid.min.css" />
+  <link rel="stylesheet" href="/theme-warm.css?v=20260901-post-newsletter" />
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -170,19 +172,26 @@ export default async function handler(req, res) {
 
         ${body}
 
-        <div class="newsletter-strip">
-          <div class="newsletter-strip__text">
-            <p class="eyebrow" style="color: var(--color-accent-strong); margin-bottom: var(--space-2);">The weekly shortlist</p>
-            <p class="newsletter-strip__title">Weekly finds, straight to your inbox.</p>
+      </div>
+
+      <div class="container post-newsletter-wrap">
+        <div class="newsletter-strip newsletter-reset">
+          <div class="newsletter-reset__content">
+            <h2>WE TALK ABOUT<br />THINGS.<br />YOU ARE SCARED<br />TO CONFRONT ALONE.</h2>
+            <p class="newsletter-reset__intro">Get our 7-page pdf,<strong>“ The Identity &amp; Routine Reset Guide for Ambitious Women”</strong> + our sunday letter on dark-skin beauty and self trust.</p>
+            <form class="newsletter-strip__form" novalidate>
+              <div class="newsletter-strip__inputwrap">
+                <label for="email-post" class="sr-only">Email address</label>
+                <div class="newsletter-reset__field">
+                  <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+                  <input class="input" id="email-post" name="email" type="email" placeholder="Enter your best email…" required autocomplete="email" />
+                </div>
+                <button class="btn newsletter-reset__button" type="submit" data-idle-label="Get the free reset guide" data-pending-label="Sending your guide…">Get the free reset guide</button>
+              </div>
+              <span class="field__error" id="email-post-err" aria-live="polite"></span>
+            </form>
+            <p class="newsletter-reset__note"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Join 500+ Ambitious Growing women. 3minutes sunday beauty guide boost. 100% free</p>
           </div>
-          <form class="newsletter-strip__form" novalidate>
-            <div class="newsletter-strip__inputwrap">
-              <label for="email-post" class="sr-only">Email address</label>
-              <input class="input" id="email-post" name="email" type="email" placeholder="you@example.com" required autocomplete="email" />
-              <button class="btn btn--primary" type="submit">Subscribe</button>
-            </div>
-            <span class="field__error" aria-live="polite"></span>
-          </form>
         </div>
       </div>
     </article>
@@ -228,19 +237,21 @@ export default async function handler(req, res) {
         var input = form.querySelector('input[type="email"]');
         var err = form.querySelector('.field__error');
         var btn = form.querySelector('button[type="submit"]');
+        var idleLabel = btn ? (btn.getAttribute('data-idle-label') || 'Subscribe') : 'Subscribe';
+        var pendingLabel = btn ? (btn.getAttribute('data-pending-label') || 'Subscribing…') : 'Subscribing…';
         if (!input) return;
         var valid = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(input.value);
         if (!valid) { input.setAttribute('aria-invalid','true'); if (err) err.textContent = 'Please enter a valid email address.'; return; }
         input.setAttribute('aria-invalid','false'); if (err) err.textContent = '';
+        if (btn) { btn.setAttribute('aria-busy','true'); btn.textContent = pendingLabel; btn.disabled = true; }
         fetch('/api/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: input.value, source: 'post-ssr' })
-        }).then(function () {
-          if (btn) { btn.setAttribute('aria-busy','true'); btn.textContent = 'Subscribed ✓'; btn.disabled = true; }
-        }).catch(function () {
-          if (btn) { btn.textContent = 'Try again'; }
-        });
+        }).then(function (r) { return r.json(); }).then(function (data) {
+          if (data.ok) { if (btn) { btn.textContent = 'Guide sent ✓'; } }
+          else { if (btn) { btn.textContent = idleLabel; btn.disabled = false; btn.removeAttribute('aria-busy'); } if (err) err.textContent = data.error || 'Something went wrong.'; }
+        }).catch(function () { if (btn) { btn.textContent = 'Try again'; btn.disabled = false; btn.removeAttribute('aria-busy'); } });
       });
     });
   </script>

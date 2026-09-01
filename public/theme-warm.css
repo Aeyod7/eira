@@ -1398,6 +1398,12 @@ img { max-width: 100%; display: block; }
   align-items: stretch;
 }
 
+.post-newsletter-wrap {
+  max-width: none;
+  margin-top: var(--space-12);
+  padding-inline: clamp(var(--space-7), 4vw, var(--space-12));
+}
+
 .newsletter-reset__content {
   position: relative;
   z-index: 1;
