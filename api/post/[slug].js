@@ -38,19 +38,20 @@ function normalizeInternalPostLinks(html) {
 
 function normalizeRoutineLinks(html) {
   const routines = [
-    ["https://tr.ee/yr6T4K", "View oily skin routine"],
-    ["https://tr.ee/Gl8tWb", "View dry skin routine"],
-    ["https://tr.ee/i7ix7V", "View combination skin routine"],
-    ["https://tr.ee/0CUuvC", "View sensitive skin routine"],
-    ["https://tr.ee/RjJyzJ", "View normal skin routine"]
+    ["https://tr.ee/yr6T4K", "Oily skin"],
+    ["https://tr.ee/Gl8tWb", "Dry skin"],
+    ["https://tr.ee/i7ix7V", "Combination skin"],
+    ["https://tr.ee/0CUuvC", "Sensitive skin"],
+    ["https://tr.ee/RjJyzJ", "Normal skin"]
   ];
 
-  let output = String(html || "");
-  for (const [href, label] of routines) {
-    const pattern = new RegExp(`<a\\b[^>]*href=["']${href.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")}["'][^>]*>[\\s\\S]*?<\\/a>`, "gi");
-    output = output.replace(pattern, `<a class="routine-cta" href="${href}" aria-label="${label}">View routine<span aria-hidden="true"> →</span></a>`);
-  }
-  return output;
+  return String(html || "").replace(/<li\b[^>]*>[\s\S]*?<\/li>/gi, item => {
+    if (!/data-placeholder-token=["']true["']/i.test(item)) return item;
+    const routine = routines.find(([href]) => item.includes(`href="${href}"`) || item.includes(`href='${href}'`));
+    if (!routine) return item;
+    const [href, name] = routine;
+    return `<li class="routine-option"><span class="routine-option__name">${name}</span><a class="routine-cta" href="${href}" aria-label="View ${name.toLowerCase()} routine">View routine<span aria-hidden="true"> →</span></a></li>`;
+  });
 }
 
 function relatedPostLink(slug, html) {
