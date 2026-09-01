@@ -36,6 +36,12 @@ function normalizeInternalPostLinks(html) {
   return String(html || "").replace(/(\bhref\s*=\s*["'])post\//gi, "$1/post/");
 }
 
+function relatedPostLink(slug, html) {
+  const partTwoPath = "/post/90-of-dark-skinned-women-are-wasting-money-on-skincare-part-2/";
+  if (slug !== "90-of-dark-skinned-women-are-wasting-money-on-skincare" || html.includes(partTwoPath)) return "";
+  return `<p><a href="${partTwoPath}">[READ PART 2]</a></p>`;
+}
+
 export default async function handler(req, res) {
   await ensureSchema();
   const slug = req.query?.slug;
@@ -99,6 +105,7 @@ export default async function handler(req, res) {
 
   let body = normalizeInternalPostLinks(stripLegacyProductSections(p.body_html));
   if (p.extra_sections_html) body += "\n" + normalizeInternalPostLinks(stripLegacyProductSections(p.extra_sections_html));
+  const relatedLink = relatedPostLink(slug, `${intro}\n${body}`);
 
   const html = `<!DOCTYPE html>
 <html lang="en-GB">
@@ -171,6 +178,8 @@ export default async function handler(req, res) {
         ${intro}
 
         ${body}
+
+        ${relatedLink}
 
       </div>
 
