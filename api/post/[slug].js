@@ -36,6 +36,23 @@ function normalizeInternalPostLinks(html) {
   return String(html || "").replace(/(\bhref\s*=\s*["'])post\//gi, "$1/post/");
 }
 
+function normalizeRoutineLinks(html) {
+  const routines = [
+    ["https://tr.ee/yr6T4K", "View oily skin routine"],
+    ["https://tr.ee/Gl8tWb", "View dry skin routine"],
+    ["https://tr.ee/i7ix7V", "View combination skin routine"],
+    ["https://tr.ee/0CUuvC", "View sensitive skin routine"],
+    ["https://tr.ee/RjJyzJ", "View normal skin routine"]
+  ];
+
+  let output = String(html || "");
+  for (const [href, label] of routines) {
+    const pattern = new RegExp(`<a\\b[^>]*href=["']${href.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")}["'][^>]*>[\\s\\S]*?<\\/a>`, "gi");
+    output = output.replace(pattern, `<a class="routine-cta" href="${href}" aria-label="${label}">View routine<span aria-hidden="true"> →</span></a>`);
+  }
+  return output;
+}
+
 function relatedPostLink(slug, html) {
   const partTwoPath = "/post/90-of-dark-skinned-women-are-wasting-money-on-skincare-part-2/";
   const hasPartTwoLink = /<a\b[^>]*href=["']\/post\/90-of-dark-skinned-women-are-wasting-money-on-skincare-part-2\/["'][^>]*>[\s\S]*?READ\s+PART\s+2[\s\S]*?<\/a>/i.test(html);
@@ -102,10 +119,10 @@ export default async function handler(req, res) {
   const imageAlt = escapeHtml(p.image_alt || p.title);
   const eyebrow = escapeHtml(p.eyebrow || "");
   const readTime = escapeHtml(p.read_time || "");
-  const intro = normalizeInternalPostLinks(p.intro_html);
+  const intro = normalizeRoutineLinks(normalizeInternalPostLinks(p.intro_html));
 
-  let body = normalizeInternalPostLinks(stripLegacyProductSections(p.body_html));
-  if (p.extra_sections_html) body += "\n" + normalizeInternalPostLinks(stripLegacyProductSections(p.extra_sections_html));
+  let body = normalizeRoutineLinks(normalizeInternalPostLinks(stripLegacyProductSections(p.body_html)));
+  if (p.extra_sections_html) body += "\n" + normalizeRoutineLinks(normalizeInternalPostLinks(stripLegacyProductSections(p.extra_sections_html)));
   const relatedLink = relatedPostLink(p.slug, `${intro}\n${body}`);
 
   const html = `<!DOCTYPE html>
@@ -148,7 +165,7 @@ export default async function handler(req, res) {
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/fontawesome.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/solid.min.css" />
-  <link rel="stylesheet" href="/theme-warm.css?v=20260901-post-newsletter" />
+  <link rel="stylesheet" href="/theme-warm.css?v=20260901-routine-picker" />
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
