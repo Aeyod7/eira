@@ -38,7 +38,8 @@ function normalizeInternalPostLinks(html) {
 
 function relatedPostLink(slug, html) {
   const partTwoPath = "/post/90-of-dark-skinned-women-are-wasting-money-on-skincare-part-2/";
-  if (slug !== "90-of-dark-skinned-women-are-wasting-money-on-skincare" || html.includes(partTwoPath)) return "";
+  const hasPartTwoLink = /<a\b[^>]*href=["']\/post\/90-of-dark-skinned-women-are-wasting-money-on-skincare-part-2\/["'][^>]*>[\s\S]*?READ\s+PART\s+2[\s\S]*?<\/a>/i.test(html);
+  if (slug !== "90-of-dark-skinned-women-are-wasting-money-on-skincare" || hasPartTwoLink) return "";
   return `<p><a href="${partTwoPath}">[READ PART 2]</a></p>`;
 }
 
@@ -105,7 +106,7 @@ export default async function handler(req, res) {
 
   let body = normalizeInternalPostLinks(stripLegacyProductSections(p.body_html));
   if (p.extra_sections_html) body += "\n" + normalizeInternalPostLinks(stripLegacyProductSections(p.extra_sections_html));
-  const relatedLink = relatedPostLink(slug, `${intro}\n${body}`);
+  const relatedLink = relatedPostLink(p.slug, `${intro}\n${body}`);
 
   const html = `<!DOCTYPE html>
 <html lang="en-GB">
