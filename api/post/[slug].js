@@ -30,6 +30,12 @@ function stripLegacyProductSections(html) {
   );
 }
 
+// CMS-authored internal post links may omit the leading slash. On a post page,
+// `post/example/` would otherwise resolve relative to the current post URL.
+function normalizeInternalPostLinks(html) {
+  return String(html || "").replace(/(\bhref\s*=\s*["'])post\//gi, "$1/post/");
+}
+
 export default async function handler(req, res) {
   await ensureSchema();
   const slug = req.query?.slug;
@@ -89,10 +95,10 @@ export default async function handler(req, res) {
   const imageAlt = escapeHtml(p.image_alt || p.title);
   const eyebrow = escapeHtml(p.eyebrow || "");
   const readTime = escapeHtml(p.read_time || "");
-  const intro = p.intro_html || "";
+  const intro = normalizeInternalPostLinks(p.intro_html);
 
-  let body = stripLegacyProductSections(p.body_html);
-  if (p.extra_sections_html) body += "\n" + stripLegacyProductSections(p.extra_sections_html);
+  let body = normalizeInternalPostLinks(stripLegacyProductSections(p.body_html));
+  if (p.extra_sections_html) body += "\n" + normalizeInternalPostLinks(stripLegacyProductSections(p.extra_sections_html));
 
   const html = `<!DOCTYPE html>
 <html lang="en-GB">
