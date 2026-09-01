@@ -483,22 +483,22 @@ img { max-width: 100%; display: block; }
 
 .card__media {
   display: block;
-  aspect-ratio: 3/4;
+  aspect-ratio: 2/3;
   overflow: hidden;
-  background: var(--color-surface-blush);
+  background: var(--color-surface-raised);
   text-decoration: none;
 }
 
 .card__media img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transition: transform var(--motion-duration-normal) var(--motion-ease);
+  object-fit: contain;
+  transition: opacity var(--motion-duration-normal) var(--motion-ease);
   border-radius: 0;
 }
 
 .card:hover .card__media img {
-  transform: scale(1.04);
+  opacity: 0.96;
 }
 
 .blog-title-grid {
