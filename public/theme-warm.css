@@ -1458,9 +1458,8 @@ img { max-width: 100%; display: block; }
 }
 
 .post-newsletter-wrap {
-  max-width: none;
+  max-width: 1140px;
   margin-top: var(--space-12);
-  padding-inline: clamp(var(--space-7), 4vw, var(--space-12));
 }
 
 .newsletter-reset__content {
